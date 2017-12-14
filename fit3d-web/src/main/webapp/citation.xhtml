@@ -1,0 +1,84 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pr="http://primefaces.org/ui">
+	<ui:define name="content">
+
+		<p>
+			<span class="initialcap">T</span>he theory behind the Fit3D algorithm
+			was recently published in <i>Journal of Computational Biology</i>.
+			Check out the paper to learn how our method works and to see how it
+			performs in contrast to existing approaches.
+		</p>
+
+		<pr:panelGrid styleClass="citation-field" columns="1">
+
+			<pr:panelGrid styleClass="article-img" columns="2">
+
+				<pr:link target="_blank"
+					href="http://www.liebertpub.com/overview/journal-of-computational-biology/31/">
+
+					<h:graphicImage library="static" styleClass="hrefLink-jocb"
+						name="images/jocb_logo.png" />
+				</pr:link>
+
+
+				<h:graphicImage library="static" styleClass="citation-img"
+					name="images/CMB-2014-0263-Kaiser.png" />
+
+			</pr:panelGrid>
+
+			<h:outputText styleClass="text-citation"
+				value="Kaiser, F., Eisold, A., Labudde, D. (2015) A novel algorithm for enhanced structural
+motif matching in proteins, J. Comput. Biol., 22, 698-713." />
+
+			<pr:panelGrid styleClass="doi-field" columns="2">
+
+				<pr:outputLabel styleClass="ui-icon ui-icon-document"
+					for="document-doi" />
+				<pr:link styleClass="hrefLink-doi" id="document-doi" target="_blank"
+					href="http://online.liebertpub.com/doi/abs/10.1089/cmb.2014.0263"
+					value="DOI: 10.1089/cmb.2014.0263" />
+			</pr:panelGrid>
+
+		</pr:panelGrid>
+
+		<pr:panelGrid styleClass="citation-field" columns="1">
+
+			<pr:panelGrid styleClass="article-img" columns="2">
+
+				<pr:link target="_blank"
+					href="http://bioinformatics.oxfordjournals.org/">
+
+					<h:graphicImage library="static" styleClass="hrefLink-jocb"
+						name="images/bioinformatics_cover.png" />
+				</pr:link>
+
+
+				<h:graphicImage library="static" styleClass="citation-img"
+					name="images/bioinformatics-2015-btv637-Kaiser.png" />
+
+			</pr:panelGrid>
+
+			<h:outputText styleClass="text-citation"
+				value="Kaiser, F., Eisold, A., Bittrich, S., Labudde, D. (2015) Fit3D: a web application for highly accurate screening of spatial residue patterns in protein structure data, Bioinformatics, advance access." />
+
+			<pr:panelGrid styleClass="doi-field" columns="2">
+
+				<pr:outputLabel styleClass="ui-icon ui-icon-document"
+					for="document-doi-bioinf" />
+				<pr:link styleClass="hrefLink-doi" id="document-doi-bioinf"
+					target="_blank"
+					href="http://bioinformatics.oxfordjournals.org/content/early/2015/12/01/bioinformatics.btv637"
+					value="DOI: 10.1093/bioinformatics/btv637" />
+			</pr:panelGrid>
+
+		</pr:panelGrid>
+
+
+
+	</ui:define>
+	<ui:define name="toolboxContent" />
+</ui:composition>

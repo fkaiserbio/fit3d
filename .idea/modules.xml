@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/fit3d-cli/fit3d-cli.iml" filepath="$PROJECT_DIR$/fit3d-cli/fit3d-cli.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fit3d-web/fit3d-web.iml" filepath="$PROJECT_DIR$/fit3d-web/fit3d-web.iml" />
+    </modules>
+  </component>
+</project>

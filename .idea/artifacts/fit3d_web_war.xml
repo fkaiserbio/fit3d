@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="fit3d-web:war">
+    <output-path>$PROJECT_DIR$/fit3d-web/target</output-path>
+    <root id="archive" name="fit3d-web-0.1.0.war">
+      <element id="artifact" artifact-name="fit3d-web:war exploded" />
+    </root>
+  </artifact>
+</component>

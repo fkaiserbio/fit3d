@@ -1,0 +1,70 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pr="http://primefaces.org/ui">
+	<ui:define name="content">
+		<p>
+			<span class="initialcap">F</span>it3D is a bioinformatics web service
+			to search for spatial residue patterns in proteins, so-called
+			structural motifs. Such motifs play key roles in clarification of
+			linkage between protein structure and function, which is still a
+			demanding process. Fortunately, the comparison of three-dimensional
+			residue patterns can aid the functional comprehension. However, there
+			is an urgent need for up-to-date and versatile computational
+			resources to search for local similarities. Fit3D bridges the gap
+			between easy usability and highly accurate pattern matching. Beside
+			the online version there is also a versatile
+			<h:link styleClass="hrefLink-download" outcome="/download">command line implementation</h:link>
+			available.
+		</p>
+		<pr:panel styleClass="search" id="search" header="Structural motifs">
+			<pr:panelGrid styleClass="inner-panel-grid" columns="2">
+				<p>
+					The identification and the thorough comprehension of spatial
+					residue patterns can undoubtedly help to bridge the gap between
+					protein structure and function. Spatial arrangements of only a few
+					residues, so-called <b>structural motifs</b>, were observed to play
+					key roles in various biochemical functionalities of proteins like
+					catalytic activity or structure stabilization. Protein-protein or
+					protein-nucleotide interactions are mediated by only a few key
+					residues that can be abstracted to structural motifs as well.
+					Furthermore, it was shown that protein superfamilies can be
+					represented adequately by structural motif templates and hence,
+					distinct homologous structures can be detected. Especially highly
+					diverse protein families like serine proteases are a bottleneck for
+					overall structure comparison methods.
+				</p>
+				<h:graphicImage styleClass="home-panel-img" id="motifDeductionImage"
+					library="static" name="images/main_figure_1.png" />
+			</pr:panelGrid>
+		</pr:panel>
+
+		<pr:panel styleClass="analyses" id="analyses"
+			header="Features and advantages">
+
+			<pr:panelGrid columns="2" styleClass="inner-panel-grid">
+				<p>
+					Fit3D offers a variety of features and was shown to be an efficient
+					and sensitive search method (Kaiser et al. 2015 <a target="_blank"
+						href="http://www.ncbi.nlm.nih.gov/pubmed/25695840"
+						class="ui-icon ui-icon-extlink" style="display: inline-block" />).
+					Beside easy usage there are several advantages over existing
+					approaches:
+				</p>
+				<ul>
+					<li>definition of <b>position-specific exchanges</b> (PSEs)
+						for structural motif search
+					</li>
+					<li><b>detection of intra- and inter-molecular occurrences</b>
+						(especially relevant for interaction sites)</li>
+					<li>definition of arbitrary atoms used for motif alignment</li>
+				</ul>
+				<h:graphicImage styleClass="home-panel-img" id="featuresImage"
+					library="static" name="images/main_figure_2.png" />
+			</pr:panelGrid>
+		</pr:panel>
+	</ui:define>
+	<ui:define name="toolbox" />
+</ui:composition>

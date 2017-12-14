@@ -1,0 +1,310 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pr="http://primefaces.org/ui">
+
+<f:metadata>
+	<f:event type="preRenderView"
+		listener="#{resultView.redirectToJobSelection}" />
+</f:metadata>
+
+<ui:composition template="/WEB-INF/templates/layout.xhtml">
+	<ui:define name="content">
+
+		<h:form id="resultArea">
+
+			<pr:toolbar styleClass="result-toolbar" id="mainToolBar">
+				<f:facet name="left">
+
+					<h:outputText rendered="#{resultView.job.enqueued}"
+						value="Your request is enqueued. There are currently #{resultView.enqueuedCount} jobs enqueued." />
+					<h:outputText rendered="#{resultView.job.running}"
+						value="Your request is running." />
+					<h:outputText rendered="#{resultView.job.finished}"
+						value="Your request is finished." />
+
+				</f:facet>
+
+				<f:facet name="right">
+					<h:graphicImage
+						rendered="#{resultView.job.enqueued or resultView.job.running}"
+						library="static" name="images/ajax_loader_small.gif"
+						styleClass="loader-img" />
+					<pr:menuButton value="Actions"
+						disabled="#{not resultView.job.finished or empty resultView.results}">
+						<pr:menuitem value="Multiple alignment" icon="ui-icon-zoomin"
+							actionListener="#{resultView.showAllAgainstOne}" />
+						<pr:separator />
+						<pr:menuitem value="Download CSV" ajax="false"
+							icon="ui-icon-arrowthickstop-1-s">
+							<pr:fileDownload value="#{resultView.csvResults}" />
+						</pr:menuitem>
+						<pr:menuitem value="Download all results" ajax="false"
+							icon="ui-icon-disk">
+							<pr:fileDownload value="#{resultView.zippedResults}" />
+						</pr:menuitem>
+
+						<pr:menuitem value="Download LRMSD" ajax="true"
+							icon="ui-icon-image" onclick="exportChart()">
+						</pr:menuitem>
+
+					</pr:menuButton>
+				</f:facet>
+			</pr:toolbar>
+
+			<center>
+				<h:outputText styleClass="ui-state-error"
+					rendered="#{resultView.job.finished and empty resultView.results}"
+					value="Sorry, no matches could be found for your request." />
+			</center>
+			<pr:dataScroller styleClass="result-scroller"
+				value="#{resultView.results}" var="hit" chunkSize="100"
+				mode="inline" scrollHeight="400"
+				rendered="#{resultView.job.finished and not empty resultView.results}">
+				<f:facet name="header">
+					<h:outputText value="You are viewing the results for job " />
+					<h:outputText value="#{resultView.job}" />
+				</f:facet>
+				<div class="result-entry">
+					<h:outputText value="#{hit.title}" id="title" styleClass="title" />
+					<pr:tooltip id="hitTitle" for="title" value="#{hit.title}" />
+					<pr:panelGrid styleClass="result-field" columns="3"
+						style="width: 100%"
+						columnClasses="perc-twentyfive, perc-fiddy, perc-twentyfive">
+						<pr:panelGrid styleClass="results-pv-download-field" columns="2"
+							style="width: 100%" columnClasses="perc-ten, perc-ninety">
+							<pr:outputLabel styleClass="ui-icon ui-icon-zoomin" for="showPv" />
+							<pr:commandLink value="Show match" id="showPv"
+								styleClass="show-link"
+								actionListener="#{resultView.showPairwise(hit)}" />
+
+							<pr:outputLabel styleClass="ui-icon ui-icon-zoomin" for="showPv" />
+							<pr:commandLink value="Show in structure" id="showStructurePv"
+								styleClass="show-link"
+								actionListener="#{resultView.showInStructure(hit)}" />
+
+							<pr:outputLabel styleClass="ui-icon ui-icon-zoomin"
+								for="alignMatch" />
+							<h:panelGroup>
+								<pr:commandLink value="Show alignment" id="alignMatch"
+									disabled="#{empty resultView.job.parameters.extractPdbFilePath}"
+									styleClass="download-link"
+									actionListener="#{resultView.showGlobalAlignment(hit)}" />
+								<pr:tooltip for="alignMatch"
+									value="Global alignment is only available if the query motif was extracted from a structure using the extraction wizard. Otherwise the source structure is not known." />
+							</h:panelGroup>
+							<pr:outputLabel styleClass="ui-icon ui-icon-arrowthickstop-1-s"
+								for="downloadHit" />
+							<pr:commandLink value="Download match" id="downloadHit"
+								styleClass="download-link" ajax="false">
+								<pr:fileDownload value="#{resultView.getHitPdbFile(hit)}" />
+							</pr:commandLink>
+
+						</pr:panelGrid>
+						<pr:panelGrid styleClass="results-pv-download-field" columns="2"
+							style="width: 100%" columnClasses="perc-forty, perc-sixty">
+							<pr:outputLabel for="hitIdentifier" value="hit:" />
+							<h:outputText styleClass="hitIdentifier-text" id="hitIdentifier"
+								value="#{hit}" />
+
+							<pr:outputLabel for="hitType" value="type:" />
+							<h:outputText id="hitType" value="#{hit.type}" />
+
+							<pr:outputLabel for="hitRmsd" value="LRMSD:" />
+							<h:panelGroup layout="block">
+								<h:outputText styleClass="hitRmsd-text" id="hitRmsd"
+									value="#{hit.rmsd}">
+									<f:convertNumber pattern="#0.0000" />
+								</h:outputText>
+								<h:outputText value=" Å" styleClass="hitRmsd-text" />
+							</h:panelGroup>
+
+							<pr:outputLabel for="hitAlignedSeq" value="aligned sequence:" />
+							<h:outputText id="hitAlignedSeq" value="#{hit.alignedSeq}" />
+
+						</pr:panelGrid>
+						<pr:panelGrid styleClass="results-pv-download-field" columns="2"
+							style="width: 100%" columnClasses="perc-fiddy, perc-fiddy">
+							<pr:outputLabel for="hitPvalue">
+								<i>p</i>-value
+							</pr:outputLabel>
+							<h:outputText id="hitPvalue" value="#{hit.pvalue}"
+								rendered="#{not empty hit.pvalue}">
+								<f:convertNumber pattern="0.0000E0" />
+							</h:outputText>
+							<h:panelGroup rendered="#{empty hit.pvalue}">
+								<h:outputText id="no-pvalue-label" value="n/a"
+									styleClass="na-link" />
+								<pr:tooltip id="no-pvalue-label-tooltip" for="no-pvalue-label">
+									The <i>p</i>-values are not calculated for matches with exchanges due to limitations of the model, if all <i>p</i>-values are not availaible data was too sparse for kernel density estimation (only Fofanov et al. model).
+								</pr:tooltip>
+							</h:panelGroup>
+
+							<pr:outputLabel for="hitEc" value="EC class" />
+							<h:outputLink target="_blank" disabled="#{hit.ecNumber == '?'}"
+								id="hitEc" value="#{resultView.convertToExpasy(hit)}"
+								styleClass="#{hit.ecNumber == '?' ? '' : 'download-link'}">
+								<h:outputText value="#{hit.ecNumber}" />
+							</h:outputLink>
+
+							<pr:outputLabel value="PDB" for="pdbLink" />
+							<h:outputLink id="pdbLink" target="_blank"
+								value="http://www.rcsb.org/pdb/explore/explore.do"
+								styleClass="download-link">
+								<span>#{hit.pdbId}</span>
+								<f:param name="structureId" value="#{hit.pdbId}" />
+							</h:outputLink>
+
+							<pr:outputLabel for="hitPfam" value="Pfam" />
+							<h:outputLink target="_blank" disabled="#{hit.pfamAcc == '?'}"
+								id="hitPfam" value="http://pfam.xfam.org/family/#{hit.pfamAcc}"
+								styleClass="#{hit.pfamAcc == '?' ? '' : 'download-link'}">
+								<h:outputText value="#{hit.pfamAcc}" />
+							</h:outputLink>
+
+						</pr:panelGrid>
+					</pr:panelGrid>
+				</div>
+			</pr:dataScroller>
+
+			<pr:chart widgetVar="chart" type="line"
+				model="#{resultView.rmsdChart}" styleClass="chart-lrmsd"
+				rendered="#{resultView.job.finished and not empty resultView.results}" />
+
+
+			<pr:poll interval="5" update="@form"
+				stop="#{resultView.job.finished}" widgetVar="poll"
+				listener="#{resultView.updateResults}" />
+
+
+		</h:form>
+
+		<pr:dialog widgetVar="dlg" showEffect="fade" modal="true"
+			header="Chart as an Image" resizable="false">
+			<pr:outputPanel id="output" layout="block"
+				style="width:500px;height:300px" />
+		</pr:dialog>
+
+		<script type="text/javascript">
+			function exportChart() {
+				//export image
+				$('#output').empty().append(PF('chart').exportAsImage());
+
+				//show the dialog
+				PF('dlg').show();
+			}
+		</script>
+	</ui:define>
+
+	<ui:define name="toolboxContent">
+
+		<div id="viewer" class="protein-viewer" />
+
+		<pr:outputPanel styleClass="proteinViewerStatus"
+			id="proteinViewerStatus">
+			<h:outputText escape="false" value='#{resultView.currentPv}' />
+		</pr:outputPanel>
+
+		<pr:separator styleClass="hr-separator" />
+
+		<pr:outputPanel id="resultsMetaData">
+
+			<pr:accordionPanel>
+				<pr:tab id="jobDetails" title="Job details">
+					<center>
+						<h:outputText value="#{resultView.job.description}"
+							rendered="#{not empty resultView.job.description}" />
+					</center>
+					<pr:separator rendered="#{not empty resultView.job.description}" />
+					<pr:panelGrid styleClass="result-details-field" columns="2">
+
+						<pr:outputLabel for="motifName" value="query motif" />
+						<h:outputText id="motifName"
+							value="#{resultView.job.parameters.motifName}" />
+
+						<pr:outputLabel
+							rendered="#{not empty resultView.extractStructureDescription}"
+							for="motifSource" value="query motif source" />
+						<h:outputText
+							rendered="#{not empty resultView.extractStructureDescription}"
+							id="motifSource"
+							value="#{resultView.extractStructureDescription}" />
+
+						<pr:outputLabel
+							rendered="#{empty resultView.job.parameters.targetListFileLabel}"
+							for="predefinedList" value="predefined target list" />
+						<h:outputText
+							rendered="#{empty resultView.job.parameters.targetListFileLabel}"
+							id="predefinedList"
+							value="#{resultView.job.parameters.predefinedList.label}" />
+
+						<pr:outputLabel
+							rendered="#{not empty resultView.job.parameters.targetListFileLabel}"
+							for="targetListFileLabel" value="uploaded target list" />
+						<h:outputText
+							rendered="#{not empty resultView.job.parameters.targetListFileLabel}"
+							id="targetListFileLabel"
+							value="#{resultView.job.parameters.targetListFileLabel}" />
+
+						<pr:outputLabel for="lrmsdLimit" value="LRMSD limit" />
+						<h:outputText id="lrmsdLimit"
+							value="#{resultView.job.parameters.lrmsdLimit} Å" />
+
+						<pr:outputLabel for="filtering"
+							value="pairwise distance filtering" />
+						<h:outputText id="filtering"
+							value="#{resultView.job.parameters.filtering}" />
+
+						<pr:outputLabel for="pvalueMethod">
+							<i>p</i>-value
+						</pr:outputLabel>
+						<h:outputText id="pvalueMethod"
+							value="#{resultView.job.parameters.pvalueMethod.label}" />
+
+						<pr:outputLabel for="alignmentAtoms" value="alignment atoms" />
+						<h:outputText id="alignmentAtoms"
+							value="#{resultView.job.parameters.atomSelection.label}" />
+
+						<pr:outputLabel for="exchanges" value="PSEs" />
+						<h:outputText id="exchanges"
+							value="#{empty resultView.job.parameters.exchangeDefinitions ? 'none' : resultView.job.parameters.exchangeDefinitions}" />
+
+					</pr:panelGrid>
+				</pr:tab>
+
+				<pr:tab id="resultDetails" title="Result details">
+					<center>
+						<h:outputText id="resultCount"
+							value="#{resultView.resultCount} matches in #{resultView.resultStructures} structures" />
+						<pr:separator />
+					</center>
+					<pr:panelGrid styleClass="result-details-field" columns="3">
+
+						<pr:outputLabel for="intraCount" value="intra" />
+						<h:outputText id="intraCount" value="#{resultView.intraCount}" />
+						<h:outputText value="#{resultView.intraCountRel}">
+							<f:convertNumber type="percent" minFractionDigits="2" />
+						</h:outputText>
+
+						<pr:outputLabel for="
+							interCount" value="inter" />
+						<h:outputText id="interCount" value="#{resultView.interCount}" />
+						<h:outputText value="#{resultView.interCountRel}">
+							<f:convertNumber type="percent" minFractionDigits="2" />
+						</h:outputText>
+
+						<pr:outputLabel for="maxLrmsd" value="LRMSD range" />
+						<h:outputText id="minLrmsd" value="#{resultView.minLrmsd}">
+							<f:convertNumber minFractionDigits="4" />
+						</h:outputText>
+						<h:outputText id="maxLrmsd" value="#{resultView.maxLrmsd}">
+							<f:convertNumber minFractionDigits="4" />
+						</h:outputText>
+					</pr:panelGrid>
+				</pr:tab>
+			</pr:accordionPanel>
+		</pr:outputPanel>
+	</ui:define>
+</ui:composition>
+</html>

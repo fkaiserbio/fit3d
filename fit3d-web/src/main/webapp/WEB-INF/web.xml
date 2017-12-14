@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0">
+	<display-name>de.bioforscher.fit3d.webserver</display-name>
+	<welcome-file-list>
+		<welcome-file>home.xhtml</welcome-file>
+	</welcome-file-list>
+	<!-- context-param> <description>State saving method: 'client' or 'server' 
+		(=default). See JSF Specification 2.5.2</description> <param-name>javax.faces.STATE_SAVING_METHOD</param-name> 
+		<param-value>client</param-value> </context-param -->
+	<context-param>
+		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+		<param-value>resources.application</param-value>
+	</context-param>
+	<!-- context-param> <param-name>javax.faces.FACELETS_BUFFER_SIZE</param-name> 
+		<param-value>131070</param-value> </context-param -->
+	<context-param>
+		<param-name>com.sun.faces.writeStateAtFormEnd</param-name>
+		<param-value>false</param-value>
+	</context-param>
+	<context-param>
+		<param-name>primefaces.THEME</param-name>
+		<param-value>bootstrap</param-value>
+	</context-param>
+	<context-param>
+		<param-name>org.omnifaces.FACES_VIEWS_SCAN_PATHS</param-name>
+		<param-value>/*.xhtml</param-value>
+	</context-param>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/errorpages/404.xhtml</location>
+	</error-page>
+	<error-page>
+		<exception-type>javax.faces.application.ViewExpiredException</exception-type>
+		<location>/home.xhtml</location>
+	</error-page>
+	<session-config>
+		<session-timeout>60</session-timeout>
+	</session-config>
+</web-app>

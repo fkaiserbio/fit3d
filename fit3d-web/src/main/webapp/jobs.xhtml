@@ -1,0 +1,72 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pr="http://primefaces.org/ui">
+
+<f:metadata>
+	<f:viewParam name="id" value="#{sessionController.id}">
+		<f:converter converterId="uuidConverter" />
+	</f:viewParam>
+</f:metadata>
+
+<ui:composition template="/WEB-INF/templates/layout.xhtml">
+	<ui:define name="content">
+		<center>
+			<h:outputText rendered="#{empty jobListView.associatedJobs}"
+				styleClass="ui-state-error"
+				value="No jobs are associated to your session ID. Either you did not submit any jobs within the current browser session or your results were deleted from the server after 72 hours." />
+		</center>
+		<h3>
+			<h:outputText rendered="#{not empty jobListView.associatedJobs}"
+				value="Your are viewing submitted jobs for session " />
+			<h:outputText rendered="#{not empty jobListView.associatedJobs}"
+				value="#{sessionController.id}." />
+		</h3>
+
+		<pr:panelGrid styleClass="job-grid" columns="3">
+
+			<h:outputText rendered="#{not empty jobListView.associatedJobs}"
+				value="Bookmark URL: " />
+			<pr:inputText id="bookmarkUrl" style="width:800px" readonly="1"
+				rendered="#{not empty jobListView.associatedJobs}"
+				value="https://biosciences.hs-mittweida.de/fit3d/jobs?id=#{sessionController.id}" />
+			<pr:tooltip id="bookmarkUrlTip" for="bookmarkUrl"
+				value="Store this URL for later usage." />
+		</pr:panelGrid>
+
+		<h:form id="selectJobForm"
+			rendered="#{not empty jobListView.associatedJobs}">
+			<h3>Select a job to display results:</h3>
+			<pr:growl id="messages" showDetail="true" showSummary="false" />
+			<pr:panelGrid styleClass="job-grid" columns="4">
+				<pr:outputLabel for="jobList" value="Jobs:" />
+				<pr:selectOneListbox converter="omnifaces.SelectItemsConverter"
+					required="true" id="jobList" value="#{jobListView.selectedJob}"
+					style="width:600px" requiredMessage="Please select a job">
+					<f:selectItems value="#{jobListView.associatedJobs}" />
+				</pr:selectOneListbox>
+
+				<ui:repeat var="job" value="#{jobListView.associatedJobs}">
+					<pr:panelGrid styleClass="job-selection-field-status" columns="1">
+						<h:graphicImage rendered="#{job.enqueued or job.running}"
+							library="static" name="images/ajax_loader_small.gif" />
+						<h:graphicImage rendered="#{job.finished}" library="static"
+							name="images/tick.png" />
+						<pr:poll stop="#{job.finished}" interval="5" update="@parent" />
+					</pr:panelGrid>
+				</ui:repeat>
+
+				<pr:tooltip id="jobListTip" for="jobList"
+					value="Select a job to display its results." />
+
+				<pr:commandButton value="Show Results" style="width:180px"
+					action="#{jobListView.selectJob}" id="selectButton"
+					styleClass="ui-priority-primary" update="selectJobForm" />
+			</pr:panelGrid>
+		</h:form>
+
+	</ui:define>
+	<ui:define name="toolboxContent" />
+</ui:composition>
+</html>

@@ -1,0 +1,298 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pr="http://primefaces.org/ui">
+	<ui:define name="content">
+		<p>
+			<span class="initialcap">H</span>ere you can find detailed
+			explanations on how you can use our web service to search for spatial
+			residue patterns in proteins. You can easily click on the respective
+			category to show the instructions. Brief answers to most
+			usage-related questions are given in the
+			<h:link styleClass="hrefLink-download" outcome="/faq">FAQ section</h:link>
+			.
+		</p>
+
+		<pr:panel styleClass="search" id="algorithm"
+			header="How does it work?">
+			<pr:panelGrid styleClass="inner-panel-grid" columns="2">
+				<p>
+					The search algorithm behind Fit3D is basically a combinatorial
+					search approach that works by evaluating two constraints: <b>residue
+						composition and geometric similarity (least-root-mean-square
+						deviation/LRMSD) of match candidates.</b> In the following the basic
+					algorithmic procedure is elucidated:
+				</p>
+				<ul>
+					<li>determination of the <b>maximal spatial extent of the
+							query motif</b></li>
+					<li>determination of the <b>residue composition of the
+							query motif</b></li>
+					<li><b>for all search target structures</b>, do
+						<ul>
+							<li>eliminate residues not element of the query motif
+								residue composition</li>
+							<li>combine sets with the size of the query motif, similar
+								spatial extent and matching residue composition (match
+								candidates)</li>
+							<li>determine LRMSD for match candidates</li>
+						</ul></li>
+				</ul>
+				<b>Pairwise distance filtering</b> can be used to eliminate match candidates with inter-residue distances not compatible to the query motif. 
+					For detailed information on how the algorithm works and why it is a valuable structural motif search method, please refer to Kaiser et al. 2015, <a
+					target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/25695840"
+					class="ui-icon ui-icon-extlink" style="display: inline-block" />.
+				<h:graphicImage styleClass="algo-img" id="algorithmImage"
+					library="static" name="images/algorithm_new.gif" />
+			</pr:panelGrid>
+		</pr:panel>
+
+		<pr:panel styleClass="search" id="search" header="Prerequirements">
+			<pr:panelGrid columns="2">
+				<h:graphicImage styleClass="home-panel-img" id="motifDeductionImage"
+					library="static" name="images/pdb_file.png"
+					style="width:60px; display:inline-block; float:left" />
+				<span>Before you can start the large-scale screening for a
+					structural motif you will need:</span>
+			</pr:panelGrid>
+			<ul>
+				<li>the <b>query structural motif in PDB format</b> (you can
+					also use our <h:link styleClass="hrefLink-download"
+						outcome="/extract">extraction wizard</h:link> or our <h:link
+						styleClass="hrefLink-download" outcome="/download">command line tool</h:link>
+					to extract a query motif)
+				</li>
+				<li>(optional) <b>a list of search targets</b> as text file
+					(you can also use our predefined lists)
+				</li>
+			</ul>
+			<center>
+				<pr:panelGrid styleClass="download-field-link" columns="2">
+					<pr:outputLabel styleClass="ui-icon ui-icon-arrowthickstop-1-s"
+						for="download-lists-url" />
+					<pr:link styleClass="hrefLink-download" id="download-lists-url"
+						target="_blank" href="data/predefined_lists.zip"
+						value="download archive of predefined lists used by Fit3D" />
+				</pr:panelGrid>
+			</center>
+		</pr:panel>
+
+
+		<pr:accordionPanel activeIndex="null">
+			<pr:tab title="Extracting a motif" collapsed="true" toggleable="true"
+				toggleSpeed="500" styleClass="fieldset">
+				<pr:outputPanel>
+
+					<p>
+						To define a new structural motif you can use our
+						<h:link styleClass="hrefLink-download" outcome="/extract">extraction wizard</h:link>
+						that allows convenient and intuitive motif definition. You can
+						either access a PDB structure by its PDB-ID or you can upload a
+						structure in PDB format. <b>The video below shows the
+							extraction process step-by-step using a known PDB structure:</b>
+					</p>
+					<pr:panelGrid styleClass="inner-panel-grid" columns="2">
+						<ol>
+							<li>Choose <b>"Extract motif"</b> in the navigation menu on
+								the left side.
+							</li>
+							<li>Enter a valid <b>PDB-ID or upload your own
+									structure.</b></li>
+							<li>On the next wizard page: <b>select residues</b> that
+								should be part of the query motif using the drop-down menu.
+							</li>
+							<li>After <b>clicking the button "Extract"</b>, the motif
+								structure is visualized and the toolbox shows further details.
+							</li>
+							<li>Directly submit a new search job by clicking <b>"Submit"</b>
+								or download the motif structure for offline usage (click <b>"Download"</b>)
+							</li>
+						</ol>
+						<pr:media value="https://www.youtube.com/v/-VnpCJZ3ibM"
+							width="800" height="450" player="flash" styleClass="help-video" />
+					</pr:panelGrid>
+					<center>
+						<b>Note:</b> If the extracted motif is rated as too complex to be
+						processed by the web server, the
+						<h:link styleClass="hrefLink-download" outcome="/download">command line version</h:link>
+						of Fit3D can be used.
+					</center>
+				</pr:outputPanel>
+			</pr:tab>
+
+			<pr:tab title="Submitting a job" collapsed="true" toggleable="true"
+				toggleSpeed="500" styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						To submit a new job click <b>"Submit job"</b> in the left
+						navigation menu. A motif file in PDB format is mandatory and must
+						be provided by the user. Otherwise, the
+						<h:link styleClass="hrefLink-download" outcome="/extract">extraction wizard</h:link>
+						can be used to obtain a query structure. The target search space
+						can be customized by uploading a list of PDB-IDs separated by line
+						break. Alternatively, different pre-defined target lists, that
+						were computed based on sequence or structure homology analysis,
+						can be selected. <b>The video below shows the submission
+							process in detail:</b>
+					</p>
+					<pr:panelGrid columns="2" styleClass="inner-panel-grid">
+						<ol>
+							<li>Choose <b>"Submit job"</b> in the navigation menu on the
+								left side.
+							</li>
+							<li>Upload a query motif structure in PDB format by clicking
+								<b>"+motif file"</b>.
+							</li>
+							<li>Select a predefined target list of search targets or
+								upload your own target list by clicking <b>"+target list"</b>.
+							</li>
+							<li>Choose a LRMSD limit up to which matches will be
+								reported.</li>
+							<li>(optional) Enter a representative description and an
+								email address in order to be notified after your job has
+								finished.</li>
+							<li>(optional) Use the <b>"Advanced settings"</b> tab to
+								enable/disable pairwise distance filtering, to change the <i>p</i>-value
+								calculation method, to select alignment atoms, or to define
+								position-specific exchanges (PSEs).
+							</li>
+						</ol>
+						<pr:media value="https://www.youtube.com/v/_kTDH7C1hhE"
+							width="800" height="450" player="flash" styleClass="help-video" />
+					</pr:panelGrid>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab title="Advanced settings" collapsed="true" toggleable="true"
+				toggleSpeed="500" styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						Position-specific exchanges (PSEs) for the motif search can be
+						easily defined by using the advanced settings dialog. This can be
+						useful for analysis of diverse protein families or mutagenesis
+						experiments. PSEs are residue substitutions that are allowed
+						during motif matching. As the name suggest, Fit3D handles
+						position-specific residue substitutions, e.g. one can define a
+						single residue in the query motif to be also matched against other
+						residue types. <b>The video below shows how to allow matching
+							of different amino acid types:</b>
+					</p>
+					<pr:panelGrid columns="2" styleClass="inner-panel-grid">
+						<ol>
+							<li>Activate PSEs for your query motif by clicking the <b>"Define
+									exchanges"</b> button (<b>important: the query motif must be
+									already known</b>).
+							</li>
+							<li>Select possible substitutions for single residues from
+								the drop-down menu.</li>
+							<li>Click <b>"Set exchanges"</b> to apply your selection.
+							</li>
+						</ol>
+
+						<pr:media value="https://www.youtube.com/v/Q6fzOL9bV9M"
+							width="800" height="450" player="flash" styleClass="help-video" />
+						<center>
+							<b>Note:</b> The total number of position-specific exchanges
+							(PSEs) is restricted to three.
+						</center>
+					</pr:panelGrid>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab title="View results" collapsed="true" toggleable="true"
+				toggleSpeed="500" styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						To view the results of your job click "View results" in the left
+						navigation menu. You can now select a corresponding job to show
+						all detailed results. <b>Watch the video below to see the
+							whole process:</b>
+					</p>
+					<pr:panelGrid columns="2" styleClass="inner-panel-grid">
+						<ul>
+							<li>All jobs submitted during the active browser session are
+								accessible under the <b>"View results"</b> section.
+							</li>
+							<li>If you used email notification you can recover all
+								results of the session later. <b>Important: the results of
+									each job are deleted from our server after 72 hours.</b>
+							</li>
+						</ul>
+						<pr:media value="https://www.youtube.com/v/iIHYySWMBRw"
+							width="800" height="450" player="flash" styleClass="help-video" />
+					</pr:panelGrid>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab title="Result page layout" collapsed="true" toggleable="true"
+				toggleSpeed="500" styleClass="fieldset">
+				<pr:outputPanel>
+					<pr:panelGrid columns="2" styleClass="inner-panel-grid">
+						<h:panelGroup>
+							<p>
+								When viewing the results of your job, motif matches are ranked
+								based on the lowest least-root-mean-square deviation (LRMSD).
+								Hints on how to understand and interpret the LRMSD are given in
+								the
+								<h:link styleClass="hrefLink-download" outcome="/faq">FAQ section</h:link>. If you want to investigate a single match in detail, just
+								click on "Show" or "Show in structure". Furthermore, you can
+								directly access the corresponding Protein Data Bank (PDB) entry
+								of the structure. Note that you can download all results or the
+								LRMSD distribution plot by clicking on the "Action" drop down
+								menu on the toolbar at the very top of the result page.
+							</p>
+						</h:panelGroup>
+					</pr:panelGrid>
+					<center>
+						<h:graphicImage id="resultPageImage" library="static"
+							name="images/result_page.png" styleClass="help-image" />
+					</center>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab title="&lt;i&gt;p&lt;/i&gt;-value theory" collapsed="true"
+				toggleable="true" toggleSpeed="500" styleClass="fieldset">
+				<pr:outputPanel>
+					<pr:panelGrid styleClass="inner-panel-grid" columns="2">
+						<h:panelGroup>
+							<p>
+								Beside geometric similarity matches are rated according their
+								statistical significance. Every reported match to a query motif
+								is labeled with a <i>p</i>-value such that the user can assess
+								true positives intuitively. <b>However, a significant <i>p</i>-value
+									does not necessarily indicate a true positive match
+								</b> because the underlying models are based solely on the
+								distribution of LRMSD values. Hints on how to understand and
+								interpret the <i>p</i>-value are given in the
+								<h:link styleClass="hrefLink-download" outcome="/faq">FAQ section</h:link>.
+								No biological features are represented by those models. To
+								estimate statistical significance, Fit3D implements two
+								statistical models:
+							</p>
+							<ul>
+								<li>kernel density based model, corrected with a maximum
+									likelihood estimated point-weight (according to Fofanov et al.
+									2008 <a target="_blank"
+									href="http://www.ncbi.nlm.nih.gov/pubmed/25695840"
+									class="ui-icon ui-icon-extlink" style="display: inline-block" />)
+								</li>
+								<li>empirical derived model according to Stark et al. 2003 <a
+									target="_blank"
+									href="http://www.ncbi.nlm.nih.gov/pubmed/12595245"
+									class="ui-icon ui-icon-extlink" style="display: inline-block" />
+								</li>
+							</ul>
+						</h:panelGroup>
+						<pr:panelGrid columns="1">
+							<h:graphicImage
+								style="display:block; margin: 1em auto 1em auto; width:400px"
+								id="pValueImage" library="static"
+								name="images/statistical_model.png" />
+							<h:outputText
+								value="Illustration of a statistical model to estimate significance of local similartities in protein structures according to Fofanov et al. 2008. A kernel density esimation of the match LRMSD distribution is calculated using the Sheather-Jones bandwidth selection algorithm. Additionally, a point-weight correction (pwt) is applied to estimate matches beyond the LRMSD limit by a maximum likelihood approach." />
+						</pr:panelGrid>
+					</pr:panelGrid>
+				</pr:outputPanel>
+			</pr:tab>
+		</pr:accordionPanel>
+	</ui:define>
+	<ui:define name="toolbox" />
+</ui:composition>

@@ -1,0 +1,273 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pr="http://primefaces.org/ui">
+	<ui:define name="content">
+		<p>
+			<span class="initialcap">F</span>requently asked questions are
+			answered below. Just click on the respective question to show the
+			answer. We encourage new users to study especially the questions
+			related to interpretation of the results. Please also refer to the
+			<h:link styleClass="hrefLink-download" outcome="/help">help section</h:link>
+			for more comprehensive elucidations.
+		</p>
+		<pr:accordionPanel activeIndex="null">
+			<pr:tab title="Why the upload of my PDB file failed?"
+				collapsed="true" toggleable="true" toggleSpeed="500"
+				styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						Errors during the upload of a PDB file can have several reasons.
+						As Fit3D relies on the BioJava framework to read PDB files, they
+						have to be well-formed and correctly formatted. Further, <b>there
+							need to be Cα atoms present for the residues of interest</b>. If
+						parsing fails for any reason, a BioJava <b>StructureException</b>
+						will be thrown, which may give a clue why the problem occurred.
+						Additionally, the PDB file upload is restricted to the file ending
+						<b>*.pdb</b> (not *.pdb.txt, which may be masked as *.pdb by the
+						operating system) and to a <b>maximum file size of 10MB for
+							motif extraction and 1MB for motif submission</b>.
+					</p>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab title="Why the upload of my target list failed?"
+				collapsed="true" toggleable="true" toggleSpeed="500"
+				styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						Fit3D only accepts plain text target lists that have the extension
+						<b>*.txt</b> and a <b>file size below 1MB</b>. All target
+						structures must be separated by a line break and identified by
+						their four-character PDB-ID (e.g. 4CHA). Chain-IDs must be omitted
+						because Fit3D searches in all chains, due to the inter-meolecular
+						search approach.
+					</p>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab title="Why is my query motif rated as too complex?"
+				collapsed="true" toggleable="true" toggleSpeed="500"
+				styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						Fit3D rates the query motif according to the <b>estimated
+							computational complexity</b> of the search task into three
+						categories: low (
+						<h:graphicImage library="static" name="images/complexity_low.png"
+							style="width:16px; display:inline;" />
+						), medium (
+						<h:graphicImage library="static"
+							name="images/complexity_medium.png"
+							style="width:16px; display:inline;" />
+						) and high (
+						<h:graphicImage library="static" name="images/complexity_high.png"
+							style="width:16px; display:inline;" />
+						). The estimation depends on the spatial extent of the motif and
+						the number of different residue types. Due to limited
+						computational resources of the web server, query motifs rated with
+						high complexity are not accepted for calculation. We encourage
+						users to user our
+						<h:link styleClass="hrefLink-download" outcome="/download">command line implementation</h:link>
+						for such calculations. Furthermore, <b>the total number of
+							position-specific exchanges (PSEs) is restricted to three</b>, as
+						PSEs heavily increase computational complexity.
+					</p>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab
+				title="Why are not all structures in my target list recognized by Fit3D?"
+				collapsed="true" toggleable="true" toggleSpeed="500"
+				styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						If Fit3D reports less entries in your target list than you would
+						expect, <b>this is due to duplicate entries</b>. Internally, Fit3D
+						filters duplicate entries because it is not expedient to search
+						the query motif repeatedly in the same structure (Fit3D is not a
+						heuristic algorithm).
+					</p>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab title="Why are duplicate matches reported by Fit3D?"
+				collapsed="true" toggleable="true" toggleSpeed="500"
+				styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						<b>Even if it seems at a first glance that duplicate matches
+							are reported by Fit3D, this is not the case</b>. Fit3D does not
+						consider protein chains individually due to its inter-molecular
+						search approach (matches that spread multiple protein chains).
+						Matches that are reported in homomeric structures can be
+						misinterpreted as duplicate entries, e.g.
+					</p>
+					<ul>
+						<li><b>1OP8_A-H57_A-D102_A-S195 (LRMSD: 0.3482)</b> and</li>
+						<li><b>1OP8_F-H57_F-D102_F-S195 (LRMSD: 0.3483)</b></li>
+					</ul>
+					<p>
+						<b> are not identical</b>. One match occurs in chain A, whereas
+						the other occurs in chain F. Also note the slightly different
+						LRMSD values. Such matches are not omitted internally, to be able
+						to locate inter-molecular matches.
+					</p>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab title="Why is 2.5 Å the maximum LRMSD
+				limit?"
+				collapsed="true" toggleable="true" toggleSpeed="500"
+				styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						<b>With increasing LRMSD limit, more alignments have to be
+							performed</b> using the Singular Value Decomposition (SVD) method
+						offered by BioJava. SVD minimizes the root-mean-square deviation
+						between two sets of three-dimensional points of the same size.
+						Consequently, the computational load is significantly increased.
+						Please consider to use our
+						<h:link styleClass="hrefLink-download" outcome="/download">command line implementation</h:link>
+						if a higher LRMSD limit is desired. However, note that a lot of
+						noise will occur for LRMSD values above approximately 3 Å for
+						small structural motifs. Please refer to the next question to
+						understand the theory behind it.
+					</p>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab title="What is a &quot;good&quot; LRMSD value for a match?"
+				collapsed="true" toggleable="true" toggleSpeed="500"
+				styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						The least-root-mean-square deviation (LRMSD) is the minimal
+						root-mean-square deviation of all possible alignments
+						(permutations) of two motifs. Due to the LRMSD definition, it is
+						only possible to calculate an LRMSD for two sets of points of the
+						same size. <b>Additionally, the LRMSD depends on the size of
+							the two point sets A and B:</b><br />
+						<h:graphicImage library="static"
+							style="display:block; margin: 1em auto 1em auto; width:350px"
+							name="images/lrmsd_formula.png" />
+						<b>Consequently, structural motifs consisting of a small
+							amount of residue atoms will have a low LRMSD if they have a good
+							agreement. In contrast, structural motifs consisting of more
+							residues still have a high structural similarity if the LRMSD is
+							higher.</b> Consider an agreement of the
+						<h:outputLink id="pdb-1ZEQ" target="_blank"
+							value="http://www.rcsb.org/pdb/explore/explore.do"
+							styleClass="download-link">
+							<f:param name="structureId" value="4cha" />4CHA</h:outputLink>
+						serine protease catalytic triad (the example job) of 2.0 Å to a
+						reported match. This is a poorer agreement than a match of 2.0 Å
+						against the five-residue enolase superfamily template.
+						Furthermore, the matching of different residue types when allowing
+						position-specific exchanges (PSEs) is based on Cα atom comparison
+						due to incompatible sidechains. Hence, a match containing a PSE
+						and a similar LRMSD is less reliable than a match without any
+						PSEs. To aid the assessment of match quality, the alignment
+						function should be used for visual inspection.
+					</p>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab title="How to interpret the LRMSD plot?" collapsed="true"
+				toggleable="true" toggleSpeed="500" styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						The LRMSD plot depicts <b>the distribution of the LRMSD values
+							of all matches within the LRMSD limit</b>. It was shown that
+						significant matches tend to appear in the left region of this
+						distribution and form a "significance peak". This peak is usually
+						separated by an area where matches are sparse, followed by an
+						exponentially increasing reporting of noise. The Figure below
+						depicts the "ideal" LRMSD distribution schematically.
+					</p>
+
+					<h:graphicImage library="static"
+						style="display:block; margin: 1em auto 0 auto; width:800px"
+						name="images/lrmsd_plot.png" />
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab
+				title="What is a &quot;good&quot; &lt;i&gt;p&lt;/i&gt;-value for a match?"
+				collapsed="true" toggleable="true" toggleSpeed="500"
+				styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						The <i>p</i>-value is a <b>measurement for the significance of
+							a single match</b> and is computed either by an empirical model
+						(according to Stark et al. 2003) or by kernel density estimation
+						of the LRMSD distribution (according to Fofanov et al. 2008). <b>The
+							lower the <i>p</i>-value, the higher the statistical significance
+							of a match
+						</b>. A "good" <i>p</i>-value should be significantly smaller than
+						0.1. <b>The <i>p</i>-value represents the probability that a
+							match of better agreement can be found.
+						</b> As for LRMSD values, the <i>p</i>-value has to be treated
+						carefully. <b>Ideally, low <i>p</i>-values indicate matches
+							within the "significance peak" of the LRMSD distribution and
+							therefore <i>p</i>-values are dependent on the LRMSD values.
+						</b> The model according to Fofanov et al. is based on the LRMSD
+						distribution describing the current search results. This is
+						generally more favorable than the approach of Stark et al. 2003,
+						which approximates the LRMSD distribution using an empirical
+						derived model. In previous work we showed that approach of Fofanov
+						et al. 2008 is also robust when considering different atoms for
+						alignment and reliably identifies members of the enolase
+						superfamily with 99.68% specificity when all non-hydrogen atoms
+						are used for alignment (Kaiser et al. 2015 <a target="_blank"
+							href="http://www.ncbi.nlm.nih.gov/pubmed/25695840"
+							class="ui-icon ui-icon-extlink" style="display: inline-block" />).
+						But nevertheless, <b>cross-checking with the LRMSD value, the
+							LRMSD distribution, and the visual alignment to assess a match is
+							advisable in any case</b>.
+					</p>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab
+				title="Why is no &lt;i&gt;p&lt;/i&gt;-value calculated for matches containing position-specific exchanges (PSEs)?"
+				collapsed="true" toggleable="true" toggleSpeed="500"
+				styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						<i>p</i>-value calculation for matches containing PSEs can be
+						misleading. Currently there is no score available that combines
+						the influence of PSEs or aligned atoms. <b>As the alignment
+							for different residue types is based solely on Cα atoms, the
+							LRMSD tends to be lower, even if sidechains are not in a good
+							agreement. Hence, the <i>p</i>-value calculation is based only on
+							matches without PSEs and therefore no <i>p</i>-values are
+							calculated for matches containing PSEs.
+						</b>
+					</p>
+				</pr:outputPanel>
+			</pr:tab>
+			<pr:tab title="Which atoms should I select for alignment?"
+				collapsed="true" toggleable="true" toggleSpeed="500"
+				styleClass="fieldset">
+				<pr:outputPanel>
+					<p>
+						<b>This depends on your demands</b> for the motif search, so there
+						is no general answer to this question. It can be meaningful to
+						align on the basis of sidechain atoms, if the motif is expected to
+						have large Cα variance, which is the case for enolase superfamily
+						or other divergently evolved protein families. In turn,
+						backbone-based alignment can be suitable if high sidechain
+						variance is expected. A bad quality model structure that is used
+						for query motif definition can be a scenario, where matching of Cα
+						atoms may be reasonable. <b>However, in general the method
+							specificity experiences a loss if less atoms are considered for
+							alignment. Therefore, the default non-hydrogen atom alignment
+							should be used for most cases. </b> For very special needs the
+						command line implementation can be used, that allows the
+						definition of arbitrary atoms (e.g. backbone nitrogen and Cβ atom
+						only) Please refer to Kaiser et al. 2015 <a target="_blank"
+							href="http://www.ncbi.nlm.nih.gov/pubmed/25695840"
+							class="ui-icon ui-icon-extlink" style="display: inline-block" />
+						for further information on how different atom representations
+						influences the quality of the method.
+					</p>
+				</pr:outputPanel>
+			</pr:tab>
+		</pr:accordionPanel>
+	</ui:define>
+	<ui:define name="toolbox" />
+</ui:composition>

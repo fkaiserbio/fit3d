@@ -1,0 +1,254 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pr="http://primefaces.org/ui">
+	<ui:define name="content">
+
+		<p>
+			<span class="initialcap">S</span>ubmit a <b>structural motif
+				search </b> here. You can either upload a PDB file representing your
+			motif structure or use our extract motif wizard to define a new
+			structural motif. Several algorithmic parameters can be adapted here.
+			If your search should meet some special requirements, check out the
+			advanced settings.
+		</p>
+
+		<h:form id="mainForm" enctype="multipart/form-data">
+
+			<pr:growl id="messages" showDetail="true" showSummary="false" />
+
+			<pr:fieldset legend="Settings" styleClass="fieldset">
+
+				<pr:panelGrid styleClass="submit-settings-field" columns="3">
+
+					<pr:panelGrid columns="1">
+						<pr:outputLabel for="motifFile" value="motif file" />
+						<h:outputText value="#{submitJobView.motifFileLabel}"
+							id="motifFileLabel" styleClass="custom-file-upload" />
+					</pr:panelGrid>
+					<pr:fileUpload required="true" id="motifFile"
+						fileUploadListener="#{submitJobView.handleMotifUpload}"
+						mode="advanced" update="messages" auto="true" sizeLimit="1000000"
+						allowTypes="/(\.|\/)(pdb)$/" fileLimit="1" style="width:600px"
+						fileLimitMessage="Please reset input to correct your upload"
+						invalidFileMessage="Invalid file type, only *.pdb is accepted."
+						disabled="#{submitJobView.redirectedFromExtract}" />
+					<pr:tooltip id="motifFileTip" for="motifFile"
+						value="Select a file in PDB format as query motif." />
+
+					<pr:panelGrid columns="1">
+						<pr:outputLabel for="targetListFile" value="target list" />
+						<h:outputText value="#{submitJobView.targetListFileLabel}"
+							id="targetListFileLabel" styleClass="custom-file-upload" />
+					</pr:panelGrid>
+					<pr:fileUpload id="targetListFile"
+						disabled="#{submitJobView.targetListSelected}"
+						fileUploadListener="#{submitJobView.handleTargetListUpload}"
+						mode="advanced" update="messages" auto="true" sizeLimit="1000000"
+						allowTypes="/(\.|\/)(txt)$/" style="width:600px" fileLimit="1"
+						fileLimitMessage="Please reset input to correct your upload"
+						invalidFileMessage="Invalid file type, only *.txt is accepted." />
+					<pr:tooltip id="targetListFileTip" for="targetListFile"
+						value="Upload your own target list as a text file containing PDB-IDs sepearted by line break." />
+
+					<pr:outputLabel for="targetList" value="predefined target list" />
+					<pr:selectOneMenu id="targetList"
+						value="#{submitJobView.predefinedTargetList}" style="width:233px"
+						disabled="#{submitJobView.targetListFileUploaded}">
+						<pr:ajax event="change" update="targetListFile"
+							listener="#{submitJobView.handleTargetListSelected}" />
+						<f:selectItems value="#{dataProvider.predefinedLists}" var="list"
+							itemValue="#{list}" itemLabel="#{list.label}" />
+					</pr:selectOneMenu>
+					<pr:tooltip id="targetListTip" for="targetList"
+						value="Choose a pre-defined target list. All predefined lists are provided as download in the help section." />
+
+					<pr:outputLabel for="rmsdSpin" value="LRMSD limit" />
+					<pr:spinner id="rmsdSpin" value="#{submitJobView.maxRmsd}"
+						min="0.1" max="2.5" stepFactor="0.1" suffix=" Å" size="19" />
+					<pr:tooltip id="rmsdTip" for="rmsdSpin"
+						value="Select the maximal allowed least root-mean-square deviation (LRMSD) to the query motif (default: 2 Å)." />
+
+					<pr:outputLabel for="description" value="description" />
+					<pr:inputText id="description" value="#{submitJobView.description}"
+						placeholder="new Fit3D job"
+						validatorMessage="invalid job description">
+						<f:validateLength minimum="3" maximum="20" />
+					</pr:inputText>
+					<pr:tooltip id="descriptionTip" for="description"
+						value="Assign a name to your job." />
+
+					<pr:outputLabel for="email" value="email address" />
+					<pr:inputText id="email" value="#{submitJobView.email}"
+						placeholder="yourmail@mail.com"
+						validatorMessage="invalid email address">
+						<f:validateRegex
+							pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*(\.[A-Za-z]{2,})$" />
+					</pr:inputText>
+					<pr:tooltip id="emailTip" for="email"
+						value="Enter your email address to be notified when your request is finished." />
+
+					<pr:commandButton value="Submit Job" id="submitButton"
+						action="#{submitJobView.submit}" styleClass="ui-priority-primary"
+						style="width:150px" update="@form"
+						disabled="#{submitJobView.blocked}" />
+					<pr:panelGrid styleClass="submit-field-reset" columns="2">
+						<pr:outputLabel styleClass="ui-icon ui-icon-refresh"
+							for="resetButton" />
+						<h:link id="resetButton" outcome="/submit" value="Reset input"
+							styleClass="show-link" />
+					</pr:panelGrid>
+					<pr:tooltip id="submitTip" for="submitButton"
+						value="Click to submit your job." />
+				</pr:panelGrid>
+				<pr:separator />
+				<pr:panelGrid styleClass="submit-settings-field" columns="2">
+					<pr:commandButton value="Example run" id="exampleButton"
+						action="#{submitJobView.submitExample}" update="@form"
+						style="width:150px" />
+					<pr:tooltip id="exampleTip" for="exampleButton"
+						value="Click to run example." />
+				</pr:panelGrid>
+			</pr:fieldset>
+
+			<pr:fieldset legend="Advanced settings" collapsed="true"
+				toggleable="true" toggleSpeed="500" styleClass="fieldset">
+				<pr:ajax event="toggle"
+					listener="#{submitJobView.handleAdvancedOptionsToggle}"
+					update="messages" />
+
+				<pr:panelGrid styleClass="submit-advanced-settings-field"
+					columns="3">
+
+					<pr:outputLabel for="filtering" value="pairwise distance filtering" />
+					<pr:inputSwitch id="filtering" value="#{submitJobView.filtering}" />
+					<pr:tooltip id="filteringTip" for="filtering"
+						value="Pairwise distance filtering is used to reduce computational load for larger motifs. Please refer to the help section for further explanations." />
+
+					<pr:outputLabel for="pvalueSelection">
+						<i>p</i>-value
+					</pr:outputLabel>
+					<pr:selectOneMenu value="#{submitJobView.pvalueMethod}"
+						id="pvalueSelection" style="width:240px">
+						<f:selectItems value="#{dataProvider.pvalueMethods}"
+							var="pvalueMethod" itemValue="#{pvalueMethod}"
+							itemLabel="#{pvalueMethod.label}" />
+					</pr:selectOneMenu>
+					<pr:tooltip id="pvalueSelectionTooltip" for="pvalueSelection"
+						value="Choose the method of p-value estimation. Please refer to the help section for further explanations (default: Fofanov et al. 2008)." />
+
+					<pr:outputLabel for="atomSelection" value="alignment atoms" />
+					<pr:selectOneMenu value="#{submitJobView.alignmentAtomSelection}"
+						id="atomSelection" style="width:240px">
+						<f:selectItems value="#{dataProvider.atomSelections}"
+							var="atomSelection" itemValue="#{atomSelection}"
+							itemLabel="#{atomSelection.label}" />
+					</pr:selectOneMenu>
+					<pr:tooltip id="atomsTooltip" for="atomSelection"
+						value="Select the atoms that should be used for alignment of match candidates to query motif. Arbitrary atoms can be defined in the command line version." />
+
+					<pr:outputLabel for="exchangeDefinition"
+						value="position-specific exchanges (PSEs)" />
+					<pr:panelGrid id="exchangeDefinition"
+						styleClass="submit-exchange-definition-field" columns="1">
+						<ui:repeat var="ed" value="#{submitJobView.exchanges}">
+							<pr:selectCheckboxMenu value="#{ed.exchangeAminoAcids}"
+								id="menu#{ed.resNum}" label="#{ed.aminoAcidType}#{ed.resNum}"
+								filter="true" filterMatchMode="startsWith"
+								panelStyle="width:300px">
+								<f:selectItems value="#{dataProvider.singleLetterCodes}" />
+							</pr:selectCheckboxMenu>
+						</ui:repeat>
+						<pr:outputPanel id="exchangePanel">
+							<div class="datalist-noborder">
+								<pr:dataList value="#{submitJobView.exchanges}" var="ed"
+									emptyMessage="No exchanges defined.">
+				            #{ed}
+				        </pr:dataList>
+							</div>
+						</pr:outputPanel>
+
+						<pr:panelGrid styleClass="set-exchanges-field" columns="2">
+
+							<pr:outputLabel styleClass="ui-icon ui-icon-transfer-e-w"
+								for="setExchanges"
+								rendered="#{not empty submitJobView.exchanges}"
+								update="exchangePanel" />
+
+							<pr:commandLink id="setExchanges" styleClass="set-exchanges-link"
+								rendered="#{not empty submitJobView.exchanges}"
+								value="Set exchanges" update="exchangePanel" />
+						</pr:panelGrid>
+
+						<pr:commandButton value="Define exchanges"
+							id="defineExchangesButton" update="exchangeDefinition,messages"
+							rendered="#{empty submitJobView.exchanges}"
+							actionListener="#{submitJobView.handleExchangeDefinition}" />
+						<pr:tooltip id="exchangeDefinitionTooltip"
+							for="defineExchangesButton"
+							value="Define position-specific exchanges to match non-identical residues and to cover functional substitutions." />
+					</pr:panelGrid>
+
+				</pr:panelGrid>
+			</pr:fieldset>
+		</h:form>
+	</ui:define>
+
+	<ui:define name="toolboxContent">
+		<div id="viewer" class="protein-viewer" />
+		<pr:separator styleClass="hr-separator" />
+
+
+
+		<pr:outputPanel id="motifMetaData">
+			<pr:accordionPanel>
+				<pr:tab id="motifDetails" title="Motif details">
+					<pr:panelGrid styleClass="motif-details-field" columns="2">
+	
+						<pr:outputLabel for="motifSequence" value="sequence" />
+						<h:outputText id="motifSequence" value="#{submitJobView.motifSeq}" />
+	
+						<pr:outputLabel for="motifAminoAcidCount" value="residues" />
+						<h:outputText id="motifAminoAcidCount"
+							value="#{submitJobView.motifAminoAcidCount}" />
+	
+						<pr:outputLabel for="motifExtent" value="spatial extent" />
+						<h:panelGroup layout="block">
+							<h:outputText id="motifExtent" value="#{submitJobView.maxExtent}">
+								<f:convertNumber pattern="#0.00" />
+							</h:outputText>
+							<h:outputText value=" Å" />
+						</h:panelGroup>
+	
+						<pr:outputLabel for="motifType" value="type" />
+						<h:outputText id="motifType" value="#{submitJobView.motifType}" />
+	
+						<pr:outputLabel for="motifComplexityImage" value="complexity" />
+	
+						<h:graphicImage styleClass="complexity-image"
+							id="motifComplexityImage" library="static"
+							name="images/complexity_#{submitJobView.motifComplexity.label}.png" />
+	
+					</pr:panelGrid>
+				</pr:tab>
+			</pr:accordionPanel>
+		</pr:outputPanel>
+
+		<pr:outputPanel id="targetListMetaData">
+			<pr:panel id="targetListDetails" header="Target list details"
+				rendered="#{submitJobView.targetListFileUploaded}">
+				<pr:panelGrid styleClass="target-details-field" columns="2">
+
+					<pr:outputLabel for="targetListCount" value="entries" />
+					<h:outputText id="targetListCount"
+						value="#{submitJobView.targetListCount}" />
+
+				</pr:panelGrid>
+			</pr:panel>
+
+		</pr:outputPanel>
+	</ui:define>
+
+</ui:composition>

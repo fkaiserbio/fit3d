@@ -1,0 +1,111 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"  xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pr="http://primefaces.org/ui">
+	<ui:define name="content">
+
+		<script src="https://maps.google.com/maps/api/js?sensor=false"
+			type="text/javascript"></script>
+
+
+		<!--  <h2>Contact</h2>
+		<pr:link styleClass="hrefLink" target="_blank"
+			href="https://www.hs-mittweida.de/en.html"
+			value="University of Applied Sciences Mittweida" />
+		<br />
+		<br />
+		<pr:link styleClass="hrefLink" target="_blank"
+			href="http://www.bioforscher.de/"
+			value="Bioinformatics Group Mittweida (bigM)" />
+		<br />
+		Technikumplatz 17<br />
+		09648 Mittweida<br />
+		Germany<br />
+		<br /> -->
+
+		<pr:panelGrid styleClass="contact-field" columns="4">
+
+			<h:outputText value="back-end developer" />
+			<h:outputText value="front-end developer" />
+			<h:outputText value="java script consultant" />
+			<h:outputText value="project head" />
+
+			<h:graphicImage library="static" name="images/fkaiser.png"
+				styleClass="contact-img" />
+			<h:graphicImage library="static" name="images/aeisold.jpg"
+				styleClass="contact-img" />
+			<h:graphicImage library="static" name="images/sbittrich.jpg"
+				styleClass="contact-img" />
+			<h:graphicImage library="static" name="images/dlabudde.png"
+				styleClass="contact-img" />
+				
+			<pr:outputPanel>
+				<blockquote>Structural bioinformatician dealing with protein function annotation by substructural units.</blockquote>
+			</pr:outputPanel>
+			<pr:outputPanel>
+				<blockquote>Applications in structural bioinformatics should have a decent design for neat usability.</blockquote>
+			</pr:outputPanel>
+			<pr:outputPanel>
+				<blockquote>Java script hacker and structure quality assessor, solving problems beyond back-end.</blockquote>
+			</pr:outputPanel>
+			<pr:outputPanel>
+				<blockquote>Group leader of bioinformatics group Mittweida. Expert in bioinformatics and structure analysis.</blockquote>
+			</pr:outputPanel>
+
+			<pr:panelGrid styleClass="contact-field-mail" columns="2">
+				<pr:outputLabel styleClass="ui-icon ui-icon-mail-closed"
+					for="mailtoFk" />
+				<pr:link styleClass="hrefLink" id="mailtoFk"
+					href="mailto:kaiser1@hs-mittweida.de" value="Florian Kaiser" />
+			</pr:panelGrid>
+
+			<pr:panelGrid styleClass="contact-field-mail" columns="2">
+				<pr:outputLabel styleClass="ui-icon ui-icon-mail-closed"
+					for="mailtoAe" />
+				<pr:link styleClass="hrefLink" id="mailtoAe"
+					href="mailto:eisold@hs-mittweida.de" value="Alexander Eisold" />
+			</pr:panelGrid>
+
+			<pr:panelGrid styleClass="contact-field-mail" columns="2">
+				<pr:outputLabel styleClass="ui-icon ui-icon-mail-closed"
+					for="mailtoSb" />
+				<pr:link styleClass="hrefLink" id="mailtoSb"
+					href="mailto:bittrich@hs-mittweida.de" value="Sebastian Bittrich" />
+			</pr:panelGrid>
+
+			<pr:panelGrid styleClass="contact-field-mail" columns="2">
+				<pr:outputLabel styleClass="ui-icon ui-icon-mail-closed"
+					for="mailtoDl" />
+				<pr:link styleClass="hrefLink" id="mailtoDl"
+					href="mailto:labudde@hs-mittweida.de" value="Dirk Labudde" />
+			</pr:panelGrid>
+
+
+		</pr:panelGrid>
+
+		<pr:gmap styleClass="contact-map" center="50.989325, 12.970540 "
+			zoom="15" type="ROADMAP" model="#{mapBean.model}">
+			<pr:ajax event="overlaySelect" listener="#{mapBean.onMarkerSelect}" />
+			<pr:gmapInfoWindow>
+				<pr:link target="_blank" styleClass="external-link"
+					value="Hochschule Mittweida - University of Applied Sciences"
+					href="https://www.hs-mittweida.de/en.html" />
+				<br />
+				<pr:link target="_blank" styleClass="external-link"
+					value="Bioinformatics Group Mittweida"
+					href="http://www.bioforscher.de" />
+				<br />
+				<h:graphicImage library="static" name="images/haus8.png"
+					styleClass="building-eight-img" />
+				<br />
+				Richard-Stücklen Bau<br />
+				Am Schwanenteich 6b<br />
+				09648 Mittweida<br />
+				Germany<br />
+			</pr:gmapInfoWindow>
+		</pr:gmap>
+
+	</ui:define>
+	<ui:define name="toolbox" />
+</ui:composition>

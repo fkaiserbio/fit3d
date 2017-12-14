@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pr="http://primefaces.org/ui" lang="en">
+
+<h:head>
+	<title><ui:insert name="title">Fit3D Webserver</ui:insert></title>
+	<link href='https://fonts.googleapis.com/css?family=Open+Sans:300'
+		rel='stylesheet' type='text/css' />
+	<h:outputScript library="static" name="js/pv.js" />
+	<h:outputScript library="static" name="js/resultviewer.js" />
+
+	<link rel="shortcut icon" type="image/x-icon"
+		href="#{resource['static/images/favicon.ico']}" />
+
+	<script>
+		(function(i, s, o, g, r, a, m) {
+			i['GoogleAnalyticsObject'] = r;
+			i[r] = i[r] || function() {
+				(i[r].q = i[r].q || []).push(arguments)
+			}, i[r].l = 1 * new Date();
+			a = s.createElement(o), m = s.getElementsByTagName(o)[0];
+			a.async = 1;
+			a.src = g;
+			m.parentNode.insertBefore(a, m)
+		})(window, document, 'script',
+				'//www.google-analytics.com/analytics.js', 'ga');
+
+		ga('create', 'UA-63938580-1', 'auto');
+		ga('send', 'pageview');
+	</script>
+
+</h:head>
+
+<h:body>
+	<noscript>
+		<h3 style="text-align: center">JavaScript is disabled! Please
+			enable JavaScript in your web browser!</h3>
+	</noscript>
+
+	<f:facet name="last">
+		<h:outputStylesheet library="static" name="css/custom.css" />
+	</f:facet>
+
+	<pr:layout fullPage="true" widgetVar="mainContainer">
+		<pr:layoutUnit position="north" size="120">
+
+			<h:graphicImage id="headerLogo" library="static"
+				name="images/logo.png" />
+
+			<pr:panelGrid styleClass="grid-header-images"
+				style="display:inline-block" columns="18">
+				<pr:tooltip id="headerMotif1Tooltip" for="headerMotif1"
+					value="nucleotide interaction" />
+
+				<h:outputLink id="pdb-1EC6" target="_blank"
+					value="http://www.rcsb.org/pdb/explore/explore.do"
+					styleClass="download-link">
+					<f:param name="structureId" value="1ec6" />
+					<h:graphicImage id="headerMotif1" library="static"
+						name="images/header/motif_EQIR_interaction.png" />
+				</h:outputLink>
+
+				<h:outputLink id="pdb-4CHA" target="_blank"
+					value="http://www.rcsb.org/pdb/explore/explore.do"
+					styleClass="download-link">
+					<f:param name="structureId" value="4cha" />
+					<pr:tooltip id="headerMotif2Tooltip" for="headerMotif2"
+						value="catalytic activity" />
+					<h:graphicImage id="headerMotif2" library="static"
+						name="images/header/motif_HDS_catalysis.png" />
+				</h:outputLink>
+
+				<h:outputLink id="pdb-1G2F" target="_blank"
+					value="http://www.rcsb.org/pdb/explore/explore.do"
+					styleClass="download-link">
+					<f:param name="structureId" value="1g2f" />
+					<pr:tooltip id="headerMotif3Tooltip" for="headerMotif3"
+						value="Zn ion binding" />
+					<h:graphicImage id="headerMotif3" library="static"
+						name="images/header/motif_CCHH_binding.png" />
+				</h:outputLink>
+
+
+				<h:outputLink id="pdb-1FHA" target="_blank"
+					value="http://www.rcsb.org/pdb/explore/explore.do"
+					styleClass="download-link">
+					<f:param name="structureId" value="1fha" />
+					<pr:tooltip id="headerMotif4Tooltip" for="headerMotif4"
+						value="Fe ion binding" />
+					<h:graphicImage id="headerMotif4" library="static"
+						name="images/header/motif_EEHEQ_binding.png" />
+				</h:outputLink>
+
+
+				<h:outputLink id="pdb-2FK1" target="_blank"
+					value="http://www.rcsb.org/pdb/explore/explore.do"
+					styleClass="download-link">
+					<f:param name="structureId" value="2fk1" />
+					<pr:tooltip id="headerMotif5Tooltip" for="headerMotif5"
+						value="Cu ion binding" />
+					<h:graphicImage id="headerMotif5" library="static"
+						name="images/header/motif_HHY_binding.png" />
+				</h:outputLink>
+
+				<h:outputLink id="pdb-1ZEQ" target="_blank"
+					value="http://www.rcsb.org/pdb/explore/explore.do"
+					styleClass="download-link">
+					<f:param name="structureId" value="1zeq" />
+					<pr:tooltip id="headerMotif6Tooltip" for="headerMotif6"
+						value="Cu ion binding" />
+					<h:graphicImage id="headerMotif6" library="static"
+						name="images/header/motif_HWMM_binding.png" />
+				</h:outputLink>
+
+				<h:outputLink id="pdb-2MNR" target="_blank"
+					value="http://www.rcsb.org/pdb/explore/explore.do"
+					styleClass="download-link">
+					<f:param name="structureId" value="2mnr" />
+					<pr:tooltip id="headerMotif7Tooltip" for="headerMotif7"
+						value="enolase superfamily template" />
+					<h:graphicImage id="headerMotif7" library="static"
+						name="images/header/motif_KDEEH_detailed.png" />
+				</h:outputLink>
+
+				<h:outputLink id="pdb-1QQ5" target="_blank"
+					value="http://www.rcsb.org/pdb/explore/explore.do"
+					styleClass="download-link">
+					<f:param name="structureId" value="1qq5" />
+					<pr:tooltip id="headerMotif8Tooltip" for="headerMotif8"
+						value="haloacid dehalogenase superfamily template" />
+					<h:graphicImage id="headerMotif8" library="static"
+						name="images/header/motif_DSKSD_detailed.png" />
+				</h:outputLink>
+
+				<h:outputLink id="pdb-4FDI" target="_blank"
+					value="http://www.rcsb.org/pdb/explore/explore.do"
+					styleClass="download-link">
+					<f:param name="structureId" value="4fdi" />
+					<pr:tooltip id="headerMotif9Tooltip" for="headerMotif9"
+						value="double CH/&#960; interaction motif" />
+					<h:graphicImage id="headerMotif9" library="static"
+						name="images/header/motif_WWP_mechanism.png" />
+				</h:outputLink>
+			</pr:panelGrid>
+		</pr:layoutUnit>
+
+		<pr:layoutUnit position="south" size="45">
+			<h:outputText value="&#169; 2015 " />
+			<pr:link styleClass="hrefLink-doi" target="_blank"
+				href="http://www.bioforscher.de/bigM"
+				value="bioinformatics group Mittweida" />
+			<h:outputText value=" | online since #{jobJanitorService.genesis} | " />
+			<h:outputText
+				value="current job load: #{loadMonitorBean.loadMonitor.enqueued}"
+				styleClass="ui-widget display" />
+
+		</pr:layoutUnit>
+
+		<pr:layoutUnit position="west" size="250">
+			<h:form>
+				<pr:growl id="messages" showDetail="true" />
+				<pr:menu>
+					<pr:menuitem value="Home" outcome="/home.xhtml" icon="ui-icon-home"
+						styleClass="#{view.viewId == '/home.xhtml' ? 'active' : ''}" />
+					<pr:submenu label="Preprocessing">
+						<pr:menuitem value="Extract motif" outcome="/extract.xhtml"
+							icon="ui-icon-seek-next"
+							styleClass="#{view.viewId == '/extract.xhtml' ? 'active' : ''}" />
+					</pr:submenu>
+					<pr:submenu label="Motif search">
+						<pr:menuitem value="Submit job" outcome="/submit.xhtml"
+							icon="ui-icon-circle-arrow-e"
+							styleClass="#{view.viewId == '/submit.xhtml' ? 'active' : ''}" />
+						<pr:menuitem value="View results" outcome="/jobs.xhtml"
+							icon="ui-icon-newwin"
+							styleClass="#{(view.viewId == '/jobs.xhtml' || view.viewId == '/result.xhtml') ? 'active' : ''}" />
+					</pr:submenu>
+					<pr:submenu label="Others">
+						<pr:menuitem value="Download" outcome="/download.xhtml"
+							icon="ui-icon-arrowthickstop-1-s"
+							styleClass="#{view.viewId == '/download.xhtml' ? 'active' : ''}" />
+						<pr:menuitem value="Help" outcome="/help.xhtml"
+							icon="ui-icon-help"
+							styleClass="#{view.viewId == '/help.xhtml' ? 'active' : ''}" />
+						<pr:menuitem value="FAQ" outcome="/faq.xhtml"
+							icon="ui-icon-lightbulb"
+							styleClass="#{view.viewId == '/faq.xhtml' ? 'active' : ''}" />
+						<pr:menuitem value="Citation" outcome="/citation.xhtml"
+							icon="ui-icon-document"
+							styleClass="#{view.viewId == '/citation.xhtml' ? 'active' : ''}" />
+						<pr:menuitem value="Contact us" outcome="/contact.xhtml"
+							icon="ui-icon-contact"
+							styleClass="#{view.viewId == '/contact.xhtml' ? 'active' : ''}" />
+					</pr:submenu>
+				</pr:menu>
+			</h:form>
+			<h:link outcome="/terms" styleClass="terms-link">Terms of Service</h:link>
+		</pr:layoutUnit>
+
+		<ui:insert name="toolbox">
+			<pr:layoutUnit position="east" size="310" header="Toolbox"
+				styleClass="toolbox" resizable="false" closable="false"
+				collapsible="true" effect="drop" visible="false">
+				<ui:insert name="toolboxContent" />
+				<f:facet name="header"
+					style="display:inline-block; vertical-align:middle">
+					<h:form>
+					Toolbox <pr:commandLink onclick="PF('toolboxHelpDialog').show();"
+							styleClass="ui-icon ui-icon-help toolbox-help-icon" />
+					</h:form>
+
+				</f:facet>
+			</pr:layoutUnit>
+			<pr:dialog header="How to use the Toolbox?"
+				widgetVar="toolboxHelpDialog" styleClass="toolbox-help-dialog">
+				<pr:panel header="Structure viewer" style="width:1200px">
+					<pr:panelGrid styleClass="toolbox-help-dialog-panel-grid"
+						columns="4" >
+						<pr:panelGrid
+							styleClass="toolbox-help-dialog-panel-grid-inner-grid"
+							columns="1">
+							<h:graphicImage
+								styleClass="toolbox-help-dialog-panel-grid-inner-grid-image"
+								id="pvImage" library="static" name="images/pv.png" />
+							<p>
+								The Fit3D webserver implements the JavaScript-based Protein
+								Viewer from Marco Biasini <a target="_blank"
+									href="https://biasmv.github.io/pv/"
+									class="ui-icon ui-icon-extlink" style="display: inline-block" />.
+								The zoom level can be controlled with the mouse wheel. You can
+								manipulate the point of view by pressing the middle mouse button
+								or by holding down the Shift-key. To center the point of view
+								double click with the left mouse button.
+							</p>
+						</pr:panelGrid>
+						<pr:panelGrid
+							styleClass="toolbox-help-dialog-panel-grid-inner-grid"
+							columns="1">
+							<h:graphicImage
+								styleClass="toolbox-help-dialog-panel-grid-inner-grid-image"
+								id="oneAgainstOneImage" library="static"
+								name="images/one_against_one_new.png" />
+							<p>One against one alignment for a single match found by
+								Fit3D. The green ball-stick structure represents the query
+								motif. Residues of the query motif are labeled in green, whereas
+								the corresponding match is labeled in black on gray background.</p>
+						</pr:panelGrid>
+						<pr:panelGrid
+							styleClass="toolbox-help-dialog-panel-grid-inner-grid"
+							columns="1">
+							<h:graphicImage
+								styleClass="toolbox-help-dialog-panel-grid-inner-grid-image"
+								id="oneAgainstAllImage" library="static"
+								name="images/one_against_all_new.png" />
+							<p>One against all alignment for the query motif against all
+								matches found by Fit3D. The residues of the query motif are
+								labeled in green.</p>
+						</pr:panelGrid>
+						<pr:panelGrid
+							styleClass="toolbox-help-dialog-panel-grid-inner-grid"
+							columns="1">
+							<h:graphicImage
+								styleClass="toolbox-help-dialog-panel-grid-inner-grid-image"
+								id="globalAlignment" library="static"
+								name="images/global_alignment.png" />
+							<p>Global alignment of the query motif source structure
+								(green) with a structure where a match occurred (grey). The
+								superimposition is based on the matching residues of the
+								query and the target structure. Hence, non-homologous structures
+								can be easily recognized to verify whether a match occurred due
+								to global structural similarity or convergent evolution.</p>
+						</pr:panelGrid>
+					</pr:panelGrid>
+				</pr:panel>
+				<pr:panel header="Meta information" style="width:1200px">
+					<p>Additionally, the toolbox shows information about the query
+						structure when needed (submit a job or extract a motif).
+						Additionally, target lists uploaded by the user are analyzed. When
+						the calculation is finished, some statistics of the results are
+						presented (e.g. intra-/inter-molecular occurrences,
+						maximal/minimal LRMSD values). Furthermore, the user can
+						recapitulate the original parameters of the job when inspecting
+						the results.</p>
+				</pr:panel>
+			</pr:dialog>
+		</ui:insert>
+
+		<pr:layoutUnit position="center">
+			<ui:insert name="content">Put default content here, if any.</ui:insert>
+		</pr:layoutUnit>
+	</pr:layout>
+</h:body>
+
+</html>

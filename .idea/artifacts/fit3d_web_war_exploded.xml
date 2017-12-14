@@ -1,0 +1,44 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="fit3d-web:war exploded">
+    <output-path>$PROJECT_DIR$/fit3d-web/target/fit3d-web-0.1.0</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="fit3d-web" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: com.sun.faces:jsf-api:2.2.13" />
+          <element id="library" level="project" name="Maven: com.sun.faces:jsf-impl:2.2.13" />
+          <element id="library" level="project" name="Maven: org.primefaces:primefaces:6.1" />
+          <element id="library" level="project" name="Maven: org.primefaces.themes:bootstrap:1.0.10" />
+          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-structure:0.3.0-alpha" />
+          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-chemistry:0.3.0-alpha" />
+          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-core:0.3.0-alpha" />
+          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-features:0.3.0-alpha" />
+          <element id="library" level="project" name="Maven: tec.units:unit-ri:1.0" />
+          <element id="library" level="project" name="Maven: javax.measure:unit-api:1.0" />
+          <element id="library" level="project" name="Maven: tec.uom.lib:uom-lib-common:1.0" />
+          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-mathematics:0.3.0-alpha" />
+          <element id="library" level="project" name="Maven: org.rcsb:mmtf-codec:1.0.7" />
+          <element id="library" level="project" name="Maven: org.rcsb:mmtf-serialization:1.0.7" />
+          <element id="library" level="project" name="Maven: org.msgpack:jackson-dataformat-msgpack:0.7.1" />
+          <element id="library" level="project" name="Maven: org.msgpack:msgpack-core:0.7.1" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.6.3" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.6.0" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.6.3" />
+          <element id="library" level="project" name="Maven: commons-lang:commons-lang:2.4" />
+          <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-api:2.6.2" />
+          <element id="library" level="project" name="Maven: org.rcsb:mmtf-api:1.0.7" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.21" />
+          <element id="library" level="project" name="Maven: javax.mail:mail:1.4.7" />
+          <element id="library" level="project" name="Maven: javax.activation:activation:1.1" />
+          <element id="library" level="project" name="Maven: org.omnifaces:omnifaces:1.10" />
+        </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/fit3d-web/target/fit3d-web-0.1.0/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="javaee-facet-resources" facet="fit3d-web/web/Web" />
+    </root>
+  </artifact>
+</component>
