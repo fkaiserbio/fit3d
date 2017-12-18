@@ -41,7 +41,7 @@ public class Fit3DCommandLineRunner {
                                                  .parse();
             } else {
                 logger.info("specified target {} is identifier", commandLine.getTarget());
-                Pattern identifierPattern = Pattern.compile("([1-9a-zA-Z]{4})(_[\\w]+)*");
+                Pattern identifierPattern = Pattern.compile("([1-9a-zA-Z][0-9a-zA-Z]{3})(_[\\w]+)*");
                 Matcher matcher = identifierPattern.matcher(commandLine.getTarget());
                 matcher.find();
 //                if (!matcher.matches()) {

@@ -27,7 +27,7 @@
 							<h:outputLabel for="pdbId" value="PDB-ID" />
 							<pr:inputText id="pdbId" value="#{extractView.pdbId}"
 								validatorMessage="Please enter a valid PDB-ID">
-								<f:validateRegex pattern="^[A-Za-z0-9]{4}$" />
+								<f:validateRegex pattern="^[1-9a-zA-Z][0-9a-zA-Z]{3}$" />
 							</pr:inputText>
 
 							<pr:outputLabel for="pdbFile" value="PDB file" />
