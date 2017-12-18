@@ -1,139 +1,139 @@
 <ui:composition template="/WEB-INF/templates/layout.xhtml"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:pr="http://primefaces.org/ui">
-	<ui:define name="content">
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:pr="http://primefaces.org/ui">
+    <ui:define name="content">
 
-		<p>
-			<span class="initialcap">U</span>se this wizard to <b>define a
-				structural motif</b>. You can use an uploaded PDB file or simply enter a
-			PDB-ID to extract an arbitrary structural motif. After successful
-			extraction of the motif you can directly submit a search or download
-			your motif in PDB format.
-		</p>
+        <p>
+            <span class="initialcap">U</span>se this wizard to <b>define a
+            structural motif</b>. You can use an uploaded PDB file or simply enter a
+            PDB-ID to extract an arbitrary structural motif. After successful
+            extraction of the motif you can directly submit a search or download
+            your motif in PDB format.
+        </p>
 
-		<h:form id="extractForm">
+        <h:form id="extractForm">
 
-			<pr:growl id="messages" showDetail="true" showSummary="false"
-				autoUpdate="true" />
+            <pr:growl id="messages" showDetail="true" showSummary="false"
+                      autoUpdate="true"/>
 
-			<pr:wizard widgetVar="extractWizard" showStepStatus="false"
-				flowListener="#{extractView.onFlowProcess}">
-				<pr:tab id="pdb" title="PDB structure">
-					<pr:fieldset legend="PDB structure" styleClass="fieldset">
-						<h:panelGrid columns="2" columnClasses="label, value">
-							<h:outputLabel for="pdbId" value="PDB-ID" />
-							<pr:inputText id="pdbId" value="#{extractView.pdbId}"
-								validatorMessage="Please enter a valid PDB-ID">
-								<f:validateRegex pattern="^[1-9a-zA-Z][0-9a-zA-Z]{3}$" />
-							</pr:inputText>
+            <pr:wizard widgetVar="extractWizard" showStepStatus="false"
+                       flowListener="#{extractView.onFlowProcess}">
+                <pr:tab id="pdb" title="PDB structure">
+                    <pr:fieldset legend="PDB structure" styleClass="fieldset">
+                        <h:panelGrid columns="2" columnClasses="label, value">
+                            <h:outputLabel for="pdbId" value="PDB-ID"/>
+                            <pr:inputText id="pdbId" value="#{extractView.pdbIdentifier}"
+                                          validatorMessage="Please enter a valid PDB-ID">
+                                <f:validateRegex pattern="^[1-9a-zA-Z][0-9a-zA-Z]{3}$"/>
+                            </pr:inputText>
 
-							<pr:outputLabel for="pdbFile" value="PDB file" />
-							<pr:fileUpload id="pdbFile"
-								fileUploadListener="#{extractView.handlePdbUpload}"
-								mode="advanced" update="messages" auto="true"
-								allowTypes="/(\.|\/)(pdb)$/" fileLimit="1" style="width:600px"
-								sizeLimit="10000000" />
+                            <pr:outputLabel for="pdbFile" value="PDB file"/>
+                            <pr:fileUpload id="pdbFile"
+                                           fileUploadListener="#{extractView.handlePdbUpload}"
+                                           mode="advanced" update="messages" auto="true"
+                                           allowTypes="/(\.|\/)(pdb)$/" fileLimit="1" style="width:600px"
+                                           sizeLimit="10000000"/>
 
-						</h:panelGrid>
-					</pr:fieldset>
-				</pr:tab>
+                        </h:panelGrid>
+                    </pr:fieldset>
+                </pr:tab>
 
-				<pr:tab id="motif" title="Extract motif">
-					<pr:fieldset legend="Motif structure" styleClass="fieldset">
-						<pr:panelGrid columns="2" styleClass="extract-protein-field">
+                <pr:tab id="motif" title="Extract motif">
+                    <pr:fieldset legend="Motif structure" styleClass="fieldset">
+                        <pr:panelGrid columns="2" styleClass="extract-protein-field">
 
-							<pr:panelGrid columns="1" styleClass="extract-protein-viewer">
-								<div id="viewer" class="protein-viewer" />
+                            <pr:panelGrid columns="1" styleClass="extract-protein-viewer">
+                                <div id="viewerStructure" class="protein-viewer"/>
 
-								<pr:outputLabel styleClass="extract-protein-viewer-label"
-									value="#{extractView.pdbName}" />
-							</pr:panelGrid>
+                                <pr:outputLabel styleClass="extract-protein-viewer-label"
+                                                value="#{extractView.pdbFileName}"/>
+                            </pr:panelGrid>
 
-							<pr:panelGrid columns="1" styleClass="extract-protein-viewer">
+                            <pr:panelGrid columns="1" styleClass="extract-protein-viewer">
 
-								<div id="motif-viewer" class="protein-viewer" />
-								<pr:outputLabel styleClass="extract-protein-viewer-label"
-									id="motifLabel" value="#{extractView.extractedMotifSeq}" />
+                                <div id="motif-viewer" class="protein-viewer"/>
+                                <pr:outputLabel styleClass="extract-protein-viewer-label"
+                                                id="motifLabel" value="#{extractView.extractedMotifSequence}"/>
 
-							</pr:panelGrid>
+                            </pr:panelGrid>
 
-							<pr:panelGrid columns="2" styleClass="extract-protein-viewer">
+                            <pr:panelGrid columns="2" styleClass="extract-protein-viewer">
 
-								<pr:selectCheckboxMenu value="#{extractView.extractAminoAcids}"
-									label="Select motif residues" filter="true"
-									filterMatchMode="contains" panelStyle="width:300px">
-									<pr:ajax listener="#{extractView.updateProteinViewer}" />
-									<f:selectItems value="#{extractView.aaIdentifiers}" />
-								</pr:selectCheckboxMenu>
+                                <pr:selectCheckboxMenu value="#{extractView.extractAminoAcids}"
+                                                       label="Select motif residues" filter="true"
+                                                       filterMatchMode="contains" panelStyle="width:300px">
+                                    <pr:ajax listener="#{extractView.updateProteinViewer}"/>
+                                    <f:selectItems value="#{extractView.leafIdentifierStrings}"/>
+                                </pr:selectCheckboxMenu>
 
-								<pr:commandButton value="Extract" id="extractMotifButton"
-									actionListener="#{extractView.extractMotif}" />
+                                <pr:commandButton value="Extract" id="extractMotifButton"
+                                                  actionListener="#{extractView.extractMotif}"/>
 
-							</pr:panelGrid>
+                            </pr:panelGrid>
 
-							<pr:panelGrid columns="2" styleClass="extract-protein-viewer">
+                            <pr:panelGrid columns="2" styleClass="extract-protein-viewer">
 
-								<pr:commandButton value="Submit" id="submitMotifButton"
-									styleClass="ui-priority-primary" update="messages"
-									actionListener="#{extractView.submitMotif}"
-									disabled="#{not extractView.motifExtracted or extractView.blocked}" />
+                                <pr:commandButton value="Submit" id="submitMotifButton"
+                                                  styleClass="ui-priority-primary" update="messages"
+                                                  actionListener="#{extractView.submitMotif}"
+                                                  disabled="#{not extractView.motifExtracted or extractView.blocked}"/>
 
-								<pr:commandButton value="Download" id="downloadMotifButton"
-									ajax="false" disabled="#{not extractView.motifExtracted}">
-									<pr:fileDownload value="#{extractView.extractedMotif}" />
-								</pr:commandButton>
+                                <pr:commandButton value="Download" id="downloadMotifButton"
+                                                  ajax="false" disabled="#{not extractView.motifExtracted}">
+                                    <pr:fileDownload value="#{extractView.extractedMotif}"/>
+                                </pr:commandButton>
 
-							</pr:panelGrid>
+                            </pr:panelGrid>
 
-						</pr:panelGrid>
-					</pr:fieldset>
-				</pr:tab>
-			</pr:wizard>
-		</h:form>
-	</ui:define>
+                        </pr:panelGrid>
+                    </pr:fieldset>
+                </pr:tab>
+            </pr:wizard>
+        </h:form>
+    </ui:define>
 
-	<ui:define name="toolboxContent">
-		<pr:outputPanel id="motifMetaData">
-			<pr:accordionPanel>
-				<pr:tab id="motifDetails" title="Motif details"
-					rendered="#{extractView.motifExtracted}">
-					<pr:panelGrid styleClass="motif-details-field" columns="2">
+    <ui:define name="toolboxContent">
+        <pr:outputPanel id="motifMetaData">
+            <pr:accordionPanel>
+                <pr:tab id="motifDetails" title="Motif details"
+                        rendered="#{extractView.motifExtracted}">
+                    <pr:panelGrid styleClass="motif-details-field" columns="2">
 
-						<pr:outputLabel for="motifSequence" value="sequence" />
-						<h:outputText id="motifSequence" value="#{extractView.motifSeq}" />
+                        <pr:outputLabel for="motifSequence" value="sequence"/>
+                        <h:outputText id="motifSequence" value="#{extractView.motifSeq}"/>
 
-						<pr:outputLabel for="motifAminoAcidCount" value="residues" />
-						<h:outputText id="motifAminoAcidCount"
-							value="#{extractView.motifAminoAcidCount}" />
+                        <pr:outputLabel for="motifAminoAcidCount" value="residues"/>
+                        <h:outputText id="motifAminoAcidCount"
+                                      value="#{extractView.motifAminoAcidCount}"/>
 
-						<pr:outputLabel for="motifExtent" value="spatial extent" />
-						<h:panelGroup>
-							<h:outputText id="motifExtent" value="#{extractView.maxExtent}">
-								<f:convertNumber pattern="#0.00" />
-							</h:outputText>
-							<h:outputText value=" Å" />
-						</h:panelGroup>
+                        <pr:outputLabel for="motifExtent" value="spatial extent"/>
+                        <h:panelGroup>
+                            <h:outputText id="motifExtent" value="#{extractView.maxExtent}">
+                                <f:convertNumber pattern="#0.00"/>
+                            </h:outputText>
+                            <h:outputText value=" Å"/>
+                        </h:panelGroup>
 
-						<pr:outputLabel for="motifType" value="type" />
-						<h:outputText id="motifType" value="#{extractView.motifType}" />
+                        <pr:outputLabel for="motifType" value="type"/>
+                        <h:outputText id="motifType" value="#{extractView.motifType}"/>
 
-						<pr:outputLabel for="motifComplexityImage" value="complexity" />
+                        <pr:outputLabel for="motifComplexityImage" value="complexity"/>
 
-						<h:graphicImage styleClass="complexity-image"
-							id="motifComplexityImage" library="static"
-							name="images/complexity_#{extractView.motifComplexity.label}.png" />
+                        <h:graphicImage styleClass="complexity-image"
+                                        id="motifComplexityImage" library="static"
+                                        name="images/complexity_#{extractView.motifComplexity.label}.png"/>
 
-					</pr:panelGrid>
-				</pr:tab>
-			</pr:accordionPanel>
+                    </pr:panelGrid>
+                </pr:tab>
+            </pr:accordionPanel>
 
-		</pr:outputPanel>
-	</ui:define>
+        </pr:outputPanel>
+    </ui:define>
 
 </ui:composition>
 
-<!-- <pr:commandButton value="Extract" id="extractMotifButton"
-									update="messages" actionListener="#{extractView.extractMotif}" /> -->
+        <!-- <pr:commandButton value="Extract" id="extractMotifButton"
+                                            update="messages" actionListener="#{extractView.extractMotif}" /> -->

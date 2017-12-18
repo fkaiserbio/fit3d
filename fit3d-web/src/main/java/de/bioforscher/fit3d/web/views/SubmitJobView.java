@@ -6,7 +6,6 @@ import de.bioforscher.fit3d.web.core.Fit3DJob;
 import de.bioforscher.fit3d.web.services.JobExecutorService;
 import de.bioforscher.fit3d.web.utilities.ExchangeDefinition;
 import de.bioforscher.fit3d.web.utilities.Fit3dConstants;
-import de.bioforscher.fit3d.web.utilities.LogHandler;
 import de.bioforscher.fit3d.web.utilities.enums.AtomSelection;
 import de.bioforscher.fit3d.web.utilities.enums.MotifComplexity;
 import de.bioforscher.fit3d.web.utilities.enums.PredefinedList;
@@ -15,6 +14,8 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.ToggleEvent;
 import org.primefaces.model.Visibility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -25,10 +26,8 @@ import java.util.UUID;
 
 public class SubmitJobView implements Serializable {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -5044058806940833723L;
+    private static final long serialVersionUID = -4697699771578104350L;
+    private static final Logger logger = LoggerFactory.getLogger(SubmitJobView.class);
 
     private boolean complete;
     private String description;
@@ -88,11 +87,11 @@ public class SubmitJobView implements Serializable {
 
     public SubmitJobView() {
 
-        this.id = UUID.randomUUID();
+        id = UUID.randomUUID();
     }
 
     public AtomSelection getAlignmentAtomSelection() {
-        return this.alignmentAtomSelection;
+        return alignmentAtomSelection;
     }
 
     public void setAlignmentAtomSelection(AtomSelection alignmentAtomSelection) {
@@ -100,7 +99,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public String getDescription() {
-        return this.description;
+        return description;
     }
 
     public void setDescription(String description) {
@@ -108,7 +107,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public String getEmail() {
-        return this.email;
+        return email;
     }
 
     public void setEmail(String email) {
@@ -116,7 +115,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public List<ExchangeDefinition> getExchanges() {
-        return this.exchanges;
+        return exchanges;
     }
 
     public void setExchanges(List<ExchangeDefinition> exchanges) {
@@ -124,15 +123,15 @@ public class SubmitJobView implements Serializable {
     }
 
     public String getExtractPdbFileExternalPath() {
-        return this.extractPdbFileExternalPath;
+        return extractPdbFileExternalPath;
     }
 
     public String getExtractPdbFileInternalPath() {
-        return this.extractPdbFileInternalPath;
+        return extractPdbFileInternalPath;
     }
 
     public JobController getJobController() {
-        return this.jobController;
+        return jobController;
     }
 
     public void setJobController(JobController jobController) {
@@ -140,7 +139,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public JobExecutorService getJobExecutorService() {
-        return this.jobExecutorService;
+        return jobExecutorService;
     }
 
     public void setJobExecutorService(JobExecutorService jobExecutorService) {
@@ -148,11 +147,11 @@ public class SubmitJobView implements Serializable {
     }
 
     public double getMaxExtent() {
-        return this.maxExtent;
+        return maxExtent;
     }
 
     public double getMaxRmsd() {
-        return this.maxRmsd;
+        return maxRmsd;
     }
 
     public void setMaxRmsd(double maxRmsd) {
@@ -160,11 +159,11 @@ public class SubmitJobView implements Serializable {
     }
 
     public int getMotifAminoAcidCount() {
-        return this.motifAminoAcidCount;
+        return motifAminoAcidCount;
     }
 
     public MotifComplexity getMotifComplexity() {
-        return this.motifComplexity;
+        return motifComplexity;
     }
 
     public void setMotifComplexity(MotifComplexity motifComplexity) {
@@ -172,7 +171,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public String getMotifFileExternalPath() {
-        return this.motifFileExternalPath;
+        return motifFileExternalPath;
     }
 
     public void setMotifFileExternalPath(String motifFileExternalPath) {
@@ -180,11 +179,11 @@ public class SubmitJobView implements Serializable {
     }
 
     public String getMotifFileLabel() {
-        return this.motifFileLabel;
+        return motifFileLabel;
     }
 
     public String getMotifSeq() {
-        return this.motifSeq;
+        return motifSeq;
     }
 
     public void setMotifSeq(String motifSeq) {
@@ -192,7 +191,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public String getMotifType() {
-        return this.motifType;
+        return motifType;
     }
 
     public void setMotifType(String motifType) {
@@ -200,7 +199,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public PredefinedList getPredefinedTargetList() {
-        return this.predefinedTargetList;
+        return predefinedTargetList;
     }
 
     public void setPredefinedTargetList(PredefinedList predefinedTargetList) {
@@ -208,7 +207,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public PvalueMethod getPvalueMethod() {
-        return this.pvalueMethod;
+        return pvalueMethod;
     }
 
     public void setPvalueMethod(PvalueMethod pvalueMethod) {
@@ -216,7 +215,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public SessionController getSessionController() {
-        return this.sessionController;
+        return sessionController;
     }
 
     public void setSessionController(SessionController sessionController) {
@@ -224,11 +223,11 @@ public class SubmitJobView implements Serializable {
     }
 
     public int getTargetListCount() {
-        return this.targetListCount;
+        return targetListCount;
     }
 
     public String getTargetListFileInternalPath() {
-        return this.targetListFileInternalPath;
+        return targetListFileInternalPath;
     }
 
     public void setTargetListFileInternalPath(String targetListFileInternalPath) {
@@ -236,11 +235,11 @@ public class SubmitJobView implements Serializable {
     }
 
     public String getTargetListFileLabel() {
-        return this.targetListFileLabel;
+        return targetListFileLabel;
     }
 
     public String getWorkingDirectory() {
-        return this.workingDirectory;
+        return workingDirectory;
     }
 
     public void setWorkingDirectory(String workingDirectory) {
@@ -259,7 +258,7 @@ public class SubmitJobView implements Serializable {
 
     public void handleExchangeDefinition() throws IOException {
 
-        if (!this.motifFileUploaded) {
+        if (!motifFileUploaded) {
 
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                                                     "A query motif file is required before exchanges can be defined.");
@@ -283,19 +282,19 @@ public class SubmitJobView implements Serializable {
     public void handleExtractMotifSubmission(String extractMotifFilePath, String extractPdbFilePath)
             throws FileNotFoundException, IOException {
 
-        LogHandler.LOG.info("trying to copy motif file to local storage");
+        logger.info("trying to copy motif file to local storage");
 
-        copyFile(this.workingDirectory + "/motif.pdb", new FileInputStream(new File(extractMotifFilePath)));
-        copyFile(this.workingDirectory + "/extract.pdb", new FileInputStream(new File(extractPdbFilePath)));
+        copyFile(workingDirectory + "/motif.pdb", new FileInputStream(new File(extractMotifFilePath)));
+        copyFile(workingDirectory + "/extract.pdb", new FileInputStream(new File(extractPdbFilePath)));
 
-        this.extractPdbFileInternalPath = this.workingDirectory + "/extract.pdb";
-        this.extractPdbFileExternalPath = "data/" + this.sessionController.getId() + "/" + this.id + "/extract.pdb";
+        extractPdbFileInternalPath = workingDirectory + "/extract.pdb";
+        extractPdbFileExternalPath = "data/" + sessionController.getSessionIdentifier() + "/" + id + "/extract.pdb";
 
-        this.motifFileExternalPath = "data/" + this.sessionController.getId() + "/" + this.id + "/motif.pdb";
-        this.motifFileUploaded = true;
+        motifFileExternalPath = "data/" + sessionController.getSessionIdentifier() + "/" + id + "/motif.pdb";
+        motifFileUploaded = true;
 
         // set flag that we are coming from extract page
-        this.redirectedFromExtract = true;
+        redirectedFromExtract = true;
         // update motif meta data
         RequestContext.getCurrentInstance().update("motifFile");
 
@@ -309,7 +308,7 @@ public class SubmitJobView implements Serializable {
         RequestContext.getCurrentInstance().execute("PF('mainContainer').show('east')");
 
         // show protein viewer
-        RequestContext.getCurrentInstance().execute("viewer({ pdb : '" + this.motifFileExternalPath
+        RequestContext.getCurrentInstance().execute("viewer({ pdb : '" + motifFileExternalPath
                                                     + "', clear : true, labels : true, labelSize : 22, labelStyle : 'bold' })");
 
         // FacesMessage message = new FacesMessage("Succesful", event.getFile()
@@ -325,16 +324,16 @@ public class SubmitJobView implements Serializable {
      */
     public void handleMotifUpload(FileUploadEvent event) throws IOException {
 
-        LogHandler.LOG.info("trying to copy motif file to local storage");
+        logger.info("trying to copy motif file to local storage");
 
-        copyFile(this.workingDirectory + "/motif.pdb", event.getFile().getInputstream());
-        this.motifFileLabel = event.getFile().getFileName();
+        copyFile(workingDirectory + "/motif.pdb", event.getFile().getInputstream());
+        motifFileLabel = event.getFile().getFileName();
 
         // update file name to indicate uploaded file
         RequestContext.getCurrentInstance().update("mainForm:motifFileLabel");
 
-        this.motifFileExternalPath = "data/" + this.sessionController.getId() + "/" + this.id + "/motif.pdb";
-        this.motifFileUploaded = true;
+        motifFileExternalPath = "data/" + sessionController.getSessionIdentifier() + "/" + id + "/motif.pdb";
+        motifFileUploaded = true;
 
         // analyze motif structure
         analyzeMotif();
@@ -346,21 +345,21 @@ public class SubmitJobView implements Serializable {
         RequestContext.getCurrentInstance().execute("PF('mainContainer').show('east')");
 
         // show protein viewer
-        RequestContext.getCurrentInstance().execute("viewer({ pdb : '" + this.motifFileExternalPath
+        RequestContext.getCurrentInstance().execute("viewer({ pdb : '" + motifFileExternalPath
                                                     + "', clear : true, labels : true, labelSize : 22, labelStyle : 'bold' })");
 
-        FacesMessage message = new FacesMessage("Succesful", this.motifFileLabel + " successfully uploaded.");
+        FacesMessage message = new FacesMessage("Succesful", motifFileLabel + " successfully uploaded.");
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
 
     public void handleTargetListSelected() {
 
-        if (this.predefinedTargetList.equals(PredefinedList.NONE)) {
+        if (predefinedTargetList.equals(PredefinedList.NONE)) {
 
-            this.targetListSelected = false;
+            targetListSelected = false;
         } else {
 
-            this.targetListSelected = true;
+            targetListSelected = true;
         }
     }
 
@@ -372,17 +371,17 @@ public class SubmitJobView implements Serializable {
      */
     public void handleTargetListUpload(FileUploadEvent event) throws IOException {
 
-        LogHandler.LOG.info("trying to copy target list file to local storage");
+       logger.info("trying to copy target list file to local storage");
 
-        this.targetListFileInternalPath = this.workingDirectory + "/" + "targets.txt";
+        targetListFileInternalPath = workingDirectory + "/" + "targets.txt";
 
-        copyFile(this.targetListFileInternalPath, event.getFile().getInputstream());
-        this.targetListFileLabel = event.getFile().getFileName();
+        copyFile(targetListFileInternalPath, event.getFile().getInputstream());
+        targetListFileLabel = event.getFile().getFileName();
 
         // update file name to indicate uploaded file
         RequestContext.getCurrentInstance().update("mainForm:targetListFileLabel");
 
-        this.targetListFileUploaded = true;
+        targetListFileUploaded = true;
 
         // update main formular
         RequestContext.getCurrentInstance().update("mainForm:targetList");
@@ -399,7 +398,6 @@ public class SubmitJobView implements Serializable {
 
     @PostConstruct
     public void init() {
-
         // this.workingDirectory =
         // FacesContext.getCurrentInstance().getExternalContext()
         // .getRealPath("data/" + this.sessionController.getId() + "/" + this.id
@@ -433,11 +431,11 @@ public class SubmitJobView implements Serializable {
     }
 
     public boolean isBlocked() {
-        return this.blocked;
+        return blocked;
     }
 
     public boolean isComplete() {
-        return this.complete;
+        return complete;
     }
 
     public void setComplete(boolean complete) {
@@ -445,7 +443,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public boolean isFileDefinedTargetList() {
-        return this.fileDefinedTargetList;
+        return fileDefinedTargetList;
     }
 
     public void setFileDefinedTargetList(boolean fileDefinedTargetList) {
@@ -453,7 +451,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public boolean isFiltering() {
-        return this.filtering;
+        return filtering;
     }
 
     public void setFiltering(boolean filtering) {
@@ -461,7 +459,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public boolean isMotifFileUploaded() {
-        return this.motifFileUploaded;
+        return motifFileUploaded;
     }
 
     public void setMotifFileUploaded(boolean motifFileUploaded) {
@@ -469,7 +467,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public boolean isRedirectedFromExtract() {
-        return this.redirectedFromExtract;
+        return redirectedFromExtract;
     }
 
     public void setRedirectedFromExtract(boolean redirectedFromExtract) {
@@ -477,7 +475,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public boolean isTargetListFileUploaded() {
-        return this.targetListFileUploaded;
+        return targetListFileUploaded;
     }
 
     public void setTargetListFileUploaded(boolean targetListFileUploaded) {
@@ -485,7 +483,7 @@ public class SubmitJobView implements Serializable {
     }
 
     public boolean isTargetListSelected() {
-        return this.targetListSelected;
+        return targetListSelected;
     }
 
     public void setTargetListSelected(boolean targetListSelected) {
@@ -503,11 +501,11 @@ public class SubmitJobView implements Serializable {
             return null;
         }
 
-        if (this.exchanges != null) {
+        if (exchanges != null) {
 
             // count exchanges and block if more than limit
             int exchangeCount = 0;
-            for (ExchangeDefinition exchangeDefinition : this.exchanges) {
+            for (ExchangeDefinition exchangeDefinition : exchanges) {
 
                 exchangeCount += exchangeDefinition.getExchangeAminoAcids().size();
             }
@@ -521,7 +519,7 @@ public class SubmitJobView implements Serializable {
             }
         }
 
-        if (!this.motifFileUploaded) {
+        if (!motifFileUploaded) {
 
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                                                     "A query motif file is required.");
@@ -531,9 +529,9 @@ public class SubmitJobView implements Serializable {
         }
 
         // use predefined target list if no one was provided
-        if (!this.targetListFileUploaded) {
+        if (!targetListFileUploaded) {
 
-            if (this.predefinedTargetList == PredefinedList.NONE) {
+            if (predefinedTargetList == PredefinedList.NONE) {
 
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                                                         "Please select or upload a target list.");
@@ -542,8 +540,8 @@ public class SubmitJobView implements Serializable {
                 return null;
             } else {
 
-                this.targetListFileInternalPath = FacesContext.getCurrentInstance().getExternalContext()
-                                                              .getRealPath(this.predefinedTargetList.getPath());
+                targetListFileInternalPath = FacesContext.getCurrentInstance().getExternalContext()
+                                                         .getRealPath(predefinedTargetList.getPath());
             }
         }
 
@@ -577,22 +575,22 @@ public class SubmitJobView implements Serializable {
             return null;
         }
 
-        this.predefinedTargetList = PredefinedList.BLASTe80;
-        this.description = "4CHA catalytic triad";
+        predefinedTargetList = PredefinedList.BLASTe80;
+        description = "4CHA catalytic triad";
         // this.workingDirectory =
         // FacesContext.getCurrentInstance().getExternalContext().getRealPath("data/example/");
-        this.workingDirectory = System.getProperty("os.name").startsWith("Win")
-                                ? FacesContext.getCurrentInstance().getExternalContext().getRealPath("/") + "data/example/"
-                                : FacesContext.getCurrentInstance().getExternalContext().getRealPath("data/example/");
-        this.motifSeq = "HDS";
-        this.alignmentAtomSelection = AtomSelection.ALL;
-        this.pvalueMethod = PvalueMethod.FOFANOV;
-        this.predefinedTargetList = PredefinedList.BLASTe80;
-        this.maxRmsd = 2.5;
-        this.filtering = true;
-        this.exchanges = null;
-        this.targetListFileInternalPath = null;
-        this.extractPdbFileInternalPath = this.workingDirectory + "/extract.pdb";
+        workingDirectory = System.getProperty("os.name").startsWith("Win")
+                           ? FacesContext.getCurrentInstance().getExternalContext().getRealPath("/") + "data/example/"
+                           : FacesContext.getCurrentInstance().getExternalContext().getRealPath("data/example/");
+        motifSeq = "HDS";
+        alignmentAtomSelection = AtomSelection.ALL;
+        pvalueMethod = PvalueMethod.FOFANOV;
+        predefinedTargetList = PredefinedList.BLASTe80;
+        maxRmsd = 2.5;
+        filtering = true;
+        exchanges = null;
+        targetListFileInternalPath = null;
+        extractPdbFileInternalPath = workingDirectory + "/extract.pdb";
 
         // TODO implement
 //        Fit3DJobDummy job = new Fit3DJobDummy(this.id, this.sessionController.getId(), new Date(), this.description,
@@ -745,11 +743,11 @@ public class SubmitJobView implements Serializable {
         out.flush();
         out.close();
 
-        LogHandler.LOG.info("file created: " + outputPath);
+        logger.info("file created: " + outputPath);
     }
 
     private long countJobs() {
-        List<Fit3DJob> currentJobs = this.jobController.getManagedJobs().get(this.sessionController.getId());
+        List<Fit3DJob> currentJobs = jobController.getManagedJobs().get(sessionController.getSessionIdentifier());
 
         long jobCount = (currentJobs != null)
                         ? currentJobs.stream().filter(j -> (j.isRunning() || j.isEnqueued())).count() : 0;

@@ -1,209 +1,190 @@
 package de.bioforscher.fit3d.web.core;
 
-import de.bioforscher.fit3d.web.utilities.Fit3dConstants;
-import de.bioforscher.fit3d.web.utilities.LoadMonitor;
-import de.bioforscher.fit3d.web.utilities.LogHandler;
 import de.bioforscher.fit3d.web.utilities.MailNotifier;
+import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.io.Serializable;
-import java.lang.ProcessBuilder.Redirect;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A class representing a Fit3D job.
  */
 public class Fit3DJob implements Runnable, Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6539323103513381973L;
-	private String commandLine;
-	private String description;
-	private String email;
-	private boolean enqueued = false;
-	private boolean finished = false;
-	private UUID id;
-	private boolean running = false;
+    private static final long serialVersionUID = -4519263362860178857L;
+    private static final Logger logger = LoggerFactory.getLogger(Fit3DJob.class);
 
-	private JobParameters parameters;
+    private Path workingDirectoryPath;
+    private String description;
+    private String email;
+    private boolean enqueued = false;
+    private boolean finished = false;
+    private UUID jobId;
+    private boolean running = false;
 
-	private Date timeStamp;
+    private JobParameters parameters;
 
-	private String workingDirectory;
-	private UUID sessionId;
-	transient private Process process;
+    private Date timeStamp;
 
-	public Fit3DJob(UUID id, UUID sessionId, Date timeStamp, String description, String email, String workingDirectory,
-			String commandLine, JobParameters parameters) {
+    private UUID sessionId;
+    transient private Process process;
+    private List<Fit3DMatch> results;
 
-		this.id = id;
-		this.sessionId = sessionId;
-		this.timeStamp = timeStamp;
-		this.description = description;
-		this.email = email;
-		this.workingDirectory = workingDirectory;
-		this.commandLine = commandLine;
-		this.parameters = parameters;
-	}
+    public Fit3DJob(UUID jobId, UUID sessionId, Date timeStamp, String description, String email, Path workingDirectoryPath, JobParameters parameters) {
+        this.jobId = jobId;
+        this.sessionId = sessionId;
+        this.timeStamp = timeStamp;
+        this.description = description;
+        this.email = email;
+        this.workingDirectoryPath = workingDirectoryPath;
+        this.parameters = parameters;
+    }
 
-	public String getCommandLine() {
-		return this.commandLine;
-	}
+    public Path getWorkingDirectoryPath() {
+        return workingDirectoryPath;
+    }
 
-	public String getDescription() {
-		return this.description;
-	}
+    public void setWorkingDirectoryPath(Path workingDirectoryPath) {
+        this.workingDirectoryPath = workingDirectoryPath;
+    }
 
-	public String getEmail() {
-		return this.email;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public UUID getId() {
-		return this.id;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public JobParameters getParameters() {
-		return this.parameters;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public Process getProcess() {
-		return this.process;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public UUID getSessionId() {
-		return this.sessionId;
-	}
+    public UUID getJobId() {
+        return jobId;
+    }
 
-	public String getStatus() {
+    public void setJobId(UUID jobId) {
+        this.jobId = jobId;
+    }
 
-		if (this.enqueued) {
+    public JobParameters getParameters() {
+        return parameters;
+    }
 
-			return "enqueued";
-		}
+    public void setParameters(JobParameters parameters) {
+        this.parameters = parameters;
+    }
 
-		if (this.running) {
+    public Date getTimeStamp() {
+        return timeStamp;
+    }
 
-			return "running";
-		}
+    public void setTimeStamp(Date timeStamp) {
+        this.timeStamp = timeStamp;
+    }
 
-		if (this.finished) {
+    public UUID getSessionId() {
+        return sessionId;
+    }
 
-			return "finished";
-		}
+    public void setSessionId(UUID sessionId) {
+        this.sessionId = sessionId;
+    }
 
-		return null;
-	}
+    public Process getProcess() {
+        return process;
+    }
 
-	public Date getTimeStamp() {
-		return this.timeStamp;
-	}
+    public void setProcess(Process process) {
+        this.process = process;
+    }
 
-	public String getWorkingDirectory() {
-		return this.workingDirectory;
-	}
+    public String getStatus() {
+        if (enqueued) {
+            return "enqueued";
+        }
+        if (running) {
+            return "running";
+        }
+        if (finished) {
+            return "finished";
+        }
+        return "new";
+    }
 
-	public boolean isEnqueued() {
-		return this.enqueued;
-	}
+    public boolean isEnqueued() {
+        return enqueued;
+    }
 
-	public boolean isFinished() {
-		return this.finished;
-	}
+    public void setEnqueued(boolean enqueue) {
+        enqueued = enqueue;
+    }
 
-	public boolean isRunning() {
-		return this.running;
-	}
+    public boolean isFinished() {
+        return finished;
+    }
 
-	@Override
-	public void run() {
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+    }
 
-		try {
+    public boolean isRunning() {
+        return running;
+    }
 
-			LogHandler.LOG.info("starting job " + this);
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
 
-			ProcessBuilder pb = new ProcessBuilder(
-					new String("java -jar " + Fit3dConstants.FIT3D_LOCATION + " " + this.commandLine).split(" "));
-			File log = new File(this.workingDirectory + "/Fit3D.log");
-			pb.redirectErrorStream(true);
-			pb.redirectOutput(Redirect.appendTo(log));
-			pb.directory(new File(this.workingDirectory));
+    @Override
+    public void run() {
 
-			this.process = pb.start();
+        // TODO implement
+        logger.info("starting job {}", this);
 
-			this.running = true;
-			this.enqueued = false;
+        // run Fit3D here
+        try {
+            Thread.sleep(TimeUnit.SECONDS.toMillis(30));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-			// catch log
-			assert pb.redirectInput() == Redirect.PIPE;
-			assert pb.redirectOutput().file() == log;
-			assert this.process.getInputStream().read() == -1;
+        running = true;
+        enqueued = false;
 
-			this.process.waitFor();
+        logger.info("finished job " + this);
 
-			LogHandler.LOG.info("finished job " + this);
-			this.finished = true;
-			this.running = false;
+        // send email notification
+        if (!email.isEmpty()) {
+            try {
+                MailNotifier.getInstance().sendNotificationMail(sessionId, this);
+            } catch (MessagingException | IOException e) {
+                logger.info("failed to send notification mail for job {}", this);
+            }
+        }
+    }
 
-			// count load monitor
-			LoadMonitor.getInstance().countDown();
+    @Override
+    public String toString() {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return description + " submitted at " + df.format(timeStamp);
+    }
 
-			// send notification mail
-			if (!this.email.equals("")) {
-
-				MailNotifier.getInstance().sendNotificationMail(this.sessionId, this);
-			}
-
-		} catch (Exception e) {
-
-			LogHandler.LOG.severe(e.getMessage() + " " + this);
-		}
-	}
-
-	public void setCommandLine(String commandLine) {
-		this.commandLine = commandLine;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public void setEnqueued(boolean enqueue) {
-		this.enqueued = enqueue;
-	}
-
-	public void setFinished(boolean finished) {
-		this.finished = finished;
-	}
-
-	public void setRunning(boolean running) {
-		this.running = running;
-	}
-
-	public void setSessionId(UUID sessionId) {
-		this.sessionId = sessionId;
-	}
-
-	public void setTimeStamp(Date timeStamp) {
-		this.timeStamp = timeStamp;
-	}
-
-	public void setWorkingDirectory(String workingDirectory) {
-		this.workingDirectory = workingDirectory;
-	}
-
-	@Override
-	public String toString() {
-
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-		return this.description + " submitted at " + df.format(this.timeStamp);
-	}
+    public List<Fit3DMatch> getResults() {
+        return results;
+    }
 }

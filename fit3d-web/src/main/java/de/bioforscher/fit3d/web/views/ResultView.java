@@ -1,22 +1,11 @@
 package de.bioforscher.fit3d.web.views;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import javax.annotation.PostConstruct;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-
+import de.bioforscher.fit3d.web.controllers.SessionController;
+import de.bioforscher.fit3d.web.core.Fit3DJob;
+import de.bioforscher.fit3d.web.core.Fit3DJobDummy;
+import de.bioforscher.fit3d.web.core.RmsdDistribution;
+import de.bioforscher.fit3d.web.io.DirectoryZip;
+import de.bioforscher.fit3d.web.utilities.LoadMonitor;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultStreamedContent;
@@ -25,47 +14,49 @@ import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.LineChartModel;
 import org.primefaces.model.chart.LineChartSeries;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import de.bioforscher.fit3d.web.controllers.SessionController;
-import de.bioforscher.fit3d.web.core.Fit3DJob;
-import de.bioforscher.fit3d.web.core.Fit3DJobDummy;
-import de.bioforscher.fit3d.web.core.RmsdDistribution;
-import de.bioforscher.fit3d.web.io.DirectoryZip;
-import de.bioforscher.fit3d.web.utilities.Fit3dConstants;
-import de.bioforscher.fit3d.web.utilities.LoadMonitor;
-import de.bioforscher.fit3d.web.utilities.LogHandler;
+import javax.annotation.PostConstruct;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ResultView implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2464250156372784454L;
-	private static final int ALL_AGAINT_ONE_LIMIT = 1000;
-	private int enqueuedCount;
-	private Fit3DJob job;
-	private List<Fit3DMatch> results;
-	private SessionController sessionController;
-	private LineChartModel rmsdChart;
-	private int resultCount;
-	private int resultStructures;
+    private static final long serialVersionUID = 6674743107376192171L;
+    private static final Logger logger = LoggerFactory.getLogger(ResultView.class);
 
-	private String currentPv;
 
-	private long intraCount;
+    private static final int ALL_AGAINT_ONE_LIMIT = 1000;
+    private int enqueuedCount;
+    private Fit3DJob job;
+    private List<Fit3DMatch> results;
+    private SessionController sessionController;
+    private LineChartModel rmsdChart;
+    private int resultCount;
+    private int resultStructures;
 
-	private long interCount;
-	private double intraCountRel;
-	private double interCountRel;
-	private double maxLrmsd;
-	private double minLrmsd;
-	private String currentMatchExternalPdb;
-	private String currentQueryExternalPdb;
-	private String extractStructureDescription;
+    private String currentPv;
 
-	public String convertToExpasy(Fit3DMatch h) {
+    private long intraCount;
 
-		// TODO implement
+    private long interCount;
+    private double intraCountRel;
+    private double interCountRel;
+    private double maxLrmsd;
+    private double minLrmsd;
+    private String currentMatchExternalPdb;
+    private String currentQueryExternalPdb;
+    private String extractStructureDescription;
+
+    public String convertToExpasy(Fit3DMatch h) {
+
+        // TODO implement
 //		String ecNumber = h.getEcNumber();
 //		if (h.getEcNumber().equals("?")) {
 //
@@ -95,258 +86,250 @@ public class ResultView implements Serializable {
 //			}
 //		}
 
-		return "?";
-	}
+        return "?";
+    }
 
-	// TODO title mapping
-	public StreamedContent getCsvResults() throws IOException {
+    // TODO title mapping
+    public StreamedContent getCsvResults() throws IOException {
+        return new DefaultStreamedContent(Files.newInputStream(job.getWorkingDirectoryPath().resolve("summary.csv")), "text/csv", "summary.csv");
+    }
 
-		return new DefaultStreamedContent(new FileInputStream(this.job.getWorkingDirectory() + "/results.csv"),
-				"text/csv", "results.csv");
-	}
+    public String getCurrentPv() {
+        return currentPv;
+    }
 
-	public String getCurrentPv() {
-		return this.currentPv;
-	}
+    public void setCurrentPv(String currentPv) {
+        this.currentPv = currentPv;
+    }
 
-	public int getEnqueuedCount() {
+    public int getEnqueuedCount() {
 
-		this.enqueuedCount = LoadMonitor.getInstance().getEnqueued();
+        enqueuedCount = LoadMonitor.getInstance().getEnqueued();
 
-		return this.enqueuedCount;
-	}
+        return enqueuedCount;
+    }
 
-	public String getExtractStructureDescription() {
-		return this.extractStructureDescription;
-	}
+    public String getExtractStructureDescription() {
+        return extractStructureDescription;
+    }
 
-	public StreamedContent getHitPdbFile(Fit3DMatch h) throws FileNotFoundException {
+    public void setExtractStructureDescription(String extractStructureDescription) {
+        this.extractStructureDescription = extractStructureDescription;
+    }
 
-	    // TODO implement
+    public StreamedContent getHitPdbFile(Fit3DMatch h) throws FileNotFoundException {
+
+        // TODO implement
 //		String fileName = InputOutputUtils.getOutputFilename(h) + ".pdb";
 //		File motifFile = new File(this.job.getWorkingDirectory() + "/structures/" + fileName);
 
 //		return new DefaultStreamedContent(new FileInputStream(motifFile), "chemical/pdb", fileName);
         return null;
-	}
+    }
 
-	public long getInterCount() {
-		return this.interCount;
-	}
+    public long getInterCount() {
+        return interCount;
+    }
 
-	public double getInterCountRel() {
-		return this.interCountRel;
-	}
+    public double getInterCountRel() {
+        return interCountRel;
+    }
 
-	public Object getIntraCount() {
-		return this.intraCount;
-	}
+    public Object getIntraCount() {
+        return intraCount;
+    }
 
-	public double getIntraCountRel() {
-		return this.intraCountRel;
-	}
+    public double getIntraCountRel() {
+        return intraCountRel;
+    }
 
-	public Fit3DJob getJob() {
-		return this.job;
-	}
+    public Fit3DJob getJob() {
+        return job;
+    }
 
-	public double getMaxLrmsd() {
-		return this.maxLrmsd;
-	}
+    public void setJob(Fit3DJob job) {
+        this.job = job;
+    }
 
-	public double getMinLrmsd() {
-		return this.minLrmsd;
-	}
+    public double getMaxLrmsd() {
+        return maxLrmsd;
+    }
 
-	public int getResultCount() {
-		return this.resultCount;
-	}
+    public double getMinLrmsd() {
+        return minLrmsd;
+    }
 
-	public List<Fit3DMatch> getResults() {
-		return this.results;
-	}
+    public void setMinLrmsd(double minLrmsd) {
+        this.minLrmsd = minLrmsd;
+    }
 
-	public int getResultStructures() {
-		return this.resultStructures;
-	}
+    public int getResultCount() {
+        return resultCount;
+    }
 
-	public LineChartModel getRmsdChart() {
-		return this.rmsdChart;
-	}
+    public List<Fit3DMatch> getResults() {
+        return results;
+    }
 
-	public SessionController getSessionController() {
-		return this.sessionController;
-	}
+    public void setResults(List<Fit3DMatch> results) {
+        this.results = results;
+    }
 
-	public StreamedContent getZippedResults() throws IOException {
+    public int getResultStructures() {
+        return resultStructures;
+    }
 
-		String zipFilePath = this.job.getWorkingDirectory() + "/results.zip";
+    public void setResultStructures(int resultStructures) {
+        this.resultStructures = resultStructures;
+    }
 
-		// create directory zip class
-		DirectoryZip dz = new DirectoryZip(zipFilePath, this.job.getWorkingDirectory());
+    public LineChartModel getRmsdChart() {
+        return rmsdChart;
+    }
 
-		// ignore files
-		List<String> ignoreFiles = new ArrayList<>();
+    public void setRmsdChart(LineChartModel rmsdChart) {
+        this.rmsdChart = rmsdChart;
+    }
 
-		ignoreFiles.add("all.pdb");
-		ignoreFiles.add("results.zip");
-		ignoreFiles.add("results.fit");
-		ignoreFiles.add("Fit3D.log");
-		dz.setIgnoreFiles(true);
-		dz.setIgnoreFileList(ignoreFiles);
+    public SessionController getSessionController() {
+        return sessionController;
+    }
 
-		// zip directory
-		dz.zipRecursively();
+    public void setSessionController(SessionController sessionController) {
+        this.sessionController = sessionController;
+    }
 
-		return new DefaultStreamedContent(new FileInputStream(dz.getZipFileName()), "application/octet-stream",
-				"results.zip");
-	}
+    public StreamedContent getZippedResults() throws IOException {
 
-	@PostConstruct
-	public void init() {
-		// for some unexplainable reason the ResultView is instantiated when
-		// clicking the Extract-btn within the ExtractView
-		if (FacesContext.getCurrentInstance().getViewRoot().getViewId().contains("extract.xhtml")) {
-			LogHandler.LOG.warning("illegal access to result view from extract view - fix me - urgent - seriously");
-			return;
-		}
-		this.job = this.sessionController.getSelectedJob();
+        Path zipFilePath = job.getWorkingDirectoryPath().resolve("results.zip");
 
-		if (this.job != null) {
+        // create directory zip class
+        DirectoryZip dz = new DirectoryZip(zipFilePath.toString(), job.getWorkingDirectoryPath().toString());
 
-			try {
+        // ignore files
+        List<String> ignoreFiles = new ArrayList<>();
 
-				updateResults();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
+        ignoreFiles.add("all.pdb");
+        ignoreFiles.add("results.zip");
+        ignoreFiles.add("results.fit");
+        ignoreFiles.add("Fit3D.log");
+        dz.setIgnoreFiles(true);
+        dz.setIgnoreFileList(ignoreFiles);
 
-	/**
-	 * redirects to job selection if no job is associated to prevent direct
-	 * access to result page
-	 * 
-	 * @throws IOException
-	 */
-	public void redirectToJobSelection() throws IOException {
-		if (this.job == null) {
-			ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-			externalContext.redirect(externalContext.getRequestContextPath() + "/jobs");
-		}
-	}
+        // zip directory
+        dz.zipRecursively();
 
-	public void setCurrentPv(String currentPv) {
-		this.currentPv = currentPv;
-	}
+        return new DefaultStreamedContent(new FileInputStream(dz.getZipFileName()), "application/octet-stream",
+                                          "results.zip");
+    }
 
-	public void setExtractStructureDescription(String extractStructureDescription) {
-		this.extractStructureDescription = extractStructureDescription;
-	}
+    @PostConstruct
+    public void init() {
+        // for some unexplainable reason the ResultView is instantiated when
+        // clicking the Extract-btn within the ExtractView
+        if (FacesContext.getCurrentInstance().getViewRoot().getViewId().contains("extract.xhtml")) {
+            logger.warn("illegal access to result view from extract view - fix me - urgent - seriously");
+            return;
+        }
+        job = sessionController.getSelectedJob();
 
-	public void setJob(Fit3DJob job) {
-		this.job = job;
-	}
+        if (job != null) {
+            try {
+                updateResults();
+            } catch (ClassNotFoundException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
 
-	public void setMinLrmsd(double minLrmsd) {
-		this.minLrmsd = minLrmsd;
-	}
+    /**
+     * redirects to job selection if no job is associated to prevent direct
+     * access to result page
+     *
+     * @throws IOException
+     */
+    public void redirectToJobSelection() throws IOException {
+        if (job == null) {
+            ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+            externalContext.redirect(externalContext.getRequestContextPath() + "/jobs");
+        }
+    }
 
-	public void setResults(List<Fit3DMatch> results) {
-		this.results = results;
-	}
+    /**
+     * if not yet done, a single PDB file for all result structures is created
+     * and aligned to the query motif
+     *
+     * @throws IOException
+     */
+    public void showAllAgainstOne() throws IOException {
 
-	public void setResultStructures(int resultStructures) {
-		this.resultStructures = resultStructures;
-	}
+//        File structureDir = new File(job.getWorkingDirectory() + "/structures/");
+//        File singlePdbFile = new File(job.getWorkingDirectory() + "/all.pdb");
 
-	public void setRmsdChart(LineChartModel rmsdChart) {
-		this.rmsdChart = rmsdChart;
-	}
+        // cancel if single PDB file was already created
+//        if (!singlePdbFile.exists()) {
+//
+//            // create single PDB file
+//            int fileCounter = 0;
+//            for (File f : structureDir.listFiles()) {
+//
+//                if (fileCounter > ALL_AGAINT_ONE_LIMIT) {
+//                    break;
+//                }
+//                // TODO implement
+////				String fileContent = FileUtils.readFileToString(f);
+////				FileUtils.write(singlePdbFile, fileContent, true);
+////				fileCounter++;
+//            }
+//        }
 
-	public void setSessionController(SessionController sessionController) {
-		this.sessionController = sessionController;
-	}
+        String pdbPath, motifPath;
+        if (job instanceof Fit3DJobDummy) {
+            pdbPath = "'data/example/all.pdb'";
+            motifPath = "'data/example/motif.pdb'";
+            // RequestContext.getCurrentInstance().execute(
+            // "viewer({ pdb : 'data/example/all.pdb', clear: true, style :
+            // 'lines', additionalPdb : { pdb : 'data/example/motif.pdb', style
+            // : 'sticks', color : 'green', labelColor : 'rgb(255, 255, 255)',
+            // labelSize : 22, labels : true, labelStyle : 'bold' } })");
+            // .execute("showAllAgainstOneAlignment('data/example/all.pdb','data/example/motif.pdb')");
+        } else {
+//            pdbPath = "'data/" + sessionController.getSessionIdentifier() + "/" + job.getId() + "/all.pdb'";
+//            motifPath = "'data/" + sessionController.getSessionIdentifier() + "/" + job.getId() + "/motif.pdb'";
+            // RequestContext.getCurrentInstance()
+            // .execute("showAllAgainstOneAlignment('data/" +
+            // this.sessionController.getId() + "/"
+            // + this.job.getId() + "/all.pdb','data/" +
+            // this.sessionController.getId() + "/"
+            // + this.job.getId() + "/motif.pdb')");
+            // .execute("viewer({ pdb : 'data/" +
+            // this.sessionController.getId() + "/" + this.job.getId()
+            // + "/all.pdb', " + "additionalPdbs : ['data/" +
+            // this.sessionController.getId() + "/"
+            // + this.job.getId() + "/motif.pdb'], style : 'lines' })");
+            // .execute("viewer({ pdb : 'data/" + this.sessionController.getId()
+            // + "/" + this.job.getId() + "/all.pdb', clear : true, style :
+            // 'lines', additionalPdb : { pdb : 'data/"
+            // + this.sessionController.getId() + "/" + this.job.getId()
+            // + "/motif.pdb', style : 'sticks', color : 'green', labelColor :
+            // 'rgb(255, 255, 255)', labelSize : 22, labels : true, labelStyle :
+            // 'bold' } })");
+        }
+//        RequestContext.getCurrentInstance().execute("viewer({ pdb : " + pdbPath
+//                                                    + ", clear: true, style : 'lines', additionalPdb : { pdb : " + motifPath
+//                                                    + ", style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold' } })");
 
-	/**
-	 * 
-	 * if not yet done, a single PDB file for all result structures is created
-	 * and aligned to the query motif
-	 * 
-	 * @throws IOException
-	 */
-	public void showAllAgainstOne() throws IOException {
+        // update currently shown
+        currentPv = "all against <span style=\"color:#00b04b\">query motif</span>";
 
-		File structureDir = new File(this.job.getWorkingDirectory() + "/structures/");
-		File singlePdbFile = new File(this.job.getWorkingDirectory() + "/all.pdb");
+        RequestContext.getCurrentInstance().update("proteinViewerStatus");
 
-		// cancel if single PDB file was already created
-		if (!singlePdbFile.exists()) {
+    }
 
-			// create single PDB file
-			int fileCounter = 0;
-			for (File f : structureDir.listFiles()) {
+    public void showGlobalAlignment(Fit3DMatch h) throws IOException {
 
-				if (fileCounter > ALL_AGAINT_ONE_LIMIT) {
-					break;
-				}
-				// TODO implement
-//				String fileContent = FileUtils.readFileToString(f);
-//				FileUtils.write(singlePdbFile, fileContent, true);
-//				fileCounter++;
-			}
-		}
-
-		String pdbPath, motifPath;
-		if (this.job instanceof Fit3DJobDummy) {
-			pdbPath = "'data/example/all.pdb'";
-			motifPath = "'data/example/motif.pdb'";
-			// RequestContext.getCurrentInstance().execute(
-			// "viewer({ pdb : 'data/example/all.pdb', clear: true, style :
-			// 'lines', additionalPdb : { pdb : 'data/example/motif.pdb', style
-			// : 'sticks', color : 'green', labelColor : 'rgb(255, 255, 255)',
-			// labelSize : 22, labels : true, labelStyle : 'bold' } })");
-			// .execute("showAllAgainstOneAlignment('data/example/all.pdb','data/example/motif.pdb')");
-		} else {
-			pdbPath = "'data/" + this.sessionController.getId() + "/" + this.job.getId() + "/all.pdb'";
-			motifPath = "'data/" + this.sessionController.getId() + "/" + this.job.getId() + "/motif.pdb'";
-			// RequestContext.getCurrentInstance()
-			// .execute("showAllAgainstOneAlignment('data/" +
-			// this.sessionController.getId() + "/"
-			// + this.job.getId() + "/all.pdb','data/" +
-			// this.sessionController.getId() + "/"
-			// + this.job.getId() + "/motif.pdb')");
-			// .execute("viewer({ pdb : 'data/" +
-			// this.sessionController.getId() + "/" + this.job.getId()
-			// + "/all.pdb', " + "additionalPdbs : ['data/" +
-			// this.sessionController.getId() + "/"
-			// + this.job.getId() + "/motif.pdb'], style : 'lines' })");
-			// .execute("viewer({ pdb : 'data/" + this.sessionController.getId()
-			// + "/" + this.job.getId() + "/all.pdb', clear : true, style :
-			// 'lines', additionalPdb : { pdb : 'data/"
-			// + this.sessionController.getId() + "/" + this.job.getId()
-			// + "/motif.pdb', style : 'sticks', color : 'green', labelColor :
-			// 'rgb(255, 255, 255)', labelSize : 22, labels : true, labelStyle :
-			// 'bold' } })");
-		}
-		RequestContext.getCurrentInstance().execute("viewer({ pdb : " + pdbPath
-				+ ", clear: true, style : 'lines', additionalPdb : { pdb : " + motifPath
-				+ ", style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold' } })");
-
-		// update currently shown
-		this.currentPv = "all against <span style=\"color:#00b04b\">query motif</span>";
-
-		RequestContext.getCurrentInstance().update("proteinViewerStatus");
-
-	}
-
-	public void showGlobalAlignment(Fit3DMatch h) throws IOException {
-
-	    // TODO implement
+        // TODO implement
 //		Structure matchStructure = new TargetStructureParser(Fit3dConstants.PDB_DIR, h.getPdbId()).parseStructure();
 //		FileUtils.writeStringToFile(new File(this.job.getWorkingDirectory() + "/aligned_match.pdb"),
 //				matchStructure.toPDB());
@@ -393,29 +376,30 @@ public class ResultView implements Serializable {
 //
 //		RequestContext.getCurrentInstance()
 //				.execute("viewer({ pdb : '" + this.currentMatchExternalPdb + "', motif : [" + sb1.toString()
-//						+ "], clear : true, style : 'cartoon', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labelStyle : 'bold', alternatePosition : true, additionalPdb : { pdb : '"
+//						+ "], clear : true, style : 'cartoon', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labelStyle : 'bold', alternatePosition : true, additionalPdb : { pdb
+// : '"
 //						+ this.currentQueryExternalPdb + "', style : 'cartoon', color : 'lightgrey', motif : ["
 //						+ sb2.toString() + "], labelSize : 22, labelStyle : 'bold' } })");
 //
 //		this.currentPv = matchStructure.getIdentifier() + " against <span style=\"color:#00b04b\">"
 //				+ queryStructure.getIdentifier() + "</span>";
 
-		RequestContext.getCurrentInstance().update("proteinViewerStatus");
+        RequestContext.getCurrentInstance().update("proteinViewerStatus");
 
-	}
+    }
 
-	public void showInStructure(Fit3DMatch h) throws IOException {
+    public void showInStructure(Fit3DMatch h) throws IOException {
 
-		// create PDB directory if it not exists
-		File pdbDir = new File(System.getProperty("os.name").startsWith("Win")
-				? FacesContext.getCurrentInstance().getExternalContext().getRealPath("/") + "data/pdb/"
-				: FacesContext.getCurrentInstance().getExternalContext().getRealPath("data/pdb/"));
-		if (!pdbDir.exists()) {
+        // create PDB directory if it not exists
+        File pdbDir = new File(System.getProperty("os.name").startsWith("Win")
+                               ? FacesContext.getCurrentInstance().getExternalContext().getRealPath("/") + "data/pdb/"
+                               : FacesContext.getCurrentInstance().getExternalContext().getRealPath("data/pdb/"));
+        if (!pdbDir.exists()) {
 
-			pdbDir.mkdirs();
-		}
+            pdbDir.mkdirs();
+        }
 
-		// TODO implement
+        // TODO implement
 //		String pdbId = h.getPdbId();
 //		String pdbFilePath = System.getProperty("os.name").startsWith("Win")
 //				? FacesContext.getCurrentInstance().getExternalContext().getRealPath("/") + "data/pdb/" + pdbId + ".pdb"
@@ -445,25 +429,25 @@ public class ResultView implements Serializable {
 //			out.close();
 //		}
 
-		// extract motif from PDB file
-		// extractMotifFromPdb(pdbFilePath, h);
+        // extract motif from PDB file
+        // extractMotifFromPdb(pdbFilePath, h);
 
-		// StringBuffer motifString = new StringBuffer("{residues:[");
-		// for (HitAminoAcid hAa : h.getAminoAcids()) {
-		//
-		// motifString.append("{chain:'" + hAa.getChainId() + "',resnum:" +
-		// hAa.getResidueNumber() + "},");
-		// }
-		// motifString.deleteCharAt(motifString.length() - 1);
-		// motifString.append("]}");
-		//
-		// //
-		// RequestContext.getCurrentInstance().execute("showInStructureAlignment('data/pdb/"
-		// // + pdbId + ".pdb'," + motifString + ")");
-		// RequestContext.getCurrentInstance().execute("viewer({ pdb :
-		// 'data/pdb/" + pdbId
-		// + ".pdb', clear : true, style : 'cartoon', highlight : " +
-		// motifString + " })");
+        // StringBuffer motifString = new StringBuffer("{residues:[");
+        // for (HitAminoAcid hAa : h.getAminoAcids()) {
+        //
+        // motifString.append("{chain:'" + hAa.getChainId() + "',resnum:" +
+        // hAa.getResidueNumber() + "},");
+        // }
+        // motifString.deleteCharAt(motifString.length() - 1);
+        // motifString.append("]}");
+        //
+        // //
+        // RequestContext.getCurrentInstance().execute("showInStructureAlignment('data/pdb/"
+        // // + pdbId + ".pdb'," + motifString + ")");
+        // RequestContext.getCurrentInstance().execute("viewer({ pdb :
+        // 'data/pdb/" + pdbId
+        // + ".pdb', clear : true, style : 'cartoon', highlight : " +
+        // motifString + " })");
 
         // TODO implement
 //		StringBuffer sb = new StringBuffer();
@@ -481,13 +465,13 @@ public class ResultView implements Serializable {
 //		// update currently shown
 //		this.currentPv = pdbId;
 
-		RequestContext.getCurrentInstance().update("proteinViewerStatus");
+        RequestContext.getCurrentInstance().update("proteinViewerStatus");
 
-	}
+    }
 
-	public void showPairwise(Fit3DMatch h) {
+    public void showPairwise(Fit3DMatch h) {
 
-	    // TODO implement
+        // TODO implement
 //		String pdbPath, motifPath;
 //		if (this.job instanceof Fit3DJobDummy) {
 //			pdbPath = "'data/example/structures/" + InputOutputUtils.getOutputFilename(h) + ".pdb'";
@@ -525,101 +509,101 @@ public class ResultView implements Serializable {
 //				+ motifPath
 //				+ ", style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold', alternatePosition : true } })");
 
-		// update currently shown
-		this.currentPv = h.toString();
-		RequestContext.getCurrentInstance().update("proteinViewerStatus");
+        // update currently shown
+        currentPv = h.toString();
+        RequestContext.getCurrentInstance().update("proteinViewerStatus");
 
-	}
+    }
 
-	public void updateResults() throws ClassNotFoundException, IOException {
-		if (this.results == null && this.job.isFinished()) {
+    public void updateResults() throws ClassNotFoundException, IOException {
+        if (results == null && job.isFinished()) {
 
-			// load results
-			this.results = this.sessionController.getResultsForSelectedJob();
+            // load results
+            results = sessionController.getResultsForSelectedJob();
 
-			if (!this.results.isEmpty()) {
+            if (!results.isEmpty()) {
 
-				// generate result statistics
-				analyzeResults();
+                // generate result statistics
+                analyzeResults();
 
-				// update motif meta data
-				RequestContext.getCurrentInstance().update("resultsMetaData");
+                // update motif meta data
+                RequestContext.getCurrentInstance().update("resultsMetaData");
 
-				// calculate all-against-one alignment
-				showAllAgainstOne();
+                // calculate all-against-one alignment
+                showAllAgainstOne();
 
-				// show toolbox
-				showToolbox();
+                // show toolbox
+                showToolbox();
 
-				// generate RMSD distribution
-				initRmsdDistribution();
-			}
+                // generate RMSD distribution
+                initRmsdDistribution();
+            }
 
-			if (this.job.getParameters().getExtractPdbFilePath() != null) {
+            if (job.getParameters().getExtractPdbFilePath() != null) {
 
-			    // TODO implement
+                // TODO implement
 //				String id = new QueryStructureParser(Fit3dConstants.PDB_DIR,
 //						this.job.getParameters().getExtractPdbFilePath()).parseStructure().getIdentifier();
 //				this.extractStructureDescription = (id == null) ? "unknown" : id;
 
-			}
-		}
-	}
+            }
+        }
+    }
 
-	// private void extractMotifFromPdb(String pdbFilePath, Hit h)
-	// throws IOException {
-	//
-	// StructureParser sp = new QueryStructureParser(Fit3dConstants.PDB_DIR,
-	// pdbFilePath);
-	//
-	// List<AminoAcid> motifInStructure = new ArrayList<>();
-	// for (HitAminoAcid hAa : h.getAminoAcids()) {
-	//
-	// for (AminoAcid aa : sp.parse()) {
-	//
-	// if (aa.getChainId().equals(String.valueOf(hAa.getChainId()))
-	// && aa.getResidueNumber().getSeqNum() == hAa
-	// .getResidueNumber()) {
-	//
-	// if (hAa.getInsCode() != null
-	// && aa.getResidueNumber().getInsCode() != null) {
-	//
-	// if (hAa.getInsCode().equals(
-	// aa.getResidueNumber().getInsCode())) {
-	//
-	// motifInStructure.add(aa);
-	// }
-	// } else {
-	//
-	// motifInStructure.add(aa);
-	// }
-	// }
-	// }
-	// }
-	//
-	// List<Atom> atoms = new ArrayList<>();
-	// motifInStructure.stream().forEach(a -> atoms.addAll(a.getAtoms()));
-	//
-	// LogHandler.LOG
-	// .info("writing PDB file for structure view to local storage");
-	//
-	// BufferedWriter out = new BufferedWriter(new FileWriter(FacesContext
-	// .getCurrentInstance().getExternalContext()
-	// .getRealPath("data/pdb/motif.pdb")));
-	//
-	// // write all atoms to PDB file
-	// for (Atom atom : atoms) {
-	//
-	// out.write(atom.toPDB());
-	// }
-	//
-	// // close buffered writer
-	// out.close();
-	// }
+    // private void extractMotifFromPdb(String pdbFilePath, Hit h)
+    // throws IOException {
+    //
+    // StructureParser sp = new QueryStructureParser(Fit3dConstants.PDB_DIR,
+    // pdbFilePath);
+    //
+    // List<AminoAcid> motifInStructure = new ArrayList<>();
+    // for (HitAminoAcid hAa : h.getAminoAcids()) {
+    //
+    // for (AminoAcid aa : sp.parse()) {
+    //
+    // if (aa.getChainId().equals(String.valueOf(hAa.getChainId()))
+    // && aa.getResidueNumber().getSeqNum() == hAa
+    // .getResidueNumber()) {
+    //
+    // if (hAa.getInsCode() != null
+    // && aa.getResidueNumber().getInsCode() != null) {
+    //
+    // if (hAa.getInsCode().equals(
+    // aa.getResidueNumber().getInsCode())) {
+    //
+    // motifInStructure.add(aa);
+    // }
+    // } else {
+    //
+    // motifInStructure.add(aa);
+    // }
+    // }
+    // }
+    // }
+    //
+    // List<Atom> atoms = new ArrayList<>();
+    // motifInStructure.stream().forEach(a -> atoms.addAll(a.getAtoms()));
+    //
+    // LogHandler.LOG
+    // .info("writing PDB file for structure view to local storage");
+    //
+    // BufferedWriter out = new BufferedWriter(new FileWriter(FacesContext
+    // .getCurrentInstance().getExternalContext()
+    // .getRealPath("data/pdb/motif.pdb")));
+    //
+    // // write all atoms to PDB file
+    // for (Atom atom : atoms) {
+    //
+    // out.write(atom.toPDB());
+    // }
+    //
+    // // close buffered writer
+    // out.close();
+    // }
 
-	private void analyzeResults() {
+    private void analyzeResults() {
 
-	    // TODO implement
+        // TODO implement
 //		this.resultCount = this.results.size();
 //
 //		Set<String> resultsStructureSet = new HashSet<>();
@@ -637,9 +621,9 @@ public class ResultView implements Serializable {
 //
 //		this.minLrmsd = this.results.stream().min((h1, h2) -> Double.compare(h1.getRmsd(), h2.getRmsd())).get()
 //				.getRmsd();
-	}
+    }
 
-	// TODO implement
+    // TODO implement
 //	/**
 //	 * superimposes two structures by biojava's svd then calculating
 //	 * ca-ca-distances of corresponding atoms
@@ -663,32 +647,32 @@ public class ResultView implements Serializable {
 //		Calc.shift(queryStructure, h.getShift());
 //	}
 
-	private void initRmsdDistribution() {
+    private void initRmsdDistribution() {
 
-		LogHandler.LOG.info("initializing line chart model for job " + this.job);
-		this.rmsdChart = new LineChartModel();
-		this.rmsdChart.setTitle("LRMSD distribution");
-		this.rmsdChart.setLegendPosition("e");
-		Axis xAxis = this.rmsdChart.getAxis(AxisType.X);
-		xAxis.setMin(0);
-		xAxis.setLabel("LRMSD");
-		Axis yAxis = this.rmsdChart.getAxis(AxisType.Y);
-		yAxis.setMin(0);
-		yAxis.setLabel("log10 occurrence");
-		// yAxis.setMax(10);
+        logger.info("initializing line chart model for job " + job);
+        rmsdChart = new LineChartModel();
+        rmsdChart.setTitle("LRMSD distribution");
+        rmsdChart.setLegendPosition("e");
+        Axis xAxis = rmsdChart.getAxis(AxisType.X);
+        xAxis.setMin(0);
+        xAxis.setLabel("LRMSD");
+        Axis yAxis = rmsdChart.getAxis(AxisType.Y);
+        yAxis.setMin(0);
+        yAxis.setLabel("log10 occurrence");
+        // yAxis.setMax(10);
 
-		LogHandler.LOG.info("calculating RMSD distribution for job " + this.job);
-		RmsdDistribution rd = new RmsdDistribution(this.results);
+        logger.info("calculating RMSD distribution for job " + job);
+        RmsdDistribution rd = new RmsdDistribution(results);
 
-		LineChartSeries series = new LineChartSeries();
-		series.setLabel("matches");
-		series.setData(rd.getValues());
-		this.rmsdChart.addSeries(series);
+        LineChartSeries series = new LineChartSeries();
+        series.setLabel("matches");
+        series.setData(rd.getValues());
+        rmsdChart.addSeries(series);
 
-	}
+    }
 
-	private void showToolbox() {
-		// expand toolbox when finished
-		RequestContext.getCurrentInstance().execute("PF('mainContainer').show('east')");
-	}
+    private void showToolbox() {
+        // expand toolbox when finished
+        RequestContext.getCurrentInstance().execute("PF('mainContainer').show('east')");
+    }
 }

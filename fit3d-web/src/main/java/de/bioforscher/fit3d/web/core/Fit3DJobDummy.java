@@ -1,52 +1,50 @@
 package de.bioforscher.fit3d.web.core;
 
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import de.bioforscher.fit3d.web.utilities.LoadMonitor;
-import de.bioforscher.fit3d.web.utilities.LogHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A dummy job, that does no calculation but waits for a defined time.
- * 
- * @author fkaiser
  *
+ * @author fkaiser
  */
 public class Fit3DJobDummy extends Fit3DJob {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3362504070533220168L;
-	private static final long SLEEP_TIME = TimeUnit.SECONDS.toMillis(2);
+    private static final long serialVersionUID = -5240127430082643295L;
+    private static final Logger logger = LoggerFactory.getLogger(Fit3DJobDummy.class);
 
-	public Fit3DJobDummy(UUID id, UUID sessionId, Date timeStamp, String description, String email, String workingDirectory, String commandLine, JobParameters parameters) {
-		super(id, sessionId, timeStamp, description, email, workingDirectory, commandLine, parameters);
-	}
+    private static final long SLEEP_TIME = TimeUnit.SECONDS.toMillis(2);
 
-	@Override
-	public void run() {
+    public Fit3DJobDummy(UUID jobId, UUID sessionId, Date timeStamp, String description, String email, Path workingDirectoryPath, JobParameters parameters) {
+        super(jobId, sessionId, timeStamp, description, email, workingDirectoryPath, parameters);
+    }
 
-		try {
+    @Override
+    public void run() {
 
-			LogHandler.LOG.info("starting dummy job " + this);
-			setRunning(true);
-			setEnqueued(false);
+        try {
+            logger.info("starting dummy job {}", this);
+            setRunning(true);
+            setEnqueued(false);
 
-			Thread.sleep(SLEEP_TIME);
+            Thread.sleep(SLEEP_TIME);
 
-			LogHandler.LOG.info("finished dummy job " + this);
-			setFinished(true);
-			setRunning(false);
+            logger.info("finished dummy job {}", this);
+            setFinished(true);
+            setRunning(false);
 
-			// count load monitor
-			LoadMonitor.getInstance().countDown();
+            // count load monitor
+            LoadMonitor.getInstance().countDown();
 
-		} catch (InterruptedException e) {
-
-			LogHandler.LOG.warning(e.getMessage() + " " + this);
-		}
-	}
+        } catch (InterruptedException e) {
+            logger.warn(e.getMessage() + " " + this);
+        }
+    }
 
 }

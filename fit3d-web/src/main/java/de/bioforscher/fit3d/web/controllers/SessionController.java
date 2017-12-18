@@ -1,81 +1,76 @@
 package de.bioforscher.fit3d.web.controllers;
 
+import de.bioforscher.fit3d.web.core.Fit3DJob;
+import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
-
-import de.bioforscher.fit3d.web.core.Fit3DJob;
-import de.bioforscher.fit3d.web.utilities.LogHandler;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
-
 public class SessionController implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 454000165789704379L;
-	private UUID id;
-	private JobController jobController;
+    private static final long serialVersionUID = 3604747342156591226L;
+    private static final Logger logger = LoggerFactory.getLogger(SessionController.class);
 
-	private Fit3DJob selectedJob;
+    // TODO change to real matching path in docker (e.g. /srv/data) and add to docker run command (-v)
+    private static final Path BASE_PATH = Paths.get("/home/fkaiser/Workspace/IdeaProjects/fit3d/fit3d-web/src/main/webapp/data");
 
-	@Deprecated
-	public Fit3DJob findJob(UUID id) {
+    private UUID sessionIdentifier;
+    private Path workingPath;
+    private JobController jobController;
+    private Fit3DJob selectedJob;
 
-		for (Fit3DJob job : this.jobController.getManagedJobs().get(this.id)) {
+    public List<Fit3DMatch> getResultsForSelectedJob() {
+        logger.info("loading results for job {}", selectedJob);
+        return selectedJob.getResults();
+    }
 
-			if (job.getId().equals(id)) {
+    @PostConstruct
+    public void init() {
+        sessionIdentifier = UUID.randomUUID();
+        logger.info("initializing new session with id {}", sessionIdentifier);
+        workingPath = BASE_PATH.resolve(sessionIdentifier.toString());
+        //create directories
+        try {
+            Files.createDirectories(workingPath);
+        } catch (IOException e) {
+            logger.error("failed to create working directory for session {}", sessionIdentifier, e);
+        }
+        logger.info("created working path of session is {}", workingPath);
+    }
 
-				return job;
-			}
-		}
+    public UUID getSessionIdentifier() {
+        return sessionIdentifier;
+    }
 
-		return null;
-	}
+    public void setSessionIdentifier(UUID sessionIdentifier) {
+        this.sessionIdentifier = sessionIdentifier;
+    }
 
-	public UUID getId() {
-		return this.id;
-	}
+    public Path getWorkingPath() {
+        return workingPath;
+    }
 
-	public JobController getJobController() {
-		return this.jobController;
-	}
+    public JobController getJobController() {
+        return jobController;
+    }
 
-	public List<Fit3DMatch> getResultsForSelectedJob() throws ClassNotFoundException,
-															  IOException {
+    public void setJobController(JobController jobController) {
+        this.jobController = jobController;
+    }
 
-		LogHandler.LOG.info("loading results for job" + this.selectedJob);
+    public Fit3DJob getSelectedJob() {
+        return selectedJob;
+    }
 
-		String resultFilePath = this.selectedJob.getWorkingDirectory()
-				+ "/results.fit";
-
-
-		// TODO implement
-		return null;
-	}
-
-	public Fit3DJob getSelectedJob() {
-		return this.selectedJob;
-	}
-
-	@PostConstruct
-	public void init() {
-
-		this.id = UUID.randomUUID();
-	}
-
-	public void setId(UUID id) {
-		this.id = id;
-	}
-
-	public void setJobController(JobController jobController) {
-		this.jobController = jobController;
-	}
-
-	public void setSelectedJob(Fit3DJob selectedJob) {
-		this.selectedJob = selectedJob;
-	}
+    public void setSelectedJob(Fit3DJob selectedJob) {
+        this.selectedJob = selectedJob;
+    }
 }

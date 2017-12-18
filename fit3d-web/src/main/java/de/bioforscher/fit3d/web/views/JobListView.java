@@ -8,73 +8,71 @@ import javax.annotation.PostConstruct;
 import de.bioforscher.fit3d.web.controllers.JobController;
 import de.bioforscher.fit3d.web.controllers.SessionController;
 import de.bioforscher.fit3d.web.core.Fit3DJob;
-import de.bioforscher.fit3d.web.utilities.LogHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JobListView implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5103812694748897508L;
+    private static final long serialVersionUID = 6696995028085411645L;
+    private static final Logger logger = LoggerFactory.getLogger(JobListView.class);
 
-	private List<Fit3DJob> associatedJobs;
+    private List<Fit3DJob> associatedJobs;
 
-	private JobController jobJontroller;
+    private JobController jobJontroller;
 
-	private Fit3DJob selectedJob;
+    private Fit3DJob selectedJob;
 
-	private SessionController sessionController;
+    private SessionController sessionController;
 
-	public List<Fit3DJob> getAssociatedJobs() {
-		return this.associatedJobs;
-	}
+    public List<Fit3DJob> getAssociatedJobs() {
+        return associatedJobs;
+    }
 
-	public JobController getJobJontroller() {
-		return this.jobJontroller;
-	}
+    public void setAssociatedJobs(List<Fit3DJob> selectedJob) {
+        associatedJobs = selectedJob;
+    }
 
-	public Fit3DJob getSelectedJob() {
-		return this.selectedJob;
-	}
+    public JobController getJobJontroller() {
+        return jobJontroller;
+    }
 
-	public SessionController getSessionController() {
-		return this.sessionController;
-	}
+    public void setJobJontroller(JobController jobJontroller) {
+        this.jobJontroller = jobJontroller;
+    }
 
-	@PostConstruct
-	public void init() {
+    public Fit3DJob getSelectedJob() {
+        return selectedJob;
+    }
 
-		this.associatedJobs = this.jobJontroller.getManagedJobs().get(
-				this.sessionController.getId());
-	}
+    public void setSelectedJob(Fit3DJob selectedJob) {
+        this.selectedJob = selectedJob;
+    }
 
-	public void listener() {
+    public SessionController getSessionController() {
+        return sessionController;
+    }
 
-		System.out.println("B");
-	}
+    public void setSessionController(SessionController sessionController) {
+        this.sessionController = sessionController;
+    }
 
-	public String selectJob() {
+    @PostConstruct
+    public void init() {
 
-		this.sessionController.setSelectedJob(this.selectedJob);
+        associatedJobs = jobJontroller.getManagedJobs().get(sessionController.getSessionIdentifier());
+    }
 
-		LogHandler.LOG.info("redirecting to detailed results");
+    public void listener() {
 
-		return "success";
-	}
+        System.out.println("B");
+    }
 
-	public void setAssociatedJobs(List<Fit3DJob> selectedJob) {
-		this.associatedJobs = selectedJob;
-	}
+    public String selectJob() {
 
-	public void setJobJontroller(JobController jobJontroller) {
-		this.jobJontroller = jobJontroller;
-	}
+        sessionController.setSelectedJob(selectedJob);
 
-	public void setSelectedJob(Fit3DJob selectedJob) {
-		this.selectedJob = selectedJob;
-	}
+        logger.info("redirecting to detailed results");
 
-	public void setSessionController(SessionController sessionController) {
-		this.sessionController = sessionController;
-	}
+        return "success";
+    }
 }

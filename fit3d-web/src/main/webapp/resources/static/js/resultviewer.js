@@ -1,183 +1,106 @@
-var defaultPVOptions = {
-	fog : false,
+var pv = pv.Viewer(document.getElementById('viewer'), {
+
 	width : 300,
 	height : 300,
 	antialias : true,
-	quality : 'high',
-	animateTime : 0,
-	selectionColor : '#f00',
-	fog : false
-};
+	quality : 'medium'
+});
 
-var aminoAcidNames = {
-	'ALA' : 'A', 'ARG' : 'R', 'ASN' : 'N', 'ASP' : 'D', 'CYS' : 'C', 'GLN' : 'Q', 'GLU' : 'E', 'GLY' : 'G', 'HIS' : 'H', 'ILE' : 'I', 'LEU' : 'L', 'LYS' : 'K', 'MET' : 'M', 'PHE' : 'F', 'PRO' : 'P', 'SER' : 'S', 'THR' : 'T', 'TRP' : 'W', 'TYR' : 'Y', 'VAL' : 'V'
-}
+function showPairwiseAlignment(pdbFilePath1, pdbFilePath2) {
 
-var pvInstances = {};
-var structures = {};
+	// clear structures
+	pv.clear();
 
-function viewer(opts) {
-	// propagate instructions
-	var id = opts.id ? opts.id : 'viewer';
-	
-	// get reference or init a new one if none exists - same for structures
-	var instance;
-	var structure;
-	if(pvInstances[id] && !opts.clear) {
-		instance = pvInstances[id];
-	} else {
-		$('#' + id).html('');
-		instance = pv.Viewer(document.getElementById(id), defaultPVOptions);
-		if(typeof(opts.motif) !== 'undefined') {
-			pvInstances = {};
-			structures = {};
-		}
-		pvInstances[id] = instance;
-	}
-	
-	// pdb file needs to be fetched - show it!
-	if(typeof(opts.pdb) !== 'undefined') {
-		loadStructure(instance, id, opts);
-	}
-	
-	// multiple structures
-	if(typeof(opts.additionalPdb) !== 'undefined') {
-		loadStructure(instance, id, opts.additionalPdb);
-	}
-	
-	structure = structures[id];
-
-	// get present structure and highlight selected residues during motif extraction
-	if(typeof(opts.highlight) !== 'undefined') {
-		var sel = structure.full().createEmptyView();
-		opts.highlight.forEach(function(res) {
-			var tmp = res.split("-");
-			var cname = tmp[0];
-			var rnum = +tmp[1].substring(1);
-			var add = instance.get('structure').select({
-				cname : cname,
-				rnum : rnum
-			});
-			add.atoms().forEach(function(a) {
-				sel.addAtom(a);
-			});
-		});
-		instance.get('structure').setSelection(sel);
-		instance.requestRedraw();
-	}
-}
-
-function loadStructure(instance, id, opts) {
-	$.ajax(opts.pdb).success(function(data) {
+	// insert the viewer under the Dom element with id 'gl'.
+	$.ajax(pdbFilePath1).done(function(data) {
+		// parse
 		var structure = io.pdb(data);
 		mol.assignHelixSheet(structure);
-		structures[id] = structure;
-		
-		var geom;
-		var style = opts.style ? opts.style : 'sticks';
-		switch (style) {
-			case 'cartoon':
-				geom = instance.cartoon('structure', structure);
-				break;
-			case 'sticks':
-				geom = instance.ballsAndSticks('structure', structure);
-				break;
-			case 'lines':
-				geom = instance.lines('structure', structure);
-				break;
-		}
-		
-		// color if requested
-		if(typeof(opts.color) !== 'undefined') {
-			geom.colorBy(pv.color.uniform(opts.color));
-		}
-		
-		// same for opacity
-		if(typeof(opts.opacity) !== 'undefined') {
-			instance.forEach(function(object) {
-				  object.setOpacity(opts.opacity);
-			});
-		}
+		// create instance rendered to specified DOM element
+		// protein.viewer = pv.Viewer($('#V' + protein.id)[0],
+		// defaultPVOptions);
+		pv.ballsAndSticks('structure', structure);
+		// viewer.lines('structure', structure);
+		pv.centerOn(structure);
+		// move camera to a reasonable position
+		pv.autoZoom();
 
-		instance.centerOn(structure);
-		instance.autoZoom();
-		
-		if(typeof(opts.motif) !== 'undefined') {
-			var labelFontColor = opts.labelColor ? opts.labelColor : "rgb(0, 0, 0)";
-			var labelFontSize = opts.labelSize ? opts.labelSize : "16";
-			var labelAlpha = opts.labelAlpha ? opts.labelAlpha : 0;
-			var labelFontStyle = opts.labelStyle ? opts.labelStyle : "normal";
-			var motif = opts.motif;
-			motif.forEach(function(go) {
-				var tmp = go.split("-");
-				var cname = tmp[0];
-				var rnum = +tmp[1].substring(1);
-				var residue = structure.residueSelect(function(res) {
-					return res.chain().name() === cname && res.num() === rnum;
-				});
+	});
+	$.ajax(pdbFilePath2).done(function(data) {
 
-				var pos = (opts.alternatePosition && residue.atoms()[1]) ? residue.atoms()[0].pos() : residue.atoms()[1].pos();
-				instance.label("label", go,
-					pos,
-					{ 	"font" : "Open Sans",
-						"fontSize" : labelFontSize,
-						"backgroundAlpha" : labelAlpha,
-						"fontColor" : labelFontColor,
-						"fontStyle" : labelFontStyle
-					});
-				var geom = instance.ballsAndSticks('motif', residue);
-				// color if requested
-				if(typeof(opts.color) !== 'undefined') {
-					geom.colorBy(pv.color.uniform(opts.color));
-				}
-			});
-			
-			instance.fitTo(structure.residueSelect(function(res) {
-				var value = false;
-				motif.forEach(function(go) {
-					var tmp = go.split("-");
-					var cname = tmp[0];
-					var rnum = +tmp[1].substring(1);
-					if (cname == res.chain().name() && rnum == res.num()) {
-						value = true;
-					}
-				});
-				return value;
-			}));
-		}
-		
-		
-		// handle labels
-		if(opts.labels) {
-			labels(instance, structure, opts);
-		}
+		var color2 = [ 0, 1, 0, 0.7 ];
+
+		// parse
+		var structure = io.pdb(data);
+		mol.assignHelixSheet(structure);
+		// create instance rendered to specified DOM element
+		// protein.viewer = pv.Viewer($('#V' + protein.id)[0],
+		// defaultPVOptions);
+
+		// color reference structure in red
+		pv.ballsAndSticks('structure', structure, {
+			color : color.uniform(color2)
+		});
+		// viewer.lines('structure', structure);
+		pv.centerOn(structure);
+		// move camera to a reasonable position
+		pv.autoZoom();
 	});
 }
 
-function labels(instance, structure, opts) {
-	var labelFontColor = opts.labelColor ? opts.labelColor : "rgb(0, 0, 0)";
-	var labelFontSize = opts.labelSize ? opts.labelSize : "16";
-	var labelAlpha = opts.labelAlpha ? opts.labelAlpha : 0;
-	var labelFontStyle = opts.labelStyle ? opts.labelStyle : "normal";
-
-	for (var i = 0; i < structure.chains().length; i++) {
-		var currentChain = structure.chains()[i];
-		for (var j = 0; j < currentChain.residues().length; j++) {
-			var currentResidue = currentChain.residues()[j];
-			var pos = opts.alternatePosition ? currentResidue.atom("CA").pos() : currentResidue.center();
-			instance.label("label",
-				currentChain.name() + "-" + convertThreeLetterCode(currentResidue.name()) + currentResidue.num(),
-				pos,
-				{ 	"font" : "Open Sans",
-					"fontSize" : labelFontSize,
-					"backgroundAlpha" : labelAlpha,
-					"fontColor" : labelFontColor,
-					"fontStyle" : labelFontStyle
-				});
+function load(pdb_id) {
+	document.getElementById('status').innerHTML = 'loading ' + pdb_id;
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', 'pdbs/' + pdb_id + '.pdb');
+	xhr.setRequestHeader('Content-type', 'application/x-pdb');
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4) {
+			structure = io.pdb(xhr.responseText);
+			preset();
+			pv.centerOn(structure);
 		}
+		document.getElementById('status').innerHTML = '';
 	}
+	xhr.send();
 }
 
-function convertThreeLetterCode(name) {
-	return aminoAcidNames[name] ? aminoAcidNames[name] : 'X';
+function showAllAgainstOneAlignment(pdbFilePath1, pdbFilePath2) {
+
+	// clear structures
+	pv.clear();
+
+	// insert the viewer under the Dom element with id 'gl'.
+	$.ajax(pdbFilePath1).done(function(data) {
+		// parse
+		var structure = io.pdb(data);
+		mol.assignHelixSheet(structure);
+		// create instance rendered to specified DOM element
+		// protein.viewer = pv.Viewer($('#V' + protein.id)[0],
+		// defaultPVOptions);
+		pv.lines('structure', structure);
+		pv.centerOn(structure);
+		// move camera to a reasonable position
+		pv.autoZoom();
+
+	});
+	$.ajax(pdbFilePath2).done(function(data) {
+
+		var color2 = [ 0, 1, 0, 0.7 ];
+
+		// parse
+		var structure = io.pdb(data);
+		mol.assignHelixSheet(structure);
+		// create instance rendered to specified DOM element
+		// protein.viewer = pv.Viewer($('#V' + protein.id)[0],
+		// defaultPVOptions);
+
+		// color reference structure in red
+		pv.ballsAndSticks('structure', structure, {
+			color : color.uniform(color2)
+		});
+		// viewer.lines('structure', structure);
+		pv.centerOn(structure);
+		// move camera to a reasonable position
+		pv.autoZoom();
+	});
 }

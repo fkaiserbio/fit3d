@@ -10,86 +10,79 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * A class to recursively zip a whole directory.
- * 
- * @author fkaiser
  *
+ * @author fkaiser
  */
 public class DirectoryZip {
 
-	private String directoryPath;
-	private String zipFileName;
-	private List<String> ignoreFileList;
+    private String directoryPath;
+    private String zipFileName;
+    private List<String> ignoreFileList;
 
-	private boolean ignoreFiles;
+    private boolean ignoreFiles;
 
-	public DirectoryZip(String zipFileName, String directoryPath) {
+    public DirectoryZip(String zipFileName, String directoryPath) {
 
-		this.zipFileName = zipFileName;
-		this.directoryPath = directoryPath;
-	}
+        this.zipFileName = zipFileName;
+        this.directoryPath = directoryPath;
+    }
 
-	public String getZipFileName() {
-		return this.zipFileName;
-	}
+    public String getZipFileName() {
+        return zipFileName;
+    }
 
-	public boolean isIgnoreFiles() {
-		return this.ignoreFiles;
-	}
+    public boolean isIgnoreFiles() {
+        return ignoreFiles;
+    }
 
-	public void setIgnoreFileList(List<String> ignoreFileList) {
+    public void setIgnoreFiles(boolean ignoreFiles) {
 
-		this.ignoreFileList = ignoreFileList;
-	}
+        this.ignoreFiles = ignoreFiles;
+    }
 
-	public void setIgnoreFiles(boolean ignoreFiles) {
+    public void setIgnoreFileList(List<String> ignoreFileList) {
 
-		this.ignoreFiles = ignoreFiles;
-	}
+        this.ignoreFileList = ignoreFileList;
+    }
 
-	public void zipRecursively() throws IOException {
+    public void zipRecursively() throws IOException {
 
-		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(
-				this.zipFileName));
-		addDir(new File(this.directoryPath), zos);
-		zos.close();
-	}
+        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(
+                zipFileName));
+        addDir(new File(directoryPath), zos);
+        zos.close();
+    }
 
-	private void addDir(File directory, ZipOutputStream zos) throws IOException {
+    private void addDir(File directory, ZipOutputStream zos) throws IOException {
 
-		File[] files = directory.listFiles();
+        File[] files = directory.listFiles();
 
-		byte[] buf = new byte[1024];
+        byte[] buf = new byte[1024];
 
-		for (int i = 0; i < files.length; i++) {
+        for (int i = 0; i < files.length; i++) {
 
-			File currentFile = files[i];
+            File currentFile = files[i];
 
-			// ignore files if enabled
-			if (this.ignoreFiles) {
+            // ignore files if enabled
+            if (ignoreFiles) {
+                if (ignoreFileList.contains(currentFile.getName())) {
+                    continue;
+                }
+            }
 
-				if (this.ignoreFileList.contains(currentFile.getName())) {
+            if (currentFile.isDirectory()) {
+                addDir(currentFile, zos);
+                continue;
+            }
 
-					continue;
-				}
-			}
-
-			if (currentFile.isDirectory()) {
-
-				addDir(currentFile, zos);
-				continue;
-			}
-
-			FileInputStream in = new FileInputStream(
-					currentFile.getAbsolutePath());
-
-			zos.putNextEntry(new ZipEntry(currentFile.getAbsolutePath()
-					.replaceAll(this.directoryPath, "")));
-			int len;
-			while ((len = in.read(buf)) > 0) {
-				zos.write(buf, 0, len);
-			}
-			in.close();
-			zos.closeEntry();
-		}
-	}
+            FileInputStream in = new FileInputStream(currentFile.getAbsolutePath());
+            zos.putNextEntry(new ZipEntry(currentFile.getAbsolutePath().replaceAll(directoryPath, "")));
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                zos.write(buf, 0, len);
+            }
+            in.close();
+            zos.closeEntry();
+        }
+    }
 }

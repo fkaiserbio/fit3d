@@ -1,46 +1,56 @@
 package de.bioforscher.fit3d.web.views;
 
 import de.bioforscher.fit3d.web.controllers.SessionController;
-import de.bioforscher.fit3d.web.utilities.LogHandler;
 import de.bioforscher.fit3d.web.utilities.enums.MotifComplexity;
+import de.bioforscher.singa.structure.model.identifiers.LeafIdentifier;
+import de.bioforscher.singa.structure.model.interfaces.AminoAcid;
+import de.bioforscher.singa.structure.model.interfaces.LeafSubstructure;
+import de.bioforscher.singa.structure.model.interfaces.Structure;
+import de.bioforscher.singa.structure.model.oak.OakStructure;
+import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
+import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserException;
+import de.bioforscher.singa.structure.parser.pdb.structures.StructureWriter;
 import org.omnifaces.util.Faces;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class ExtractView implements Serializable {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 7092080767526243192L;
-    private String pdbId;
-    private String workingDirectory;
+    private static final long serialVersionUID = 7587796072169171564L;
+    private static final Logger logger = LoggerFactory.getLogger(ExtractView.class);
+
     private SessionController sessionController;
+
+    private Path extractPdbFilePath;
+    private String pdbFileName;
+    private String[] leafIdentifierStrings;
+
+    private String pdbIdentifier;
     private String[] extractAminoAcids;
-    private String extractPdbPath;
     private String externalExtractPdbPath;
-    private String[] aaIdentifiers;
-    private boolean pdbUploaded;
+    private boolean pdbFileUploaded;
     private String extractedMotifPath;
     private String externalExtractedMotifPath;
     private boolean motifExtracted;
-    private String extractedMotifSeq;
-    private String pdbName;
+    private String extractedMotifSequence;
     private boolean blocked;
     private int motifAminoAcidCount;
     private double maxExtent;
     private String motifSeq;
     private String motifType;
-
     private MotifComplexity motifComplexity;
 
     /**
@@ -51,7 +61,7 @@ public class ExtractView implements Serializable {
      */
     public void extractMotif() {
 
-        if (this.extractAminoAcids.length < 2) {
+        if (extractAminoAcids.length < 2) {
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                                                     "Please define at least two amino acids.");
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -185,21 +195,13 @@ public class ExtractView implements Serializable {
             // 'motif-viewer', clear : true, labels : true, pdbData : '" + sb +
             // "' })");
             RequestContext.getCurrentInstance()
-                          .execute("viewer({ id : 'motif-viewer', pdb : '" + this.externalExtractedMotifPath
+                          .execute("viewer({ id : 'motif-viewer', pdb : '" + externalExtractedMotifPath
                                    + "', clear : true, labels : true, labelSize : 22, labelStyle : 'bold' })");
         }
     }
 
-    public String[] getAaIdentifiers() {
-        return this.aaIdentifiers;
-    }
-
-    public void setAaIdentifiers(String[] aaIdentifiers) {
-        this.aaIdentifiers = aaIdentifiers;
-    }
-
     public String getExternalExtractPdbPath() {
-        return this.externalExtractPdbPath;
+        return externalExtractPdbPath;
     }
 
     public void setExternalExtractPdbPath(String externalExtractPdbPath) {
@@ -207,7 +209,7 @@ public class ExtractView implements Serializable {
     }
 
     public String[] getExtractAminoAcids() {
-        return this.extractAminoAcids;
+        return extractAminoAcids;
     }
 
     public void setExtractAminoAcids(String[] extractAminoAcids) {
@@ -216,18 +218,18 @@ public class ExtractView implements Serializable {
 
     public StreamedContent getExtractedMotif() throws FileNotFoundException {
 
-        File extractedMotifFile = new File(this.extractedMotifPath);
+        File extractedMotifFile = new File(extractedMotifPath);
 
         return new DefaultStreamedContent(new FileInputStream(extractedMotifFile), "chemical/x-pdb",
-                                          "motif_" + this.extractedMotifSeq + ".pdb");
+                                          "motif_" + extractedMotifSequence + ".pdb");
     }
 
-    public String getExtractedMotifSeq() {
-        return this.extractedMotifSeq;
+    public String getExtractedMotifSequence() {
+        return extractedMotifSequence;
     }
 
     public double getMaxExtent() {
-        return this.maxExtent;
+        return maxExtent;
     }
 
     public void setMaxExtent(double maxExtent) {
@@ -235,7 +237,7 @@ public class ExtractView implements Serializable {
     }
 
     public int getMotifAminoAcidCount() {
-        return this.motifAminoAcidCount;
+        return motifAminoAcidCount;
     }
 
     public void setMotifAminoAcidCount(int motifAminoAcidCount) {
@@ -243,7 +245,7 @@ public class ExtractView implements Serializable {
     }
 
     public MotifComplexity getMotifComplexity() {
-        return this.motifComplexity;
+        return motifComplexity;
     }
 
     public void setMotifComplexity(MotifComplexity motifComplexity) {
@@ -251,7 +253,7 @@ public class ExtractView implements Serializable {
     }
 
     public String getMotifSeq() {
-        return this.motifSeq;
+        return motifSeq;
     }
 
     public void setMotifSeq(String motifSeq) {
@@ -259,74 +261,33 @@ public class ExtractView implements Serializable {
     }
 
     public String getMotifType() {
-        return this.motifType;
+        return motifType;
     }
 
     public void setMotifType(String motifType) {
         this.motifType = motifType;
     }
 
-    public String getPdbId() {
-        return this.pdbId;
-    }
-
-    public void setPdbId(String pdbId) {
-        this.pdbId = pdbId;
-    }
-
-    public String getPdbName() {
-        return this.pdbName;
-    }
-
     public SessionController getSessionController() {
-        return this.sessionController;
+        return sessionController;
     }
 
     public void setSessionController(SessionController sessionController) {
         this.sessionController = sessionController;
     }
 
-    public String getWorkingDirectory() {
-        return this.workingDirectory;
-    }
-
-    public void setWorkingDirectory(String workingDirectory) {
-        this.workingDirectory = workingDirectory;
-    }
-
     public void handlePdbUpload(FileUploadEvent event) throws IOException {
-
-        LogHandler.LOG.info("trying to copy PDB file to local storage");
-
-        copyFile(this.extractPdbPath, event.getFile().getInputstream());
-
-        // set file name for viewer
-        this.pdbName = event.getFile().getFileName();
-
+        extractPdbFilePath = sessionController.getWorkingPath().resolve("extract.pdb");
+        logger.info("copying PDB file to local path {}", extractPdbFilePath);
+        Files.copy(event.getFile().getInputstream(), extractPdbFilePath);
+        // set file name for protein viewer
+        pdbFileName = event.getFile().getFileName();
         RequestContext.getCurrentInstance().execute("PF('extractWizard').next()");
-
-        this.pdbUploaded = true;
-
-    }
-
-    @PostConstruct
-    public void init() {
-        // unix/windows spacken
-        // this.workingDirectory =
-        // FacesContext.getCurrentInstance().getExternalContext().getRealPath("data/"
-        // + this.sessionController.getId());
-        this.workingDirectory = System.getProperty("os.name").startsWith("Win")
-                                ? FacesContext.getCurrentInstance().getExternalContext().getRealPath("/data/")
-                                  + this.sessionController.getId()
-                                : FacesContext.getCurrentInstance().getExternalContext()
-                                              .getRealPath("data/" + this.sessionController.getId());
-
-        this.extractPdbPath = this.workingDirectory + "/extract.pdb";
-        this.externalExtractPdbPath = "data/" + this.sessionController.getId() + "/extract.pdb";
+        pdbFileUploaded = true;
     }
 
     public boolean isBlocked() {
-        return this.blocked;
+        return blocked;
     }
 
     public void setBlocked(boolean blocked) {
@@ -334,7 +295,7 @@ public class ExtractView implements Serializable {
     }
 
     public boolean isMotifExtracted() {
-        return this.motifExtracted;
+        return motifExtracted;
     }
 
     /**
@@ -352,7 +313,7 @@ public class ExtractView implements Serializable {
             RequestContext.getCurrentInstance().execute("PF('mainContainer').hide('east')");
         }
 
-        if (this.pdbId.isEmpty() && !this.pdbUploaded) {
+        if (pdbIdentifier.isEmpty() && !pdbFileUploaded) {
 
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                                                     "Please provide a PDB-ID or upload a PDB file.");
@@ -365,52 +326,37 @@ public class ExtractView implements Serializable {
 
         if (event.getOldStep().equals("pdb")) {
 
-            try {
-                // analyze structure
-                analyzePdb();
+            analyzePdb();
 
-            } catch (IOException e) {
+//                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+//                                                        "Could not find a structure for PDB-ID " + pdbIdentifier);
+//                FacesContext.getCurrentInstance().addMessage(null, message);
+//                RequestContext.getCurrentInstance().update("extractForm:messages");
+//                return "pdb";
 
-                LogHandler.LOG.warning("could not find PDB-ID " + this.pdbId);
-
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-                                                        "Could not find a structure for PDB-ID " + this.pdbId);
-                FacesContext.getCurrentInstance().addMessage(null, message);
-
-                RequestContext.getCurrentInstance().update("extractForm:messages");
-
-                return "pdb";
-            }
-
-            if (this.blocked) {
-
+            if (blocked) {
                 RequestContext.getCurrentInstance().update("extractForm:messages");
                 return "pdb";
             }
 
             // clear previous motif definition
-            this.motifExtracted = false;
-            this.extractedMotifSeq = null;
-            this.extractAminoAcids = null;
+            motifExtracted = false;
+            extractedMotifSequence = null;
+            extractAminoAcids = null;
 
             // show in viewer
-            // RequestContext.getCurrentInstance().execute(
-            // "showSimpleProteinViewer('" + this.externalExtractPdbPath
-            // + "','viewerStructure')");
-            // RequestContext.getCurrentInstance().execute("showProtein('" +
-            // this.externalExtractPdbPath + "','viewer',true,false,true)");
-            RequestContext.getCurrentInstance().execute(
-                    "viewer({ pdb : '" + this.externalExtractPdbPath + "', style : 'cartoon', clear : true })");
+            Path webappBasePath = Paths.get(FacesContext.getCurrentInstance().getExternalContext().getRealPath("/"));
+            RequestContext.getCurrentInstance().execute("showSimpleProteinViewer('" + webappBasePath.relativize(extractPdbFilePath) + "','viewerStructure')");
+            RequestContext.getCurrentInstance().execute("showProtein('" + externalExtractPdbPath + "','viewer',true,false,true)");
+            RequestContext.getCurrentInstance().execute("viewer({ pdb : '" + externalExtractPdbPath + "', style : 'cartoon', clear : true })");
         }
-
         return event.getNewStep();
-
     }
 
     public void submitMotif() throws IOException {
 
-        Faces.setFlashAttribute("motifFilePath", this.extractedMotifPath);
-        Faces.setFlashAttribute("extractPdbPath", this.extractPdbPath);
+        Faces.setFlashAttribute("motifFilePath", extractedMotifPath);
+//        Faces.setFlashAttribute("extractPdbPath", extractPdbPath);
 
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         externalContext.redirect(externalContext.getRequestContextPath() + "/submit");
@@ -421,7 +367,7 @@ public class ExtractView implements Serializable {
      */
     public void updateProteinViewer() {
         StringBuffer sb = new StringBuffer();
-        for (String eaa : this.extractAminoAcids) {
+        for (String eaa : extractAminoAcids) {
             sb.append("'" + eaa + "',");
         }
         RequestContext.getCurrentInstance().execute("viewer({ highlight : [" + sb.toString() + "] })");
@@ -450,7 +396,7 @@ public class ExtractView implements Serializable {
 //			throw new StructureException("motif must contain at least two amino acids");
 //		}
 
-        this.extractedMotifSeq = motifSeq.toString();
+        extractedMotifSequence = motifSeq.toString();
 
     }
 
@@ -528,105 +474,63 @@ public class ExtractView implements Serializable {
 //		}
     }
 
-    private void analyzePdb() throws IOException {
-
-        // TODO implement
-//		if (!this.pdbUploaded) {
-//
-//			StructureParser sp = new TargetStructureParser(Fit3dConstants.PDB_DIR, this.pdbId);
-//
-//			List<String> aaIdentifiers = new ArrayList<>();
-//			List<AminoAcid> aminoAcids = sp.parse();
-//			for (AminoAcid aa : aminoAcids) {
-//
-//				aaIdentifiers.add(InputOutputUtils.getAminoAcidString(aa));
-//			}
-//
-//			List<Atom> atoms = new ArrayList<>();
-//			aminoAcids.stream().forEach(a -> atoms.addAll(a.getAtoms()));
-//
-//			LogHandler.LOG.info("writing parsed PDB file to local storage " + this.extractPdbPath);
-//
-//			File extractPdb = new File(this.extractPdbPath);
-//
-//			// ensure that data folder exists
-//			if (!extractPdb.getParentFile().exists()) {
-//
-//				extractPdb.getParentFile().mkdirs();
-//			}
-//
-//			BufferedWriter out = new BufferedWriter(new FileWriter(extractPdb));
-//
-//			out.write(sp.parseStructure().toPDB());
-//
-//			// close buffered writer
-//			out.close();
-//
-//			this.aaIdentifiers = aaIdentifiers.toArray(new String[aaIdentifiers.size()]);
-//
-//			// set PDB name for viewer
-//			this.pdbName = this.pdbId.toUpperCase();
-//
-//			this.blocked = false;
-//		} else {
-//
-//			StructureParser sp = new QueryStructureParser(Fit3dConstants.PDB_DIR, this.extractPdbPath);
-//
-//			List<String> aaIdentifiers = new ArrayList<>();
-//			List<AminoAcid> aminoAcids = sp.parse();
-//
-//			if (aminoAcids.size() < 2) {
-//
-//				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-//						"Your PDB file is invalid. The source structure for motif extraction must contain at least two valid amino acids.");
-//				FacesContext.getCurrentInstance().addMessage(null, message);
-//
-//				this.blocked = true;
-//
-//			} else {
-//
-//				for (AminoAcid aa : aminoAcids) {
-//					/**
-//					 * S, 7.1.15: replaced to fix issue in case of missing chain
-//					 * names
-//					 */
-//					String s = InputOutputUtils.getAminoAcidString(aa);
-//					if (s.startsWith(" -"))
-//						s = "?" + s.substring(1);
-//					aaIdentifiers.add(s);
-//					// aaIdentifiers.add(InputOutputUtils.getAminoAcidString(aa));
-//				}
-//
-//				this.aaIdentifiers = aaIdentifiers.toArray(new String[aaIdentifiers.size()]);
-//
-//				this.blocked = false;
-//			}
-//		}
+    public String getPdbIdentifier() {
+        return pdbIdentifier;
     }
 
-    private void copyFile(String outputPath, InputStream is) throws IOException {
+    public void setPdbIdentifier(String pdbIdentifier) {
+        this.pdbIdentifier = pdbIdentifier;
+    }
 
-        File f = new File(outputPath);
+    public String[] getLeafIdentifierStrings() {
+        return leafIdentifierStrings;
+    }
 
-        // ensure that data folder exists
-        if (!f.getParentFile().exists()) {
+    private void analyzePdb() {
+        // read PDB file online with ID
+        if (!pdbFileUploaded) {
+            try {
+                Structure structure = StructureParser.online()
+                                                     .pdbIdentifier(pdbIdentifier)
+                                                     .everything()
+                                                     .parse();
+                // generate amino acid identifiers
+                leafIdentifierStrings = structure.getAllLeafSubstructures().stream()
+                                                 .map(LeafSubstructure::getIdentifier)
+                                                 .map(LeafIdentifier::toString).toArray(String[]::new);
+                blocked = false;
 
-            f.getParentFile().mkdirs();
+                // write structure in PDB format
+                extractPdbFilePath = sessionController.getWorkingPath().resolve("extract.pdb");
+                StructureWriter.writeStructure((OakStructure) structure, extractPdbFilePath);
+                logger.info("writing structure to local path {}", extractPdbFilePath);
+            } catch (IOException | UncheckedIOException | StructureParserException e) {
+                logger.error("failed to parse structure with ID {}", pdbIdentifier, e);
+            }
+        } else {
+            Structure structure = StructureParser.local()
+                                                 .path(extractPdbFilePath)
+                                                 .everything()
+                                                 .parse();
+
+            // block wizard for structures with less than two amino acids
+            int aminoAcidCount = (int) structure.getAllLeafSubstructures().stream()
+                                                .filter(AminoAcid.class::isInstance).count();
+            if (aminoAcidCount < 2) {
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                                                        "Your PDB file is invalid. The source structure for motif extraction must contain at least two valid amino acids.");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                blocked = true;
+            }
+
+            // generate amino acid identifiers
+            leafIdentifierStrings = structure.getAllLeafSubstructures().stream()
+                                             .map(LeafSubstructure::getIdentifier)
+                                             .map(LeafIdentifier::toString).toArray(String[]::new);
         }
+    }
 
-        OutputStream out = new FileOutputStream(new File(outputPath));
-
-        int read = 0;
-        byte[] bytes = new byte[1024];
-
-        while ((read = is.read(bytes)) != -1) {
-            out.write(bytes, 0, read);
-        }
-
-        is.close();
-        out.flush();
-        out.close();
-
-        LogHandler.LOG.info("file created: " + outputPath);
+    public String getPdbFileName() {
+        return pdbFileName;
     }
 }

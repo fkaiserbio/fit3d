@@ -48,7 +48,7 @@ public class Fit3DCommandLineRunner {
 //                    throw new Fit3DCommandLineException("Target is not a valid PDB identifier.");
 //                }
                 String pdbIdentifier = matcher.group(1);
-                Optional<String> chainIdentifierOptional = Optional.empty();
+                Optional<String> chainIdentifierOptional;
                 try {
                     String group = matcher.group(2);
                     if(group != null){

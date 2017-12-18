@@ -3,7 +3,8 @@ package de.bioforscher.fit3d.web.services;
 import de.bioforscher.fit3d.web.controllers.JobController;
 import de.bioforscher.fit3d.web.core.Fit3DJob;
 import de.bioforscher.fit3d.web.core.Fit3DJobDummy;
-import de.bioforscher.fit3d.web.utilities.LogHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -12,6 +13,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class JobJanitorService extends Timer {
+
+    private static final Logger logger = LoggerFactory.getLogger(JobJanitorService.class);
 
     private static final long TIMELIMIT = TimeUnit.HOURS.toMillis(72);
 
@@ -23,7 +26,7 @@ public class JobJanitorService extends Timer {
     private Date genesis;
 
     public Date getGenesis() {
-        return this.genesis;
+        return genesis;
     }
 
     public void setGenesis(Date genesis) {
@@ -31,7 +34,7 @@ public class JobJanitorService extends Timer {
     }
 
     public JobController getJobController() {
-        return this.jobController;
+        return jobController;
     }
 
     public void setJobController(JobController jobController) {
@@ -41,19 +44,19 @@ public class JobJanitorService extends Timer {
     @PostConstruct
     public void init() {
 
-        this.genesis = new Date();
+        genesis = new Date();
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        LogHandler.LOG.info("registering job janitor service at " + df.format(this.genesis));
+        logger.info("registering job janitor service at " + df.format(genesis));
 
         TimerTask t = new TimerTask() {
 
             @Override
             public void run() {
 
-                LogHandler.LOG.info("looking for old jobs");
+                logger.info("looking for old jobs");
 
-                Iterator<List<Fit3DJob>> it = JobJanitorService.this.jobController.getManagedJobs().values().iterator();
+                Iterator<List<Fit3DJob>> it = jobController.getManagedJobs().values().iterator();
 
                 while (it.hasNext()) {
 
@@ -65,21 +68,21 @@ public class JobJanitorService extends Timer {
 
                         if (timeDiff > TIMELIMIT) {
 
-                            LogHandler.LOG.info("removing job " + job);
+                            logger.info("removing job {}", job);
 
                             if (!(job instanceof Fit3DJobDummy)) {
 
                                 // kill the job if it is still running
                                 if (job.getProcess().isAlive()) {
 
-                                    LogHandler.LOG.info("job " + job + " is still running, now terminating");
+                                    logger.info("job {} is still running, now terminating", job);
                                     job.getProcess().destroyForcibly();
 
                                     // TODO handle email notification that
                                     // calculation was not successful
                                 }
 
-                                File workingDirectory = new File(job.getWorkingDirectory());
+//                                File workingDirectory = new File(job.getWorkingDirectory());
 
                                 // delete working directory
 //								TODO implement
@@ -93,7 +96,7 @@ public class JobJanitorService extends Timer {
                                 // only extract PDB file
                                 // TODO delete if contains only motif or extract
                                 // pdb file
-                                File sessionDirectory = workingDirectory.getParentFile();
+//                                File sessionDirectory = workingDirectory.getParentFile();
 
                                 // long cutoffDate = new Date().getTime() - new
                                 // Date(TIMELIMIT).getTime();
@@ -101,26 +104,25 @@ public class JobJanitorService extends Timer {
                                 // deleteOrphanedDirectories(sessionDirectory,
                                 // cutoffDate);
 
-                                if (sessionDirectory.list().length == 0 || containsNoJobs(sessionDirectory)) {
-
-                                    LogHandler.LOG.info("removing empty session folder");
-
-                                    // TODO implement
-//                                    try {
-//                                        FileUtils.deleteDirectory(sessionDirectory);
-//                                    } catch (IOException e) {
-//                                        LogHandler.LOG
-//                                                .warning("error while deleting session directory " + sessionDirectory);
-//                                    }
-                                }
+//                                if (sessionDirectory.list().length == 0 || containsNoJobs(sessionDirectory)) {
+//
+//                                    LogHandler.LOG.info("removing empty session folder");
+//
+//                                    // TODO implement
+////                                    try {
+////                                        FileUtils.deleteDirectory(sessionDirectory);
+////                                    } catch (IOException e) {
+////                                        LogHandler.LOG
+////                                                .warning("error while deleting session directory " + sessionDirectory);
+////                                    }
+//                                }
                             }
 
                             // remove registered job
                             iterator.remove();
 
                         } else {
-
-                            LogHandler.LOG.info("job " + job + " not expired");
+                            logger.info("job not expired", job);
                         }
                     }
                 }
@@ -175,6 +177,6 @@ public class JobJanitorService extends Timer {
             }
         };
 
-        this.schedule(t, INITIAL_DELAY, PERIOD);
+        schedule(t, INITIAL_DELAY, PERIOD);
     }
 }

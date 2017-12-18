@@ -1,5 +1,8 @@
 package de.bioforscher.fit3d.web.exceptions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Iterator;
 import java.util.Map;
 
@@ -12,72 +15,72 @@ import javax.faces.context.Flash;
 import javax.faces.event.ExceptionQueuedEvent;
 import javax.faces.event.ExceptionQueuedEventContext;
 
-import de.bioforscher.fit3d.web.utilities.LogHandler;
-
 public class Fit3DExceptionHandler extends ExceptionHandlerWrapper {
 
-	private ExceptionHandler wrapped;
+    private static final Logger logger = LoggerFactory.getLogger(Fit3DExceptionHandler.class);
 
-	public Fit3DExceptionHandler(ExceptionHandler exception) {
-		this.wrapped = exception;
-	}
+    private ExceptionHandler wrapped;
 
-	@Override
-	public ExceptionHandler getWrapped() {
-		return this.wrapped;
-	}
+    public Fit3DExceptionHandler(ExceptionHandler exception) {
+        wrapped = exception;
+    }
 
-	@Override
-	public void handle() throws FacesException {
+    @Override
+    public ExceptionHandler getWrapped() {
+        return wrapped;
+    }
 
-		final Iterator<ExceptionQueuedEvent> i = getUnhandledExceptionQueuedEvents()
-				.iterator();
-		while (i.hasNext()) {
+    @Override
+    public void handle() throws FacesException {
 
-			ExceptionQueuedEvent event = i.next();
-			ExceptionQueuedEventContext context = (ExceptionQueuedEventContext) event
-					.getSource();
+        final Iterator<ExceptionQueuedEvent> i = getUnhandledExceptionQueuedEvents()
+                .iterator();
+        while (i.hasNext()) {
 
-			// get the exception from context
-			Throwable t = context.getException();
+            ExceptionQueuedEvent event = i.next();
+            ExceptionQueuedEventContext context = (ExceptionQueuedEventContext) event
+                    .getSource();
 
-			final FacesContext fc = FacesContext.getCurrentInstance();
-			final Map<String, Object> requestMap = fc.getExternalContext()
-					.getRequestMap();
-			final NavigationHandler nav = fc.getApplication()
-					.getNavigationHandler();
+            // get the exception from context
+            Throwable t = context.getException();
 
-			// here you do what ever you want with exception
-			try {
+            final FacesContext fc = FacesContext.getCurrentInstance();
+            final Map<String, Object> requestMap = fc.getExternalContext()
+                                                     .getRequestMap();
+            final NavigationHandler nav = fc.getApplication()
+                                            .getNavigationHandler();
 
-				// log error ?
-				LogHandler.LOG.severe(t.getMessage());
+            // here you do what ever you want with exception
+            try {
 
-				Flash flash = fc.getExternalContext().getFlash();
+                // log error ?
+                logger.error(t.getMessage(), t);
 
-				// Put the exception in the flash scope to be displayed in the
-				// error
-				// page if necessary ...
-				// TODO prevent direct access to errorpage
-				flash.put("errorDetails", t.getMessage());
+                Flash flash = fc.getExternalContext().getFlash();
 
-				// redirect error page
-				requestMap.put("exceptionMessage", t.getMessage());
-				nav.handleNavigation(fc, null, "/errorpages/generic");
-				fc.renderResponse();
+                // Put the exception in the flash scope to be displayed in the
+                // error
+                // page if necessary ...
+                // TODO prevent direct access to errorpage
+                flash.put("errorDetails", t.getMessage());
 
-				// remove the comment below if you want to report the error in a
-				// jsf error message
-				// JsfUtil.addErrorMessage(t.getMessage());
+                // redirect error page
+                requestMap.put("exceptionMessage", t.getMessage());
+                nav.handleNavigation(fc, null, "/errorpages/generic");
+                fc.renderResponse();
 
-			} finally {
-				// remove it from queue
-				i.remove();
-			}
-		}
+                // remove the comment below if you want to report the error in a
+                // jsf error message
+                // JsfUtil.addErrorMessage(t.getMessage());
 
-		// parent handle
-		getWrapped().handle();
-	}
+            } finally {
+                // remove it from queue
+                i.remove();
+            }
+        }
+
+        // parent handle
+        getWrapped().handle();
+    }
 
 }
