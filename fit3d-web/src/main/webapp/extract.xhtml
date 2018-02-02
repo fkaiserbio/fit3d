@@ -16,8 +16,7 @@
 
         <h:form id="extractForm">
 
-            <pr:growl id="messages" showDetail="true" showSummary="false"
-                      autoUpdate="true"/>
+            <pr:growl id="messages" showDetail="true" showSummary="false" autoUpdate="true"/>
 
             <pr:wizard widgetVar="extractWizard" showStepStatus="false"
                        flowListener="#{extractView.onFlowProcess}">
@@ -27,7 +26,7 @@
                             <h:outputLabel for="pdbId" value="PDB-ID"/>
                             <pr:inputText id="pdbId" value="#{extractView.pdbIdentifier}"
                                           validatorMessage="Please enter a valid PDB-ID">
-                                <f:validateRegex pattern="^[1-9a-zA-Z][0-9a-zA-Z]{3}$"/>
+                                <f:validateRegex pattern="^[A-Za-z0-9]{4}$"/>
                             </pr:inputText>
 
                             <pr:outputLabel for="pdbFile" value="PDB file"/>
@@ -46,7 +45,7 @@
                         <pr:panelGrid columns="2" styleClass="extract-protein-field">
 
                             <pr:panelGrid columns="1" styleClass="extract-protein-viewer">
-                                <div id="viewerStructure" class="protein-viewer"/>
+                                <div id="viewer" class="protein-viewer"/>
 
                                 <pr:outputLabel styleClass="extract-protein-viewer-label"
                                                 value="#{extractView.pdbFileName}"/>
@@ -65,7 +64,7 @@
                                 <pr:selectCheckboxMenu value="#{extractView.extractAminoAcids}"
                                                        label="Select motif residues" filter="true"
                                                        filterMatchMode="contains" panelStyle="width:300px">
-                                    <pr:ajax listener="#{extractView.updateProteinViewer}"/>
+                                    <pr:ajax listener="#{extractView.updateResidueHighlighting}"/>
                                     <f:selectItems value="#{extractView.leafIdentifierStrings}"/>
                                 </pr:selectCheckboxMenu>
 

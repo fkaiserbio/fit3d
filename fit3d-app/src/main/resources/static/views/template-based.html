@@ -1,0 +1,36 @@
+<div>
+    <h3>{{headingTitle}}</h3>
+
+    <form name="submitForm" method="POST" ng-submit="submitJob(job)">
+        <md-content>
+            <div>
+                <md-input-container>
+                    <label>Name</label>
+                    <input required name="name" ng-model="job.name">
+                    <div ng-messages="submitForm.name.$error">
+                        <div ng-message="required">This is required.</div>
+                    </div>
+                </md-input-container>
+            </div>
+            <div>
+                <input class="ng-hide" id="input-file-id" type="file" file-model="myFile"/>
+                <label for="input-file-id" class="md-button md-raised md-primary">Choose Files</label>
+            </div>
+            <div>
+                <md-button type="submit">Submit</md-button>
+            </div>
+        </md-content>
+    </form>
+
+    <!--<form name="submitForm" method="POST" ng-submit="submitJob(job)">-->
+    <!--<div class="form-group">-->
+    <!--<label for="name">Name:</label>-->
+    <!--<input id="name" type="text" ng-model="job.name" class="form-control input-lg"/>-->
+    <!--</div>-->
+    <!--<div class="form-group">-->
+    <!--<input type="file" file-model="myFile"/>-->
+    <!--<button ng-click="uploadFile()">Upload File</button>-->
+    <!--<button type="submit" class="btn btn-lg btn-primary btn-block">Submit</button>-->
+    <!--</div>-->
+    <!--</form>-->
+</div>

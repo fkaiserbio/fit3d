@@ -14,14 +14,13 @@
           <element id="library" level="project" name="Maven: log4j:log4j:1.2.17" />
           <element id="library" level="project" name="Maven: org.primefaces:primefaces:6.1" />
           <element id="library" level="project" name="Maven: org.primefaces.themes:bootstrap:1.0.10" />
-          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-structure:0.3.0-alpha" />
-          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-chemistry:0.3.0-alpha" />
-          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-core:0.3.0-alpha" />
-          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-features:0.3.0-alpha" />
+          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-structure:0.3.2-alpha" />
+          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-mathematics:0.3.2-alpha" />
+          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-core:0.3.2-alpha" />
+          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-features:0.3.2-alpha" />
           <element id="library" level="project" name="Maven: tec.units:unit-ri:1.0" />
           <element id="library" level="project" name="Maven: javax.measure:unit-api:1.0" />
           <element id="library" level="project" name="Maven: tec.uom.lib:uom-lib-common:1.0" />
-          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-mathematics:0.3.0-alpha" />
           <element id="library" level="project" name="Maven: org.rcsb:mmtf-codec:1.0.7" />
           <element id="library" level="project" name="Maven: org.rcsb:mmtf-serialization:1.0.7" />
           <element id="library" level="project" name="Maven: org.msgpack:jackson-dataformat-msgpack:0.7.1" />
