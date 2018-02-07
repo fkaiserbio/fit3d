@@ -1,17 +1,35 @@
 var defaultPVOptions = {
-    fog : false,
-    width : 300,
-    height : 300,
-    antialias : true,
-    quality : 'high',
-    animateTime : 0,
-    selectionColor : '#f00',
-    fog : false
+    fog: false,
+    width: 300,
+    height: 300,
+    antialias: true,
+    quality: 'high',
+    animateTime: 0,
+    selectionColor: '#f00'
 };
 
 var aminoAcidNames = {
-    'ALA' : 'A', 'ARG' : 'R', 'ASN' : 'N', 'ASP' : 'D', 'CYS' : 'C', 'GLN' : 'Q', 'GLU' : 'E', 'GLY' : 'G', 'HIS' : 'H', 'ILE' : 'I', 'LEU' : 'L', 'LYS' : 'K', 'MET' : 'M', 'PHE' : 'F', 'PRO' : 'P', 'SER' : 'S', 'THR' : 'T', 'TRP' : 'W', 'TYR' : 'Y', 'VAL' : 'V'
-}
+    'ALA': 'Ala',
+    'ARG': 'Arg',
+    'ASN': 'Asn',
+    'ASP': 'Asp',
+    'CYS': 'Cys',
+    'GLN': 'Gln',
+    'GLU': 'Glu',
+    'GLY': 'Gly',
+    'HIS': 'His',
+    'ILE': 'Ile',
+    'LEU': 'Leu',
+    'LYS': 'Lys',
+    'MET': 'Met',
+    'PHE': 'Phe',
+    'PRO': 'Pro',
+    'SER': 'Ser',
+    'THR': 'Thr',
+    'TRP': 'Trp',
+    'TYR': 'Tyr',
+    'VAL': 'Val'
+};
 
 var pvInstances = {};
 var structures = {};
@@ -23,12 +41,12 @@ function viewer(opts) {
     // get reference or init a new one if none exists - same for structures
     var instance;
     var structure;
-    if(pvInstances[id] && !opts.clear) {
+    if (pvInstances[id] && !opts.clear) {
         instance = pvInstances[id];
     } else {
         $('#' + id).html('');
         instance = pv.Viewer(document.getElementById(id), defaultPVOptions);
-        if(typeof(opts.motif) !== 'undefined') {
+        if (typeof(opts.motif) !== 'undefined') {
             pvInstances = {};
             structures = {};
         }
@@ -36,29 +54,29 @@ function viewer(opts) {
     }
 
     // pdb file needs to be fetched - show it!
-    if(typeof(opts.pdb) !== 'undefined') {
+    if (typeof(opts.pdb) !== 'undefined') {
         loadStructure(instance, id, opts);
     }
 
     // multiple structures
-    if(typeof(opts.additionalPdb) !== 'undefined') {
+    if (typeof(opts.additionalPdb) !== 'undefined') {
         loadStructure(instance, id, opts.additionalPdb);
     }
 
     structure = structures[id];
 
     // get present structure and highlight selected residues during motif extraction
-    if(typeof(opts.highlight) !== 'undefined') {
+    if (typeof(opts.highlight) !== 'undefined') {
         var sel = structure.full().createEmptyView();
-        opts.highlight.forEach(function(res) {
+        opts.highlight.forEach(function (res) {
             var tmp = res.split("-");
             var cname = tmp[2];
             var rnum = +tmp[3];
             var add = instance.get('structure').select({
-                cname : cname,
-                rnum : rnum
+                cname: cname,
+                rnum: rnum
             });
-            add.atoms().forEach(function(a) {
+            add.atoms().forEach(function (a) {
                 sel.addAtom(a);
             });
         });
@@ -68,7 +86,7 @@ function viewer(opts) {
 }
 
 function loadStructure(instance, id, opts) {
-    $.ajax(opts.pdb).success(function(data) {
+    $.ajax(opts.pdb).success(function (data) {
         var structure = io.pdb(data);
         mol.assignHelixSheet(structure);
         structures[id] = structure;
@@ -88,13 +106,13 @@ function loadStructure(instance, id, opts) {
         }
 
         // color if requested
-        if(typeof(opts.color) !== 'undefined') {
+        if (typeof(opts.color) !== 'undefined') {
             geom.colorBy(pv.color.uniform(opts.color));
         }
 
         // same for opacity
-        if(typeof(opts.opacity) !== 'undefined') {
-            instance.forEach(function(object) {
+        if (typeof(opts.opacity) !== 'undefined') {
+            instance.forEach(function (object) {
                 object.setOpacity(opts.opacity);
             });
         }
@@ -102,39 +120,40 @@ function loadStructure(instance, id, opts) {
         instance.centerOn(structure);
         instance.autoZoom();
 
-        if(typeof(opts.motif) !== 'undefined') {
+        if (typeof(opts.motif) !== 'undefined') {
             var labelFontColor = opts.labelColor ? opts.labelColor : "rgb(0, 0, 0)";
             var labelFontSize = opts.labelSize ? opts.labelSize : "16";
             var labelAlpha = opts.labelAlpha ? opts.labelAlpha : 0;
             var labelFontStyle = opts.labelStyle ? opts.labelStyle : "normal";
             var motif = opts.motif;
-            motif.forEach(function(go) {
+            motif.forEach(function (go) {
                 var tmp = go.split("-");
                 var cname = tmp[0];
                 var rnum = +tmp[1].substring(1);
-                var residue = structure.residueSelect(function(res) {
+                var residue = structure.residueSelect(function (res) {
                     return res.chain().name() === cname && res.num() === rnum;
                 });
 
                 var pos = (opts.alternatePosition && residue.atoms()[1]) ? residue.atoms()[0].pos() : residue.atoms()[1].pos();
                 instance.label("label", go,
                     pos,
-                    { 	"font" : "Open Sans",
-                        "fontSize" : labelFontSize,
-                        "backgroundAlpha" : labelAlpha,
-                        "fontColor" : labelFontColor,
-                        "fontStyle" : labelFontStyle
+                    {
+                        "font": "Open Sans",
+                        "fontSize": labelFontSize,
+                        "backgroundAlpha": labelAlpha,
+                        "fontColor": labelFontColor,
+                        "fontStyle": labelFontStyle
                     });
                 var geom = instance.ballsAndSticks('motif', residue);
                 // color if requested
-                if(typeof(opts.color) !== 'undefined') {
+                if (typeof(opts.color) !== 'undefined') {
                     geom.colorBy(pv.color.uniform(opts.color));
                 }
             });
 
-            instance.fitTo(structure.residueSelect(function(res) {
+            instance.fitTo(structure.residueSelect(function (res) {
                 var value = false;
-                motif.forEach(function(go) {
+                motif.forEach(function (go) {
                     var tmp = go.split("-");
                     var cname = tmp[0];
                     var rnum = +tmp[1].substring(1);
@@ -148,7 +167,7 @@ function loadStructure(instance, id, opts) {
 
 
         // handle labels
-        if(opts.labels) {
+        if (opts.labels) {
             labels(instance, structure, opts);
         }
     });
@@ -166,18 +185,19 @@ function labels(instance, structure, opts) {
             var currentResidue = currentChain.residues()[j];
             var pos = opts.alternatePosition ? currentResidue.atom("CA").pos() : currentResidue.center();
             instance.label("label",
-                currentChain.name() + "-" + convertThreeLetterCode(currentResidue.name()) + currentResidue.num(),
+                currentChain.name() + "-" + currentResidue.num() + "-" + convertThreeLetterCode(currentResidue.name()),
                 pos,
-                { 	"font" : "Open Sans",
-                    "fontSize" : labelFontSize,
-                    "backgroundAlpha" : labelAlpha,
-                    "fontColor" : labelFontColor,
-                    "fontStyle" : labelFontStyle
+                {
+                    "font": "Open Sans",
+                    "fontSize": labelFontSize,
+                    "backgroundAlpha": labelAlpha,
+                    "fontColor": labelFontColor,
+                    "fontStyle": labelFontStyle
                 });
         }
     }
 }
 
 function convertThreeLetterCode(name) {
-    return aminoAcidNames[name] ? aminoAcidNames[name] : 'X';
+    return aminoAcidNames[name] ? aminoAcidNames[name] : name;
 }

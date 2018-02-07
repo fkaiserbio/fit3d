@@ -5,23 +5,23 @@
 	xmlns:pr="http://primefaces.org/ui">
 
 <f:metadata>
-	<f:viewParam name="id" value="#{sessionController.id}">
+	<f:viewParam name="id" value="#{sessionManager.sessionIdentifier}">
 		<f:converter converterId="uuidConverter" />
 	</f:viewParam>
 </f:metadata>
 
 <ui:composition template="/WEB-INF/templates/layout.xhtml">
 	<ui:define name="content">
-		<center>
+		<div style="text-align: center;">
 			<h:outputText rendered="#{empty jobListView.associatedJobs}"
 				styleClass="ui-state-error"
 				value="No jobs are associated to your session ID. Either you did not submit any jobs within the current browser session or your results were deleted from the server after 72 hours." />
-		</center>
+		</div>
 		<h3>
 			<h:outputText rendered="#{not empty jobListView.associatedJobs}"
 				value="Your are viewing submitted jobs for session " />
 			<h:outputText rendered="#{not empty jobListView.associatedJobs}"
-				value="#{sessionController.id}." />
+				value="#{sessionManager.sessionIdentifier}." />
 		</h3>
 
 		<pr:panelGrid styleClass="job-grid" columns="3">
@@ -30,7 +30,7 @@
 				value="Bookmark URL: " />
 			<pr:inputText id="bookmarkUrl" style="width:800px" readonly="1"
 				rendered="#{not empty jobListView.associatedJobs}"
-				value="https://biosciences.hs-mittweida.de/fit3d/jobs?id=#{sessionController.id}" />
+				value="https://biosciences.hs-mittweida.de/fit3d/jobs?id=#{sessionManager.sessionIdentifier}" />
 			<pr:tooltip id="bookmarkUrlTip" for="bookmarkUrl"
 				value="Store this URL for later usage." />
 		</pr:panelGrid>

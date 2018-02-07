@@ -378,7 +378,7 @@ span.initialcap { /* initial capital letter */
 	background: #dddddd;
 }
 
-.hitIdentifier-text, .hitRmsd-text {
+.matchIdentifier-text, .matchRmsd-text {
 	font-weight: bold;
 }
 

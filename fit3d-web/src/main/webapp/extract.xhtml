@@ -55,7 +55,7 @@
 
                                 <div id="motif-viewer" class="protein-viewer"/>
                                 <pr:outputLabel styleClass="extract-protein-viewer-label"
-                                                id="motifLabel" value="#{extractView.extractedMotifSequence}"/>
+                                                id="motifLabel" value="#{extractView.motifAnalysis.motifSequence}"/>
 
                             </pr:panelGrid>
 
@@ -102,28 +102,28 @@
                     <pr:panelGrid styleClass="motif-details-field" columns="2">
 
                         <pr:outputLabel for="motifSequence" value="sequence"/>
-                        <h:outputText id="motifSequence" value="#{extractView.motifSeq}"/>
+                        <h:outputText id="motifSequence" value="#{extractView.motifAnalysis.motifSequence}"/>
 
                         <pr:outputLabel for="motifAminoAcidCount" value="residues"/>
                         <h:outputText id="motifAminoAcidCount"
-                                      value="#{extractView.motifAminoAcidCount}"/>
+                                      value="#{extractView.motifAnalysis.motifAminoAcidCount}"/>
 
                         <pr:outputLabel for="motifExtent" value="spatial extent"/>
                         <h:panelGroup>
-                            <h:outputText id="motifExtent" value="#{extractView.maxExtent}">
+                            <h:outputText id="motifExtent" value="#{extractView.motifAnalysis.motifExtent}">
                                 <f:convertNumber pattern="#0.00"/>
                             </h:outputText>
                             <h:outputText value=" Å"/>
                         </h:panelGroup>
 
                         <pr:outputLabel for="motifType" value="type"/>
-                        <h:outputText id="motifType" value="#{extractView.motifType}"/>
+                        <h:outputText id="motifType" value="#{extractView.motifAnalysis.motifType.description}"/>
 
                         <pr:outputLabel for="motifComplexityImage" value="complexity"/>
 
                         <h:graphicImage styleClass="complexity-image"
                                         id="motifComplexityImage" library="static"
-                                        name="images/complexity_#{extractView.motifComplexity.label}.png"/>
+                                        name="images/complexity_#{extractView.motifAnalysis.motifComplexity.label}.png"/>
 
                     </pr:panelGrid>
                 </pr:tab>

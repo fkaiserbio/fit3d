@@ -65,7 +65,7 @@ app.service('jobService', ['$http', function ($http) {
             url: 'api/create',
             headers: 'Accept:application/json'
         }).then(function (response) {
-            console.log("created job: " + response.data);
+            console.log("created job: " + response.data.id);
             return angular.fromJson(response.data);
         });
     };

@@ -1,7 +1,5 @@
 package bio.fkaiser.fit3d.model;
 
-import java.util.UUID;
-
 /**
  * @author fk
  */
@@ -9,10 +7,6 @@ public class TemplateBasedJob {
 
     private String id;
     private String name;
-
-    public TemplateBasedJob() {
-        id = UUID.randomUUID().toString();
-    }
 
     public String getId() {
         return id;

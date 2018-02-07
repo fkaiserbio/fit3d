@@ -4,6 +4,8 @@ import bio.fkaiser.fit3d.model.TemplateBasedJob;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 /**
  * @author fk
  */
@@ -14,7 +16,7 @@ public class JobController {
     @RequestMapping(value = "/create")
     public TemplateBasedJob create() {
         TemplateBasedJob templateBasedJob = new TemplateBasedJob();
-        System.out.println(templateBasedJob);
+        templateBasedJob.setId(UUID.randomUUID().toString());
         return templateBasedJob;
     }
 }
