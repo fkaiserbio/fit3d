@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:pr="http://primefaces.org/ui">
+
+<h:head>
+    <title><ui:insert name="title">Fit3D Webserver</ui:insert></title>
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans:300" rel="stylesheet"/>
+
+    <h:outputScript library="static" name="js/pv.js"/>
+    <h:outputScript library="static" name="js/resultviewer.js"/>
+
+    <link rel="shortcut icon" type="image/x-icon"
+          href="#{resource['static/images/favicon.ico']}"/>
+
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o), m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script',
+            '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-63938580-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+</h:head>
+
+<h:body>
+    <noscript>
+        <h3 style="text-align: center">JavaScript is disabled! Please
+            enable JavaScript in your web browser!</h3>
+    </noscript>
+
+    <f:facet name="last">
+        <h:outputStylesheet library="static" name="css/custom.css"/>
+    </f:facet>
+
+    <pr:outputPanel>
+        <div class="ui-g">
+            <div class="ui-g-12 ui-md-2">
+                    <pr:menu>
+                        <pr:menuitem value="Home" outcome="/home.xhtml" icon="fa fa-home"
+                                     styleClass="#{view.viewId == '/home.xhtml' ? 'active' : ''}"/>
+                        <pr:submenu label="Preprocessing">
+                            <pr:menuitem value="Extract motif" outcome="/extract.xhtml"
+                                         icon="ui-icon-seek-next"
+                                         styleClass="#{view.viewId == '/extract.xhtml' ? 'active' : ''}"/>
+                        </pr:submenu>
+                        <pr:submenu label="Motif search">
+                            <pr:menuitem value="Submit job" outcome="/submit.xhtml"
+                                         icon="fa fa-angle-right"
+                                         styleClass="#{view.viewId == '/submit.xhtml' ? 'active' : ''}"/>
+                            <pr:menuitem value="View results" outcome="/jobs.xhtml"
+                                         icon="ui-icon-newwin"
+                                         styleClass="#{(view.viewId == '/jobs.xhtml' || view.viewId == '/result.xhtml') ? 'active' : ''}"/>
+                        </pr:submenu>
+                        <pr:submenu label="Others">
+                            <pr:menuitem value="Download" outcome="/download.xhtml"
+                                         icon="ui-icon-arrowthickstop-1-s"
+                                         styleClass="#{view.viewId == '/download.xhtml' ? 'active' : ''}"/>
+                            <pr:menuitem value="Help" outcome="/help.xhtml"
+                                         icon="ui-icon-help"
+                                         styleClass="#{view.viewId == '/help.xhtml' ? 'active' : ''}"/>
+                            <pr:menuitem value="FAQ" outcome="/faq.xhtml"
+                                         icon="ui-icon-lightbulb"
+                                         styleClass="#{view.viewId == '/faq.xhtml' ? 'active' : ''}"/>
+                            <pr:menuitem value="Citation" outcome="/citation.xhtml"
+                                         icon="ui-icon-document"
+                                         styleClass="#{view.viewId == '/citation.xhtml' ? 'active' : ''}"/>
+                            <pr:menuitem value="Contact us" outcome="/contact.xhtml"
+                                         icon="ui-icon-contact"
+                                         styleClass="#{view.viewId == '/contact.xhtml' ? 'active' : ''}"/>
+                        </pr:submenu>
+                    </pr:menu>
+            </div>
+            <div class="ui-g-12 ui-md-10 ui-g-nopad">
+                <div class="ui-g-12">
+                    <ui:insert name="bar"/>
+                </div>
+                <ui:insert name="content"/>
+            </div>
+            <div class="ui-g-12 footer">
+                <h:form id="statusArea">
+                    <pr:outputLabel class="fa fa-copyright"/>
+                    <h:outputText value="2018 "/>
+                    <pr:link styleClass="hrefLink-doi" target="_blank" href="http://www.bioforscher.de/bigM" value="bioinformatics group Mittweida"/>
+                    <h:outputText value=" | online since ONLINE_SINCE | "/>
+                    <h:outputText id="jobCount" value="current job load: #{jobLoadManager.enqueuedJobCount + jobLoadManager.runningJobCount} jobs | " styleClass="ui-widget display"/>
+                    <h:link outcome="/terms" styleClass="hrefLink-doi">Terms of Service</h:link>
+                    <pr:poll interval="5" update="@form" widgetVar="poll"/>
+                </h:form>
+            </div>
+        </div>
+    </pr:outputPanel>
+</h:body>
+
+</html>

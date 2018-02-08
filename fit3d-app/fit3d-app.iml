@@ -25,6 +25,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="R User Library" level="project" />
+    <orderEntry type="library" name="R Skeletons" level="application" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-web:1.3.3.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:1.3.3.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:1.3.3.RELEASE" level="project" />
@@ -64,7 +66,5 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.webjars.bower:angular-aria:1.6.4" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.webjars.bower:angular-messages:1.6.4" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.webjars:angular-material:1.1.4" level="project" />
-    <orderEntry type="library" name="R User Library" level="project" />
-    <orderEntry type="library" name="R Skeletons" level="application" />
   </component>
 </module>
