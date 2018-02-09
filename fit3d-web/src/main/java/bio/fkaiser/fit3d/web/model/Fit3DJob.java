@@ -1,6 +1,6 @@
 package bio.fkaiser.fit3d.web.model;
 
-import bio.fkaiser.fit3d.web.utilities.Fit3DWebConstants;
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3D;

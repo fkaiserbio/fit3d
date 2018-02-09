@@ -3,7 +3,7 @@ package bio.fkaiser.fit3d.web.beans.view;
 import bio.fkaiser.fit3d.web.beans.session.SessionManager;
 import bio.fkaiser.fit3d.web.io.DirectoryZip;
 import bio.fkaiser.fit3d.web.model.*;
-import bio.fkaiser.fit3d.web.utilities.Fit3DWebConstants;
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import de.bioforscher.singa.structure.algorithms.superimposition.SubstructureSuperimposition;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
 import de.bioforscher.singa.structure.model.interfaces.LeafSubstructure;

@@ -1,2 +1,3 @@
 fit3d-cli/target/
 fit3d-web/target/
+/fit3d-web/src/main/resources/mail_credentials.txt

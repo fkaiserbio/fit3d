@@ -1,6 +1,6 @@
 package bio.fkaiser.fit3d.web.validators;
 
-import bio.fkaiser.fit3d.web.utilities.Fit3DWebConstants;
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;

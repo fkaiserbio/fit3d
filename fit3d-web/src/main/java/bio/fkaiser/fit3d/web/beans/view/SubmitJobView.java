@@ -9,7 +9,7 @@ import bio.fkaiser.fit3d.web.model.MotifAnalysis;
 import bio.fkaiser.fit3d.web.model.constant.PredefinedList;
 import bio.fkaiser.fit3d.web.model.constant.StatisticalModelType;
 import bio.fkaiser.fit3d.web.model.ExchangeDefinition;
-import bio.fkaiser.fit3d.web.utilities.Fit3DWebConstants;
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import de.bioforscher.singa.structure.model.identifiers.PDBIdentifier;
 import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter.AtomFilterType;
 import de.bioforscher.singa.structure.model.oak.StructuralMotif;

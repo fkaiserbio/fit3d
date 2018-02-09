@@ -2,7 +2,7 @@ package bio.fkaiser.fit3d.web.beans.application;
 
 import bio.fkaiser.fit3d.web.converter.JobConverter;
 import bio.fkaiser.fit3d.web.model.Fit3DJob;
-import bio.fkaiser.fit3d.web.utilities.Fit3DWebConstants;
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
@@ -19,7 +19,7 @@ public class JobManager implements Serializable {
 
     private static final long serialVersionUID = 8788250546269904072L;
     private static final Logger logger = LoggerFactory.getLogger(JobManager.class);
-    private final MongoCollection<Document> mongoCollection;
+    private MongoCollection<Document> mongoCollection;
 
     private JobExecutor jobExecutor;
     private JobLoadManager jobLoadManager;

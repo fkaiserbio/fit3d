@@ -1,7 +1,7 @@
 package bio.fkaiser.fit3d.web.beans.application;
 
 import bio.fkaiser.fit3d.web.model.Fit3DJob;
-import bio.fkaiser.fit3d.web.utilities.Fit3DWebConstants;
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

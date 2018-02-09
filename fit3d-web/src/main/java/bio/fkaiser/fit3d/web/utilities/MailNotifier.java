@@ -1,5 +1,6 @@
 package bio.fkaiser.fit3d.web.utilities;
 
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import bio.fkaiser.fit3d.web.model.Fit3DJob;
 
 import javax.mail.*;
@@ -67,8 +68,7 @@ public class MailNotifier {
             @Override
             public PasswordAuthentication getPasswordAuthentication() {
                 // TODO authenticate
-                return new PasswordAuthentication(Fit3DWebConstants.SMTP_USER,
-                                                  Fit3DWebConstants.SMTP_PASS);
+                return new PasswordAuthentication(Fit3DWebConstants.Mail.SMTP_USER, Fit3DWebConstants.Mail.SMTP_PASS);
             }
         };
 
