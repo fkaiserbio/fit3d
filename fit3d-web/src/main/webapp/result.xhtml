@@ -156,7 +156,7 @@
                 </div>
             </pr:dataScroller>
 
-            <pr:chart widgetVar="chart" type="line" model="#{resultView.rmsdChart}" styleClass="chart-lrmsd" rendered="#{resultView.job.finished and not empty resultView.matches}" responsive="true"/>
+            <pr:chart widgetVar="chart" type="line" model="#{resultView.rmsdChart}" styleClass="chart-lrmsd" rendered="#{resultView.job.finished and not empty resultView.matches}"/>
 
             <pr:poll interval="5" update="@form" stop="#{resultView.job.finished}" widgetVar="poll" listener="#{resultView.updateResults}"/>
 

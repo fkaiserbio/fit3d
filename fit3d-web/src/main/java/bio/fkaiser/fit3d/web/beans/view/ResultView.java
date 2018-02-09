@@ -1,9 +1,12 @@
 package bio.fkaiser.fit3d.web.beans.view;
 
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import bio.fkaiser.fit3d.web.beans.session.SessionManager;
 import bio.fkaiser.fit3d.web.io.DirectoryZip;
-import bio.fkaiser.fit3d.web.model.*;
-import bio.fkaiser.fit3d.web.Fit3DWebConstants;
+import bio.fkaiser.fit3d.web.model.Fit3DJob;
+import bio.fkaiser.fit3d.web.model.Fit3DMatchAnnotation;
+import bio.fkaiser.fit3d.web.model.MotifAnalysis;
+import bio.fkaiser.fit3d.web.model.RmsdDistribution;
 import de.bioforscher.singa.structure.algorithms.superimposition.SubstructureSuperimposition;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
 import de.bioforscher.singa.structure.model.interfaces.LeafSubstructure;
@@ -66,12 +69,6 @@ public class ResultView implements Serializable {
 
     @PostConstruct
     public void init() {
-//        // for some unexplainable reason the ResultView is instantiated when
-//        // clicking the Extract-btn within the ExtractView
-//        if (FacesContext.getCurrentInstance().getViewRoot().getViewId().contains("extract.xhtml")) {
-//            logger.warn("illegal access to result view from extract view - fix me - urgent - seriously");
-//            return;
-//        }
         job = sessionManager.getSelectedJob();
         if (job != null) {
             updateResults();
@@ -134,28 +131,28 @@ public class ResultView implements Serializable {
 //        } else {
 //            pdbPath = "'data/" + sessionManager.getSessionIdentifier() + "/" + job.getId() + "/all.pdb'";
 //            motifPath = "'data/" + sessionManager.getSessionIdentifier() + "/" + job.getId() + "/motif.pdb'";
-            // RequestContext.getCurrentInstance()
-            // .execute("showAllAgainstOneAlignment('data/" +
-            // this.sessionManager.getId() + "/"
-            // + this.job.getId() + "/all.pdb','data/" +
-            // this.sessionManager.getId() + "/"
-            // + this.job.getId() + "/motif.pdb')");
-            // .execute("viewer({ pdb : 'data/" +
-            // this.sessionManager.getId() + "/" + this.job.getId()
-            // + "/all.pdb', " + "additionalPdbs : ['data/" +
-            // this.sessionManager.getId() + "/"
-            // + this.job.getId() + "/motif.pdb'], style : 'lines' })");
-            // .execute("viewer({ pdb : 'data/" + this.sessionManager.getId()
-            // + "/" + this.job.getId() + "/all.pdb', clear : true, style :
-            // 'lines', additionalPdb : { pdb : 'data/"
-            // + this.sessionManager.getId() + "/" + this.job.getId()
-            // + "/motif.pdb', style : 'sticks', color : 'green', labelColor :
-            // 'rgb(255, 255, 255)', labelSize : 22, labels : true, labelStyle :
-            // 'bold' } })");
+        // RequestContext.getCurrentInstance()
+        // .execute("showAllAgainstOneAlignment('data/" +
+        // this.sessionManager.getId() + "/"
+        // + this.job.getId() + "/all.pdb','data/" +
+        // this.sessionManager.getId() + "/"
+        // + this.job.getId() + "/motif.pdb')");
+        // .execute("viewer({ pdb : 'data/" +
+        // this.sessionManager.getId() + "/" + this.job.getId()
+        // + "/all.pdb', " + "additionalPdbs : ['data/" +
+        // this.sessionManager.getId() + "/"
+        // + this.job.getId() + "/motif.pdb'], style : 'lines' })");
+        // .execute("viewer({ pdb : 'data/" + this.sessionManager.getId()
+        // + "/" + this.job.getId() + "/all.pdb', clear : true, style :
+        // 'lines', additionalPdb : { pdb : 'data/"
+        // + this.sessionManager.getId() + "/" + this.job.getId()
+        // + "/motif.pdb', style : 'sticks', color : 'green', labelColor :
+        // 'rgb(255, 255, 255)', labelSize : 22, labels : true, labelStyle :
+        // 'bold' } })");
 //        }
         String executionString = "viewer({ pdb : '" + SessionManager.relativizePath(singlePdbFilePath)
-                   + "', clear: true, style : 'lines', additionalPdb : { pdb : '" + SessionManager.relativizePath(motifPath)
-                   + "', style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold' } })";
+                                 + "', clear: true, style : 'lines', additionalPdb : { pdb : '" + SessionManager.relativizePath(motifPath)
+                                 + "', style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold' } })";
         RequestContext.getCurrentInstance().execute(executionString);
 
         // update currently shown
@@ -307,7 +304,24 @@ public class ResultView implements Serializable {
 
     }
 
-    public void showPairwise(Fit3DMatch h) {
+    public void showPairwise(Fit3DMatch match) {
+
+        // ensure matches are written
+        job.writeMatches();
+
+        // find corresponding PDB file
+        Path matchPath = job.getJobPath().resolve("matches").resolve(match.getSubstructureSuperimposition().getStringRepresentation() + ".pdb");
+        if (matchPath.toFile().exists()) {
+            RequestContext.getCurrentInstance().execute("viewer({ pdb : '" + SessionManager.relativizePath(matchPath) +
+                                                        "', style : 'sticks', labels : true, labelSize : 22, labelStyle : 'bold', clear : true, additionalPdb : { pdb : '"
+                                                        + SessionManager.relativizePath(motifPath) +
+                                                        "', style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold', alternatePosition :" +
+                                                        " true } })");
+            currentPvLabel = match.getCandidateMotif().toString();
+            RequestContext.getCurrentInstance().update("proteinViewerStatus");
+        } else {
+            currentPvLabel = "no structure available";
+        }
 
         // TODO implement
 //		String pdbPath, motifPath;
@@ -348,7 +362,6 @@ public class ResultView implements Serializable {
 //				+ ", style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold', alternatePosition : true } })");
 
         // update currently shown
-        currentPvLabel = h.toString();
         RequestContext.getCurrentInstance().update("proteinViewerStatus");
 
     }
@@ -397,8 +410,12 @@ public class ResultView implements Serializable {
                 // update motif meta data
                 RequestContext.getCurrentInstance().update("resultsMetaData");
 
-                // calculate all-against-one alignment
-//                showAllAgainstOne();
+                try {
+                    // calculate all-against-one alignment
+                    showAllAgainstOne();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
 
                 // show toolbox
                 showToolbox();
@@ -406,15 +423,6 @@ public class ResultView implements Serializable {
                 // generate RMSD distribution
                 initRmsdDistribution();
             }
-
-//            if (job.getParameters().getExtractPdbFilePath() != null) {
-
-            // TODO implement
-//				String id = new QueryStructureParser(Fit3dConstants.PDB_DIR,
-//						this.job.getParameters().getExtractPdbFilePath()).parseStructure().getIdentifier();
-//				this.extractStructureDescription = (id == null) ? "unknown" : id;
-
-//            }
         }
     }
 

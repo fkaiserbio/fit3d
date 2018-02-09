@@ -85,7 +85,7 @@ public class SubmitJobView implements Serializable {
     private String email;
     private double rmsdLimit = Fit3DWebConstants.DefaultJobParameters.DEFAULT_RMSD_LIMIT;
     private StatisticalModelType statisticalModelType = Fit3DWebConstants.DefaultJobParameters.DEFAULT_STATISTICAL_MODEL_TYPE;
-    private AtomFilterType atomFilterType;
+    private AtomFilterType atomFilterType = Fit3DWebConstants.DefaultJobParameters.DEFAULT_ATOM_FILTER_TYPE;
     private boolean pdbTargetList;
     private boolean chainTargetList;
     private List<ExchangeDefinition> exchangeDefinitions;
