@@ -27,9 +27,11 @@ public class JobManager implements Serializable {
 
     public JobManager() {
         logger.info("creating new database collection '{}' in database '{}'", Fit3DWebConstants.Database.DB_COLLECTION_NAME, Fit3DWebConstants.Database.DB_NAME);
-        MongoClient mongoClient = new MongoClient(Fit3DWebConstants.Database.DB_HOST, Fit3DWebConstants.Database.DB_PORT);
-        mongoCollection = mongoClient.getDatabase(Fit3DWebConstants.Database.DB_NAME).getCollection(Fit3DWebConstants.Database.DB_COLLECTION_NAME);
-        mongoCollection.drop();
+        if (Fit3DWebConstants.Database.DROP_DB_ON_RESTART) {
+            MongoClient mongoClient = new MongoClient(Fit3DWebConstants.Database.DB_HOST, Fit3DWebConstants.Database.DB_PORT);
+            mongoCollection = mongoClient.getDatabase(Fit3DWebConstants.Database.DB_NAME).getCollection(Fit3DWebConstants.Database.DB_COLLECTION_NAME);
+            mongoCollection.drop();
+        }
     }
 
     public void addJob(Fit3DJob job) {

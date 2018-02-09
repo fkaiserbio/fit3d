@@ -18,6 +18,22 @@
           <element id="library" level="project" name="Maven: org.primefaces:primefaces:6.1" />
           <element id="library" level="project" name="Maven: org.primefaces.themes:bootstrap:1.0.10" />
           <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-structure:0.3.2-alpha" />
+          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-mathematics:0.3.2-alpha" />
+          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-features:0.3.2-alpha" />
+          <element id="library" level="project" name="Maven: tec.units:unit-ri:1.0" />
+          <element id="library" level="project" name="Maven: javax.measure:unit-api:1.0" />
+          <element id="library" level="project" name="Maven: tec.uom.lib:uom-lib-common:1.0" />
+          <element id="library" level="project" name="Maven: org.rcsb:mmtf-codec:1.0.7" />
+          <element id="library" level="project" name="Maven: org.rcsb:mmtf-serialization:1.0.7" />
+          <element id="library" level="project" name="Maven: org.msgpack:jackson-dataformat-msgpack:0.7.1" />
+          <element id="library" level="project" name="Maven: org.msgpack:msgpack-core:0.7.1" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.6.3" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.6.0" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.6.3" />
+          <element id="library" level="project" name="Maven: commons-lang:commons-lang:2.4" />
+          <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-api:2.6.2" />
+          <element id="library" level="project" name="Maven: org.rcsb:mmtf-api:1.0.7" />
+          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-core:0.3.2-alpha" />
           <element id="library" level="project" name="Maven: javax.mail:mail:1.4.7" />
           <element id="library" level="project" name="Maven: javax.activation:activation:1.1" />
           <element id="library" level="project" name="Maven: org.omnifaces:omnifaces:1.10" />

@@ -54,10 +54,12 @@ public class Fit3DJob implements Runnable, Serializable {
      */
     private List<Fit3DMatch> matches;
     private Future<?> future;
+    private Fit3D fit3d;
 
     public Fit3DJob() {
 
     }
+
     public Fit3DJob(UUID jobIdentifier, UUID sessionIdentifier, String ipAddress, String description, String email, Path jobPath, Fit3DJobParameters parameters) {
 
         // get new time stamp for job
@@ -137,17 +139,27 @@ public class Fit3DJob implements Runnable, Serializable {
                                          .localPDB(Fit3DWebConstants.LOCAL_PDB, pdbIdentifiers)
                                          .everything();
         }
-        Fit3D fit3d = Fit3DBuilder.create()
-                                  .query(motif)
-                                  .targets(multiParser)
-                                  .limitedParallelism(Fit3DWebConstants.CORES / Fit3DWebConstants.THREAD_POOL_SIZE)
-                                  .atomFilter(parameters.getAtomFilterType().getFilter())
-                                  .mapECNumbers()
-                                  .mapPfamIdentifiers()
-                                  .mapUniProtIdentifiers()
-                                  .run();
+        fit3d = Fit3DBuilder.create()
+                            .query(motif)
+                            .targets(multiParser)
+                            .limitedParallelism(Fit3DWebConstants.CORES / Fit3DWebConstants.THREAD_POOL_SIZE)
+                            .atomFilter(parameters.getAtomFilterType().getFilter())
+                            .mapECNumbers()
+                            .mapPfamIdentifiers()
+                            .mapUniProtIdentifiers()
+                            .run();
 
         matches = fit3d.getMatches();
+    }
+
+    public void writeMatches() {
+        Path matchesPath = jobPath.resolve("matches");
+        if (matchesPath.toFile().exists()) {
+            logger.info("matches were already written for job {}", this);
+            return;
+        } else {
+            fit3d.writeMatches(matchesPath, Fit3DWebConstants.STRUCTURE_OUTPUT_RMSD_LIMIT);
+        }
     }
 
     public boolean cancel() {
@@ -177,6 +189,10 @@ public class Fit3DJob implements Runnable, Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Fit3D getFit3d() {
+        return fit3d;
     }
 
     public Future<?> getFuture() {
@@ -211,16 +227,16 @@ public class Fit3DJob implements Runnable, Serializable {
         this.jobPath = jobPath;
     }
 
+    public List<Fit3DMatch> getMatches() {
+        return matches;
+    }
+
     public Fit3DJobParameters getParameters() {
         return parameters;
     }
 
     public void setParameters(Fit3DJobParameters parameters) {
         this.parameters = parameters;
-    }
-
-    public List<Fit3DMatch> getMatches() {
-        return matches;
     }
 
     public UUID getSessionIdentifier() {

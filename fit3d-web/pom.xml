@@ -73,6 +73,11 @@
             <version>0.3.2-alpha</version>
         </dependency>
         <dependency>
+            <groupId>de.bioforscher.singa</groupId>
+            <artifactId>singa-core</artifactId>
+            <version>0.3.2-alpha</version>
+        </dependency>
+        <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <version>1.4.7</version>

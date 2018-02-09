@@ -12,6 +12,8 @@
 <ui:composition template="/WEB-INF/templates/layout.xhtml">
     <ui:define name="content">
 
+        <pr:importConstants type="java.lang.Double" var="Double"/>
+
         <h:form id="resultArea">
 
             <pr:toolbar styleClass="result-toolbar" id="mainToolBar">
@@ -50,9 +52,9 @@
                     <h:outputText value="#{resultView.job}"/>
                 </f:facet>
                 <div class="result-entry">
-                    <h:outputText value="TITLE" id="title" styleClass="title"/>
-                    <pr:tooltip id="matchTitle" for="title" value="TITLE"/>
-                    <pr:panelGrid styleClass="result-field" columns="3" style="width: 100%" columnClasses="perc-twentyfive, perc-fiddy, perc-twentyfive">
+                    <h:outputText value="#{match.structureTitle}" id="title" styleClass="title"/>
+                    <pr:tooltip id="matchTitle" for="title" value="#{match.structureTitle}"/>
+                    <pr:panelGrid styleClass="result-field" columns="2" style="width: 100%" columnClasses="perc-twentyfive, perc-seventy-five">
                         <pr:panelGrid styleClass="results-pv-download-field" columns="2" style="width: 100%" columnClasses="perc-ten, perc-ninety">
 
                             <pr:outputLabel styleClass="ui-icon ui-icon-zoomin" for="showPv"/>
@@ -63,7 +65,6 @@
 
                             <pr:outputLabel styleClass="ui-icon ui-icon-zoomin" for="alignMatch"/>
                             <h:panelGroup>
-                                <!--TODO-->
                                 <pr:commandLink value="Show alignment" id="alignMatch"
                                                 disabled="#{empty resultView.job.parameters}"
                                                 styleClass="download-link"
@@ -71,6 +72,10 @@
                                 <pr:tooltip for="alignMatch"
                                             value="Global alignment is only available if the query motif was extracted from a structure using the extraction wizard. Otherwise the source structure is not known."/>
                             </h:panelGroup>
+
+                            <pr:outputLabel styleClass="ui-icon ui-icon-zoomin" for="showPv"/>
+                            <pr:commandLink value="Show annotations" id="showAnnotations" styleClass="show-link" onclick="PF('annotationDialog').show();"/>
+
                             <pr:outputLabel styleClass="ui-icon ui-icon-arrowthickstop-1-s"
                                             for="downloadHit"/>
                             <pr:commandLink value="Download match" id="downloadHit"
@@ -78,11 +83,44 @@
                                 <pr:fileDownload value="#{resultView.getHitPdbFile(match)}"/>
                             </pr:commandLink>
 
+                            <pr:dialog header="Annotations for #{match.candidateMotif}" widgetVar="annotationDialog" dynamic="true" styleClass="toolbox-help-dialog" width="600">
+                                <pr:dataTable var="annotation" value="#{resultView.getAnnotations(match)}">
+                                    <pr:column headerText="chain">
+                                        <h:outputText value="#{annotation.chainIdentifier}"/>
+                                    </pr:column>
+                                    <pr:column headerText="UniProt">
+                                        <pr:link styleClass="hrefLink-download" target="_blank"
+                                                 href="https://www.uniprot.org/uniprot/#{annotation.uniProtIdentifier}"
+                                                 value="#{annotation.uniProtIdentifier}"
+                                                 rendered="#{not empty annotation.uniProtIdentifier}"/>
+                                        <h:outputText value="n/a" rendered="#{empty annotation.uniProtIdentifier}"/>
+                                    </pr:column>
+                                    <pr:column headerText="Pfam">
+                                        <pr:link styleClass="hrefLink-download" target="_blank"
+                                                 href="http://pfam.xfam.org/family/#{annotation.pfamIdentifier}"
+                                                 value="#{annotation.pfamIdentifier}"
+                                                 rendered="#{not empty annotation.pfamIdentifier}"/>
+                                        <h:outputText value="n/a" rendered="#{empty annotation.pfamIdentifier}"/>
+                                    </pr:column>
+                                    <pr:column headerText="EC">
+                                        <h:outputLink styleClass="hrefLink-download" target="_blank"
+                                                      href="https://www.ebi.ac.uk/intenz/query?cmd=SearchEC"
+                                                      rendered="#{not empty annotation.ecIdentifier}">
+                                            <f:param name="ec" value="#{annotation.ecIdentifier}"/>
+                                            #{annotation.ecIdentifier}
+                                        </h:outputLink>
+                                        <h:outputText value="n/a" rendered="#{empty annotation.ecIdentifier}"/>
+                                    </pr:column>
+                                </pr:dataTable>
+                                <pr:link styleClass="hrefLink-download" target="_blank"
+                                         href="https://www.ebi.ac.uk/pdbe/docs/sifts/"
+                                         value="mapped with SIFTS"/>
+                            </pr:dialog>
                         </pr:panelGrid>
                         <pr:panelGrid styleClass="results-pv-download-field" columns="2"
-                                      style="width: 100%" columnClasses="perc-forty, perc-sixty">
+                                      style="width: 100%" columnClasses="perc-thirty, perc-sventy">
                             <pr:outputLabel for="matchIdentifier" value="match:"/>
-                            <h:outputText styleClass="hitIdentifier-text" id="matchIdentifier" value="#{match.candidateMotif}"/>
+                            <h:outputText styleClass="matchIdentifier-text" id="matchIdentifier" value="#{match.candidateMotif}"/>
 
                             <pr:outputLabel for="matchType" value="type:"/>
                             <h:outputText id="matchType" value="#{match.matchType.description}"/>
@@ -98,55 +136,27 @@
                             <pr:outputLabel for="matchAlignedSeq" value="aligned sequence:"/>
                             <h:outputText id="matchAlignedSeq" value="#{match.alignedSequence}"/>
 
-                        </pr:panelGrid>
-                        <pr:panelGrid styleClass="results-pv-download-field" columns="2"
-                                      style="width: 100%" columnClasses="perc-fiddy, perc-fiddy">
                             <pr:outputLabel for="matchPvalue">
                                 <i>p</i>-value
                             </pr:outputLabel>
-                            <h:outputText id="matchPvalue" value="#{match.pvalue}" rendered="#{match.pvalue != 0}">
-                                <f:convertNumber pattern="0.0000E0"/>
-                            </h:outputText>
-                            <h:panelGroup rendered="#{match.pvalue == 0}">
-                                <h:outputText id="no-pvalue-label" value="n/a" styleClass="na-link"/>
-                                <pr:tooltip id="no-pvalue-label-tooltip" for="no-pvalue-label">
-                                    The <i>p</i>-values are not availaible f data was too sparse for kernel density estimation (only Fofanov et al. model).
-                                </pr:tooltip>
+                            <h:panelGroup layout="block">
+                                <h:outputText styleClass="matchRmsd-text" id="matchPvalue" value="#{match.pvalue}" rendered="#{match.pvalue != Double.NaN}">
+                                    <f:convertNumber pattern="0.0000E0"/>
+                                </h:outputText>
+                                <h:panelGroup rendered="#{match.pvalue == Double.NaN}">
+                                    <h:outputText id="no-pvalue-label" value="n/a" styleClass="na-link"/>
+                                    <pr:tooltip id="no-pvalue-label-tooltip" for="no-pvalue-label">
+                                        The <i>p</i>-values are not availaible if data was too sparse for kernel density estimation (only Fofanov et al. model).
+                                    </pr:tooltip>
+                                </h:panelGroup>
                             </h:panelGroup>
-
-                            <!--TODO-->
-                            <pr:outputLabel value="EC" for="ecLink" id="ecLabel"/>
-                            <h:outputLink id="ecLink" styleClass="download-link" target="_blank">
-                                <span>EC</span>
-                            </h:outputLink>
-                            <pr:overlayPanel id="ecPanel" for="ecLink" hideEffect="fade">
-                                EC numbers
-                            </pr:overlayPanel>
-
-                            <!--TODO-->
-                            <pr:outputLabel value="PDB" for="pdbLink"/>
-                            <h:outputLink id="pdbLink" target="_blank"
-                                          value="http://www.rcsb.org/pdb/explore/explore.do"
-                                          styleClass="download-link">
-                                <span>PDB-ID</span>
-                                <f:param name="structureId" value="PDB"/>
-                            </h:outputLink>
-
-                            <!--TODO-->
-                            <pr:outputLabel for="hitPfam" value="Pfam"/>
-                            <h:outputLink target="_blank" disabled="#{empty match}"
-                                          id="hitPfam" value="http://pfam.xfam.org/family/"
-                                          styleClass="#{empty match ? '' : 'download-link'}">
-                                <h:outputText value="PFAM"/>
-                            </h:outputLink>
 
                         </pr:panelGrid>
                     </pr:panelGrid>
                 </div>
             </pr:dataScroller>
 
-            <pr:chart widgetVar="chart" type="line" model="#{resultView.rmsdChart}" styleClass="chart-lrmsd" rendered="#{resultView.job.finished and not empty resultView.matches}"/>
-
+            <pr:chart widgetVar="chart" type="line" model="#{resultView.rmsdChart}" styleClass="chart-lrmsd" rendered="#{resultView.job.finished and not empty resultView.matches}" responsive="true"/>
 
             <pr:poll interval="5" update="@form" stop="#{resultView.job.finished}" widgetVar="poll" listener="#{resultView.updateResults}"/>
 
@@ -170,9 +180,8 @@
 
         <div id="viewer" class="protein-viewer"/>
 
-        <pr:outputPanel styleClass="proteinViewerStatus"
-                        id="proteinViewerStatus">
-            <h:outputText escape="false" value='#{resultView.currentPv}'/>
+        <pr:outputPanel styleClass="proteinViewerStatus" id="proteinViewerStatus">
+            <h:outputText escape="false" value='#{resultView.currentPvLabel}'/>
         </pr:outputPanel>
 
         <pr:separator styleClass="hr-separator"/>
@@ -182,45 +191,19 @@
             <pr:accordionPanel>
                 <pr:tab id="jobDetails" title="Job details">
                     <div style="text-align: center;">
-                        <h:outputText value="#{resultView.job.description}"
-                                      rendered="#{not empty resultView.job.description}"/>
+                        <h:outputText value="#{resultView.job.description}" rendered="#{not empty resultView.job.description}"/>
                     </div>
                     <pr:separator rendered="#{not empty resultView.job.description}"/>
                     <pr:panelGrid styleClass="result-details-field" columns="2">
 
-                        <pr:outputLabel for="motifName" value="query motif"/>
+                        <pr:outputLabel for="motifName" value="motif"/>
                         <h:outputText id="motifName" value="#{resultView.motifAnalysis.motifSequence}"/>
 
-                        <!--TODO-->
-                        <pr:outputLabel
-                                rendered="#{not empty resultView.extractStructureDescription}"
-                                for="motifSource" value="query motif source"/>
-                        <h:outputText
-                                rendered="#{not empty resultView.extractStructureDescription}"
-                                id="motifSource"
-                                value="#{resultView.extractStructureDescription}"/>
-
-                        <!--TODO-->
-                        <pr:outputLabel
-                                rendered="#{not empty resultView.job}"
-                                for="predefinedList" value="predefined target list"/>
-                        <h:outputText
-                                rendered="#{not empty resultView.job}"
-                                id="predefinedList"
-                                value="PREDEFINED LIST"/>
-
-                        <!--TODO-->
-                        <pr:outputLabel
-                                rendered="#{not empty resultView.job}"
-                                for="targetListFileLabel" value="uploaded target list"/>
-                        <h:outputText
-                                rendered="#{not empty resultView.job}"
-                                id="targetListFileLabel"
-                                value="UPLOADED LIST"/>
+                        <pr:outputLabel for="motifSource" value="motif source"/>
+                        <h:outputText id="motifSource" value="#{resultView.motifAnalysis.pdbIdentifier}"/>
 
                         <pr:outputLabel for="rmsdLimit" value="RMSD limit"/>
-                        <h:outputText id="rmsdLimit"
-                                      value="#{resultView.job.parameters.rmsdLimit} Å"/>
+                        <h:outputText id="rmsdLimit" value="#{resultView.job.parameters.rmsdLimit} Å"/>
 
                         <pr:outputLabel for="statisticalModelType">
                             <i>p</i>-value
@@ -228,7 +211,7 @@
                         <h:outputText id="statisticalModelType" value="#{resultView.job.parameters.statisticalModelType.description}"/>
 
                         <pr:outputLabel for="atomFilter" value="atom filter"/>
-                        <h:outputText id="atomFilter" value="#{resultView.job.parameters.atomFilterType}"/>
+                        <h:outputText id="atomFilter" value="#{resultView.job.parameters.atomFilterType.description}"/>
 
                         <pr:outputLabel for="exchangeDefinitions" value="PSEs"/>
                         <h:outputText id="exchangeDefinitions" value="#{empty resultView.job.parameters.exchangeDefinitions ? 'none' : resultView.job.parameters.exchangeDefinitions}"/>
@@ -249,20 +232,20 @@
                             <f:convertNumber type="percent" minFractionDigits="2"/>
                         </h:outputText>
 
-                        <pr:outputLabel for="
-							interCount" value="inter"/>
+                        <pr:outputLabel for="interCount" value="inter"/>
                         <h:outputText id="interCount" value="#{resultView.interCount}"/>
                         <h:outputText value="#{resultView.interCountRel}">
                             <f:convertNumber type="percent" minFractionDigits="2"/>
                         </h:outputText>
 
-                        <pr:outputLabel for="maxLrmsd" value="LRMSD range"/>
+                        <pr:outputLabel for="maxLrmsd" value="RMSD range"/>
                         <h:outputText id="minLrmsd" value="#{resultView.minimalRrmsd}">
                             <f:convertNumber minFractionDigits="4"/>
                         </h:outputText>
                         <h:outputText id="maxLrmsd" value="#{resultView.maximalRrmsd}">
                             <f:convertNumber minFractionDigits="4"/>
                         </h:outputText>
+
                     </pr:panelGrid>
                 </pr:tab>
             </pr:accordionPanel>

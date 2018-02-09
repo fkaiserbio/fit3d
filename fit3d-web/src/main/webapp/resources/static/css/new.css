@@ -1,0 +1,21 @@
+@CHARSET "UTF-8";
+
+div {
+    font-family: 'Fira Sans', sans-serif !important;
+}
+
+.ui-g {
+    font-family: 'Fira Sans', sans-serif !important;
+}
+
+.ui-widget {
+    font-family: 'Fira Sans', sans-serif !important;
+}
+
+.footer{
+    text-align: center;
+}
+
+.active {
+    background-color: #00acee;
+}

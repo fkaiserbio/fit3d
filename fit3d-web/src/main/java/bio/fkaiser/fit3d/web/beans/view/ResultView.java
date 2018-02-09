@@ -2,15 +2,14 @@ package bio.fkaiser.fit3d.web.beans.view;
 
 import bio.fkaiser.fit3d.web.beans.session.SessionManager;
 import bio.fkaiser.fit3d.web.io.DirectoryZip;
-import bio.fkaiser.fit3d.web.model.Fit3DJob;
-import bio.fkaiser.fit3d.web.model.Fit3DJobDummy;
-import bio.fkaiser.fit3d.web.model.MotifAnalysis;
-import bio.fkaiser.fit3d.web.model.RmsdDistribution;
+import bio.fkaiser.fit3d.web.model.*;
+import bio.fkaiser.fit3d.web.utilities.Fit3DWebConstants;
 import de.bioforscher.singa.structure.algorithms.superimposition.SubstructureSuperimposition;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
 import de.bioforscher.singa.structure.model.interfaces.LeafSubstructure;
 import de.bioforscher.singa.structure.model.oak.StructuralMotif;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
+import de.bioforscher.singa.structure.parser.pdb.structures.StructureWriter;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -27,6 +26,7 @@ import javax.faces.context.FacesContext;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,7 +43,7 @@ public class ResultView implements Serializable {
     private int structureCount;
     private SessionManager sessionManager;
     private LineChartModel rmsdChart;
-    private String currentPv;
+    private String currentPvLabel;
     private long intraCount;
     private long interCount;
     private double intraCountRel;
@@ -52,7 +52,7 @@ public class ResultView implements Serializable {
     private double minimalRrmsd;
     private String currentMatchExternalPdb;
     private String currentQueryExternalPdb;
-    private String extractStructureDescription;
+    private Path motifPath;
 
     public StreamedContent getHitPdbFile(Fit3DMatch h) throws FileNotFoundException {
 
@@ -91,45 +91,47 @@ public class ResultView implements Serializable {
         }
     }
 
-    /**
-     * if not yet done, a single PDB file for all result structures is created
-     * and aligned to the query motif
-     *
-     * @throws IOException
-     */
     public void showAllAgainstOne() throws IOException {
 
-//        File structureDir = new File(job.getWorkingDirectory() + "/structures/");
-//        File singlePdbFile = new File(job.getWorkingDirectory() + "/all.pdb");
+        // write matches of job
+        job.writeMatches();
 
-        // cancel if single PDB file was already created
-//        if (!singlePdbFile.exists()) {
-//
-//            // create single PDB file
-//            int fileCounter = 0;
-//            for (File f : structureDir.listFiles()) {
-//
-//                if (fileCounter > ALL_AGAINT_ONE_LIMIT) {
-//                    break;
-//                }
-//                // TODO implement
-////				String fileContent = FileUtils.readFileToString(f);
-////				FileUtils.write(singlePdbFile, fileContent, true);
-////				fileCounter++;
-//            }
-//        }
+        // create single PDB file of all aligned matches
+        Path singlePdbFilePath = job.getJobPath().resolve("all.pdb");
+        if (!singlePdbFilePath.toFile().exists()) {
+            Files.createFile(singlePdbFilePath);
+            // create single PDB file
+            final int[] fileCounter = {0};
+            Files.walk(job.getJobPath().resolve("matches")).filter(path -> path.toFile().isFile()).forEach(path -> {
+                if (fileCounter[0] > Fit3DWebConstants.ALL_AGAINST_ONE_LIMIT) {
+                    return;
+                } else {
+                    try {
+                        String fileContent = Files.lines(path)
+                                                  .collect(Collectors.joining("\n"));
+                        Files.write(singlePdbFilePath, fileContent.getBytes(), StandardOpenOption.APPEND);
+                    } catch (IOException e) {
+                        logger.warn("failed to read {} and append to single structure file", path, e);
+                    }
+                }
+                fileCounter[0]++;
+            });
+        }
 
-        String pdbPath, motifPath;
-        if (job instanceof Fit3DJobDummy) {
-            pdbPath = "'data/example/all.pdb'";
-            motifPath = "'data/example/motif.pdb'";
-            // RequestContext.getCurrentInstance().execute(
-            // "viewer({ pdb : 'data/example/all.pdb', clear: true, style :
-            // 'lines', additionalPdb : { pdb : 'data/example/motif.pdb', style
-            // : 'sticks', color : 'green', labelColor : 'rgb(255, 255, 255)',
-            // labelSize : 22, labels : true, labelStyle : 'bold' } })");
-            // .execute("showAllAgainstOneAlignment('data/example/all.pdb','data/example/motif.pdb')");
-        } else {
+        logger.info("single structure file {} created", singlePdbFilePath);
+
+//         TODO implement
+//        String pdbPath, motifPath;
+//        if (job instanceof Fit3DJobDummy) {
+//            pdbPath = "'data/example/all.pdb'";
+//            motifPath = "'data/example/motif.pdb'";
+//            // RequestContext.getCurrentInstance().execute(
+//            // "viewer({ pdb : 'data/example/all.pdb', clear: true, style :
+//            // 'lines', additionalPdb : { pdb : 'data/example/motif.pdb', style
+//            // : 'sticks', color : 'green', labelColor : 'rgb(255, 255, 255)',
+//            // labelSize : 22, labels : true, labelStyle : 'bold' } })");
+//            // .execute("showAllAgainstOneAlignment('data/example/all.pdb','data/example/motif.pdb')");
+//        } else {
 //            pdbPath = "'data/" + sessionManager.getSessionIdentifier() + "/" + job.getId() + "/all.pdb'";
 //            motifPath = "'data/" + sessionManager.getSessionIdentifier() + "/" + job.getId() + "/motif.pdb'";
             // RequestContext.getCurrentInstance()
@@ -150,13 +152,14 @@ public class ResultView implements Serializable {
             // + "/motif.pdb', style : 'sticks', color : 'green', labelColor :
             // 'rgb(255, 255, 255)', labelSize : 22, labels : true, labelStyle :
             // 'bold' } })");
-        }
-//        RequestContext.getCurrentInstance().execute("viewer({ pdb : " + pdbPath
-//                                                    + ", clear: true, style : 'lines', additionalPdb : { pdb : " + motifPath
-//                                                    + ", style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold' } })");
+//        }
+        String executionString = "viewer({ pdb : '" + SessionManager.relativizePath(singlePdbFilePath)
+                   + "', clear: true, style : 'lines', additionalPdb : { pdb : '" + SessionManager.relativizePath(motifPath)
+                   + "', style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold' } })";
+        RequestContext.getCurrentInstance().execute(executionString);
 
         // update currently shown
-        currentPv = "all against <span style=\"color:#00b04b\">query motif</span>";
+        currentPvLabel = "all against <span style=\"color:#00b04b\">query motif</span>";
 
         RequestContext.getCurrentInstance().update("proteinViewerStatus");
 
@@ -345,9 +348,21 @@ public class ResultView implements Serializable {
 //				+ ", style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold', alternatePosition : true } })");
 
         // update currently shown
-        currentPv = h.toString();
+        currentPvLabel = h.toString();
         RequestContext.getCurrentInstance().update("proteinViewerStatus");
 
+    }
+
+    public List<Fit3DMatchAnnotation> getAnnotations(Fit3DMatch match) {
+        List<String> chainIdentifiers = match.getCandidateMotif().getAllLeafSubstructures().stream()
+                                             .map(LeafSubstructure::getChainIdentifier)
+                                             .distinct()
+                                             .collect(Collectors.toList());
+        List<Fit3DMatchAnnotation> annotations = new ArrayList<>();
+        for (String chainIdentifier : chainIdentifiers) {
+            annotations.add(new Fit3DMatchAnnotation(match, chainIdentifier));
+        }
+        return annotations;
     }
 
     public void updateResults() {
@@ -356,6 +371,17 @@ public class ResultView implements Serializable {
         motif = StructuralMotif.fromLeafSubstructures(StructureParser.local()
                                                                      .path(job.getParameters().getMotifPath())
                                                                      .parse().getAllLeafSubstructures());
+        // write motif
+        motifPath = job.getJobPath().resolve("motif.pdb");
+        if (!motifPath.toFile().exists()) {
+            try {
+                StructureWriter.writeLeafSubstructureContainer(motif, motifPath);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+            logger.info("motif written to {}", motifPath);
+        }
+
         motifAnalysis = MotifAnalysis.of(motif);
 
         if (matches == null && job.isFinished()) {
@@ -463,20 +489,12 @@ public class ResultView implements Serializable {
         return new DefaultStreamedContent(Files.newInputStream(job.getJobPath().resolve("summary.csv")), "text/csv", "summary.csv");
     }
 
-    public String getCurrentPv() {
-        return currentPv;
+    public String getCurrentPvLabel() {
+        return currentPvLabel;
     }
 
-    public void setCurrentPv(String currentPv) {
-        this.currentPv = currentPv;
-    }
-
-    public String getExtractStructureDescription() {
-        return extractStructureDescription;
-    }
-
-    public void setExtractStructureDescription(String extractStructureDescription) {
-        this.extractStructureDescription = extractStructureDescription;
+    public void setCurrentPvLabel(String currentPvLabel) {
+        this.currentPvLabel = currentPvLabel;
     }
 
     public long getInterCount() {
@@ -527,6 +545,10 @@ public class ResultView implements Serializable {
         this.minimalRrmsd = minimalRrmsd;
     }
 
+    public StructuralMotif getMotif() {
+        return motif;
+    }
+
     public MotifAnalysis getMotifAnalysis() {
         return motifAnalysis;
     }
@@ -541,6 +563,10 @@ public class ResultView implements Serializable {
 
     public SessionManager getSessionManager() {
         return sessionManager;
+    }
+
+    public void setSessionManager(SessionManager sessionManager) {
+        this.sessionManager = sessionManager;
     }
 
     // private void extractMotifFromPdb(String pdbFilePath, Hit h)
@@ -594,8 +620,8 @@ public class ResultView implements Serializable {
     // out.close();
     // }
 
-    public void setSessionManager(SessionManager sessionManager) {
-        this.sessionManager = sessionManager;
+    public int getStructureCount() {
+        return structureCount;
     }
 
     // TODO implement
@@ -621,10 +647,6 @@ public class ResultView implements Serializable {
 //		Calc.rotate(queryStructure, h.getRotation());
 //		Calc.shift(queryStructure, h.getShift());
 //	}
-
-    public int getStructureCount() {
-        return structureCount;
-    }
 
     public StreamedContent getZippedResults() throws IOException {
 

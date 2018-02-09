@@ -2,6 +2,7 @@ package bio.fkaiser.fit3d.web.model;
 
 import bio.fkaiser.fit3d.web.model.constant.MotifComplexity;
 import de.bioforscher.singa.structure.model.families.StructuralFamily;
+import de.bioforscher.singa.structure.model.identifiers.LeafIdentifier;
 import de.bioforscher.singa.structure.model.interfaces.LeafSubstructure;
 import de.bioforscher.singa.structure.model.oak.StructuralMotif;
 import de.bioforscher.singa.structure.model.oak.Structures;
@@ -20,13 +21,15 @@ public class MotifAnalysis {
     private final String motifSequence;
     private final StructuralMotif.Type motifType;
     private final MotifComplexity motifComplexity;
+    private final String pdbIdentifier;
 
-    public MotifAnalysis(int motifAminoAcidCount, double motifExtent, String motifSequence, StructuralMotif.Type motifType, MotifComplexity motifComplexity) {
+    public MotifAnalysis(int motifAminoAcidCount, double motifExtent, String motifSequence, StructuralMotif.Type motifType, MotifComplexity motifComplexity, String pdbIdentifier) {
         this.motifAminoAcidCount = motifAminoAcidCount;
         this.motifExtent = motifExtent;
         this.motifSequence = motifSequence;
         this.motifType = motifType;
         this.motifComplexity = motifComplexity;
+        this.pdbIdentifier = pdbIdentifier;
     }
 
     public static MotifAnalysis of(StructuralMotif structuralMotif) {
@@ -60,7 +63,12 @@ public class MotifAnalysis {
             motifComplexity = MotifComplexity.HIGH;
         }
 
-        return new MotifAnalysis(motifAminoAcidCount, motifExtent, motifSequence, motifType, motifComplexity);
+        String pdbIdentifier = "n/a";
+        if (!structuralMotif.getFirstLeafSubstructure().getPdbIdentifier().equals(LeafIdentifier.DEFAULT_PDB_IDENTIFIER)) {
+            pdbIdentifier = structuralMotif.getFirstLeafSubstructure().getPdbIdentifier();
+        }
+
+        return new MotifAnalysis(motifAminoAcidCount, motifExtent, motifSequence, motifType, motifComplexity, pdbIdentifier);
     }
 
     public int getMotifAminoAcidCount() {
@@ -81,5 +89,9 @@ public class MotifAnalysis {
 
     public StructuralMotif.Type getMotifType() {
         return motifType;
+    }
+
+    public String getPdbIdentifier() {
+        return pdbIdentifier;
     }
 }

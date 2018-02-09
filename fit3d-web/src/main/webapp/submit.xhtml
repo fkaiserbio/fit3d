@@ -132,7 +132,7 @@
 
                     <pr:outputLabel for="atomFilterType" value="atom filter"/>
                     <pr:selectOneMenu value="#{submitJobView.atomFilterType}" id="atomFilterType" style="width:240px">
-                        <f:selectItems value="#{dataProvider.atomFilterTypes}" var="atomFilterType" itemValue="#{atomFilterType}" itemLabel="#{atomFilterType}"/>
+                        <f:selectItems value="#{dataProvider.atomFilterTypes}" var="atomFilterType" itemValue="#{atomFilterType}" itemLabel="#{atomFilterType.description}"/>
                     </pr:selectOneMenu>
                     <pr:tooltip id="atomsTooltip" for="atomFilterType"
                                 value="Select the atoms that should be used for alignment of match candidates to query motif. Arbitrary atoms can be defined in the command line version."/>
