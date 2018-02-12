@@ -66,7 +66,7 @@
                             <pr:outputLabel styleClass="ui-icon ui-icon-zoomin" for="alignMatch"/>
                             <h:panelGroup>
                                 <pr:commandLink value="Show alignment" id="alignMatch"
-                                                disabled="#{empty resultView.job.parameters}"
+                                                disabled="#{empty resultView.motifAnalysis.pdbIdentifier}"
                                                 styleClass="download-link"
                                                 actionListener="#{resultView.showGlobalAlignment(match)}"/>
                                 <pr:tooltip for="alignMatch"
@@ -80,11 +80,16 @@
                                             for="downloadHit"/>
                             <pr:commandLink value="Download match" id="downloadHit"
                                             styleClass="download-link" ajax="false">
-                                <pr:fileDownload value="#{resultView.getHitPdbFile(match)}"/>
+                                <pr:fileDownload value="#{resultView.getMatchPDBFile(match)}"/>
                             </pr:commandLink>
 
                             <pr:dialog header="Annotations for #{match.candidateMotif}" widgetVar="annotationDialog" dynamic="true" styleClass="toolbox-help-dialog" width="600">
                                 <pr:dataTable var="annotation" value="#{resultView.getAnnotations(match)}">
+                                    <f:facet name="header">
+                                        <pr:link target="_blank"
+                                                 href="https://www.rcsb.org/structure/#{resultView.getPDBIdentifier(match)}"
+                                                 value="show in PDB"/>
+                                    </f:facet>
                                     <pr:column headerText="chain">
                                         <h:outputText value="#{annotation.chainIdentifier}"/>
                                     </pr:column>
@@ -200,7 +205,7 @@
                         <h:outputText id="motifName" value="#{resultView.motifAnalysis.motifSequence}"/>
 
                         <pr:outputLabel for="motifSource" value="motif source"/>
-                        <h:outputText id="motifSource" value="#{resultView.motifAnalysis.pdbIdentifier}"/>
+                        <h:outputText id="motifSource" value="#{empty resultView.motifAnalysis.pdbIdentifier ? 'n/a' : resultView.motifAnalysis.pdbIdentifier}"/>
 
                         <pr:outputLabel for="rmsdLimit" value="RMSD limit"/>
                         <h:outputText id="rmsdLimit" value="#{resultView.job.parameters.rmsdLimit} Å"/>

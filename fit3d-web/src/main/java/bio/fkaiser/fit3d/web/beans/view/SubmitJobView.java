@@ -260,8 +260,13 @@ public class SubmitJobView implements Serializable {
         jobParameters.setAtomFilterType(atomFilterType);
         jobParameters.setChainTargetList(chainTargetList);
         jobParameters.setPdbTargetList(pdbTargetList);
-        jobParameters.setTargetListPath(targetListPath);
+        if(motifPath.endsWith("4cha_motif.pdb")){
+            targetListPath = motifPath.getParent().resolve("targets.txt");
+            logger.info("example run detected, using short target list {}", targetListPath);
+            motifPath = motifPath.getParent().resolve("4cha_motif.pdb");
+        }
         jobParameters.setMotifPath(motifPath);
+        jobParameters.setTargetListPath(targetListPath);
         jobParameters.setRmsdLimit(rmsdLimit);
         jobParameters.setExchangeDefinitions(exchangeDefinitions);
         jobParameters.setStatisticalModelType(statisticalModelType);
@@ -280,17 +285,30 @@ public class SubmitJobView implements Serializable {
         return request.getRemoteAddr();
     }
 
-    public String submitExample() {
+    public void submitExample() {
 
-//        int jobCount = getJobCountForCurrentSession();
-//
-//        if (jobCount > Fit3dConstants.JOB_LIMIT) {
-//            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-//                                                    "Too many jobs sumitted. Please wait until until some jobs are finished.");
-//            FacesContext.getCurrentInstance().addMessage(null, message);
-//
-//            return null;
-//        }
+        predefinedList = PredefinedList.BLASTe7;
+        description = "trypsin active site";
+
+        // read example motif
+        String exampleMotifFileName = "4cha_motif.pdb";
+        motifPath = SessionManager.BASE_PATH.resolve("example").resolve(exampleMotifFileName);
+        externalMotifPath = SessionManager.relativizePath(motifPath);
+
+        motifFileName = exampleMotifFileName;
+
+        analyzeMotif();
+
+        // update motif meta data
+        RequestContext.getCurrentInstance().update("motifMetaData");
+
+        // expand toolbox
+        RequestContext.getCurrentInstance().execute("PF('mainContainer').show('east')");
+
+        // show protein viewer
+        RequestContext.getCurrentInstance().execute("viewer({ pdb : '" + externalMotifPath + "', clear : true, labels : true, labelSize : 22, labelStyle : 'bold' })");
+
+        motifFileUploaded = true;
 //
 //        predefinedTargetList = PredefinedList.BLASTe80;
 //        description = "4CHA catalytic triad";
@@ -319,15 +337,18 @@ public class SubmitJobView implements Serializable {
 //
 //        this.jobManager.addNewJob(this.sessionManager.getId(), job);
 
-        return "success";
+//        return "success";
     }
 
     private void analyzeMotif() {
         // read motif
         motif = StructuralMotif.fromLeafSubstructures(StructureParser.local()
                                                                      .path(motifPath)
+                                                                     .everything()
+                                                                     .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
                                                                      .parse().getAllLeafSubstructures());
         motifAnalysis = MotifAnalysis.of(motif);
+
     }
 
     private void analyzeTargetList() throws IOException {

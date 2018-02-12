@@ -1,8 +1,8 @@
 package bio.fkaiser.fit3d.web.beans.application;
 
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import bio.fkaiser.fit3d.web.converter.JobConverter;
 import bio.fkaiser.fit3d.web.model.Fit3DJob;
-import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
-import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -55,10 +54,24 @@ public class JobManager implements Serializable {
         job.setFuture(future);
     }
 
+    public void cancelJob(Fit3DJob job) {
+        UUID jobIdentifier = job.getJobIdentifier();
+        Optional<Fit3DJob> optionalJob = managedJobs.values().stream()
+                                                    .flatMap(Collection::stream)
+                                                    .filter(managedJob -> managedJob.getJobIdentifier().equals(jobIdentifier))
+                                                    .findFirst();
+        optionalJob.ifPresent(Fit3DJob::cancel);
+        if (optionalJob.isPresent()) {
+            Fit3DJob managedJob = optionalJob.get();
+            managedJob.cancel();
+            logger.info("sent cancel signal to job {}", managedJob);
+        } else {
+            logger.info("job with identifier not found {}", job.getJobIdentifier());
+        }
+    }
+
     @PostConstruct
     public void init() {
-        FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-
         // schedule updating of load for execution
         TimerTask loadMonitoringTask = new TimerTask() {
             @Override

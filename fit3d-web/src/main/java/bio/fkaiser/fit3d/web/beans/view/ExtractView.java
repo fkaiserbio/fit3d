@@ -1,5 +1,6 @@
 package bio.fkaiser.fit3d.web.beans.view;
 
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import bio.fkaiser.fit3d.web.beans.session.SessionManager;
 import bio.fkaiser.fit3d.web.model.MotifAnalysis;
 import bio.fkaiser.fit3d.web.model.constant.MotifComplexity;
@@ -65,6 +66,8 @@ public class ExtractView implements Serializable {
         } else {
             Structure structure = StructureParser.local()
                                                  .path(extractPdbFilePath)
+                                                 .everything()
+                                                 .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
                                                  .parse();
             List<LeafIdentifier> leafIdentifiers = new ArrayList<>();
             for (String extractAminoAcid : extractAminoAcids) {
@@ -178,6 +181,7 @@ public class ExtractView implements Serializable {
                 Structure structure = StructureParser.pdb()
                                                      .pdbIdentifier(pdbIdentifier)
                                                      .everything()
+                                                     .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
                                                      .parse();
                 // generate amino acid identifiers
                 leafIdentifierStrings = structure.getAllLeafSubstructures().stream()
@@ -200,6 +204,7 @@ public class ExtractView implements Serializable {
                 Structure structure = StructureParser.local()
                                                      .path(extractPdbFilePath)
                                                      .everything()
+                                                     .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
                                                      .parse();
 
                 // block wizard for structures with less than two amino acids

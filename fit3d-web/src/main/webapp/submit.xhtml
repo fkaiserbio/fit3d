@@ -17,7 +17,7 @@
 
         <h:form id="mainForm" enctype="multipart/form-data">
 
-            <pr:growl id="messages" showDetail="true" showSummary="false"/>
+            <pr:growl id="messages" showDetail="true" showSummary="false" autoUpdate="true"/>
 
             <pr:fieldset legend="Settings" styleClass="fieldset">
 
@@ -64,11 +64,11 @@
                     <pr:tooltip id="targetListTip" for="targetList"
                                 value="Choose a pre-defined target list. All predefined lists are provided as download in the help section."/>
 
-                    <pr:outputLabel for="rmsdSpin" value="LRMSD limit"/>
+                    <pr:outputLabel for="rmsdSpin" value="RMSD limit"/>
                     <pr:spinner id="rmsdSpin" value="#{submitJobView.rmsdLimit}"
                                 min="0.1" max="2.5" stepFactor="0.1" suffix=" Å" size="19"/>
                     <pr:tooltip id="rmsdTip" for="rmsdSpin"
-                                value="Select the maximal allowed least root-mean-square deviation (LRMSD) to the query motif (default: 2 Å)."/>
+                                value="Select the maximal allowed root-mean-square deviation (RMSD) to the query motif (default: 2 Å)."/>
 
                     <pr:outputLabel for="description" value="description"/>
                     <pr:inputText id="description" value="#{submitJobView.description}"
@@ -80,35 +80,25 @@
                                 value="Assign a name to your job."/>
 
                     <pr:outputLabel for="email" value="email address"/>
-                    <pr:inputText id="email" value="#{submitJobView.email}"
-                                  placeholder="yourmail@mail.com"
-                                  validatorMessage="invalid email address">
-                        <f:validateRegex
-                                pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*(\.[A-Za-z]{2,})$"/>
+                    <pr:inputText id="email" value="#{submitJobView.email}" placeholder="yourmail@mail.com" validatorMessage="invalid email address">
+                        <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*(\.[A-Za-z]{2,})$"/>
                     </pr:inputText>
                     <pr:tooltip id="emailTip" for="email"
                                 value="Enter your email address to be notified when your request is finished."/>
 
-                    <pr:commandButton value="Submit Job" id="submitButton"
-                                      action="#{submitJobView.submit}" styleClass="ui-priority-primary"
-                                      style="width:150px" update="@form"
-                                      disabled="#{submitJobView.blocked}"/>
-                    <pr:panelGrid styleClass="submit-field-reset" columns="2">
-                        <pr:outputLabel styleClass="ui-icon ui-icon-refresh"
-                                        for="resetButton"/>
-                        <h:link id="resetButton" outcome="/submit" value="Reset input"
-                                styleClass="show-link"/>
+                    <pr:captcha label="Captcha"/>
+
+                    <pr:panelGrid styleClass="submit-settings-field" columns="1">
+                        <pr:commandButton value="Submit Job" id="submitButton" action="#{submitJobView.submit}" styleClass="ui-priority-primary" style="width:150px"
+                                          disabled="#{submitJobView.blocked}"/>
+                        <pr:tooltip id="submitTip" for="submitButton" value="Click to submit your job."/>
+                        <pr:commandButton value="Example run" id="exampleButton" action="#{submitJobView.submitExample}" style="width:150px" update="@form"/>
+                        <pr:tooltip id="exampleTip" for="exampleButton" value="Click to load example input."/>
                     </pr:panelGrid>
-                    <pr:tooltip id="submitTip" for="submitButton"
-                                value="Click to submit your job."/>
                 </pr:panelGrid>
-                <pr:separator/>
-                <pr:panelGrid styleClass="submit-settings-field" columns="2">
-                    <pr:commandButton value="Example run" id="exampleButton"
-                                      action="#{submitJobView.submitExample}" update="@form"
-                                      style="width:150px"/>
-                    <pr:tooltip id="exampleTip" for="exampleButton"
-                                value="Click to run example."/>
+                <pr:panelGrid styleClass="submit-field-reset submit-settings-field" columns="2">
+                    <pr:outputLabel styleClass="ui-icon ui-icon-refresh" for="resetButton"/>
+                    <h:link id="resetButton" outcome="/submit" value="Reset input" styleClass="show-link"/>
                 </pr:panelGrid>
             </pr:fieldset>
 
@@ -138,7 +128,6 @@
                                 value="Select the atoms that should be used for alignment of match candidates to query motif. Arbitrary atoms can be defined in the command line version."/>
 
                     <!--PSEs definition-->
-                    <pr:outputLabel for="exchangeDefinition" value="position-specific exchanges (PSEs)"/>
                     <pr:panelGrid id="exchangeDefinition" styleClass="submit-exchange-definition-field" columns="1">
                         <ui:repeat var="exchangeDefinition" value="#{submitJobView.exchangeDefinitions}">
                             <pr:selectCheckboxMenu value="#{exchangeDefinition.exchangeAminoAcids}"

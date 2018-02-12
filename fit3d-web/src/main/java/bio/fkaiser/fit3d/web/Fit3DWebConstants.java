@@ -5,6 +5,7 @@ import de.bioforscher.singa.core.utility.Resources;
 import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter;
 import de.bioforscher.singa.structure.parser.pdb.structures.SourceLocation;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
+import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserOptions;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -47,6 +48,11 @@ public final class Fit3DWebConstants {
         public static final String DB_NAME = "fit3d";
         public static final String DB_COLLECTION_NAME = "jobs";
         public static final boolean DROP_DB_ON_RESTART = true;
+    }
+
+    public final static class Singa {
+        public static final StructureParserOptions STRUCTURE_PARSER_OPTIONS = StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS,
+                                                                                                                  StructureParserOptions.Setting.GET_IDENTIFIER_FROM_FILENAME);
     }
 
     public final static class Mail {

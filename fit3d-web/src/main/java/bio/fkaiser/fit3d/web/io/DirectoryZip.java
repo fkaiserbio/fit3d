@@ -11,7 +11,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * A class to recursively zip a whole directory.
  *
- * @author fkaiser
+ * @author fk
  */
 public class DirectoryZip {
 

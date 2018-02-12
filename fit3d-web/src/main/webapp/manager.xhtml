@@ -1,19 +1,36 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:pr="http://primefaces.org/ui">
-
-<f:metadata>
-	<f:viewParam name="id" value="#{sessionManager.sessionIdentifier}">
-		<f:converter converterId="uuidConverter" />
-	</f:viewParam>
-</f:metadata>
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:pr="http://primefaces.org/ui">
 
 <ui:composition template="/WEB-INF/templates/layout.xhtml">
-	<ui:define name="content">
-		Manager Content goes here
-	</ui:define>
-	<ui:define name="toolboxContent" />
+    <ui:define name="content">
+        <h:form>
+            <pr:dataTable var="job" value="#{managerView.jobs}" id="jobTable">
+                <pr:column headerText="timestamp">
+                    <h:outputText value="#{job.timeStamp}"/>
+                </pr:column>
+                <pr:column headerText="description">
+                    <h:outputText value="#{job.description}"/>
+                </pr:column>
+                <pr:column headerText="IP">
+                    <h:outputText value="#{job.ipAddress}"/>
+                </pr:column>
+                <pr:column headerText="session">
+                    <h:outputText value="#{job.sessionIdentifier}"/>
+                </pr:column>
+                <pr:column headerText="job">
+                    <h:outputText value="#{job.sessionIdentifier}"/>
+                </pr:column>
+                <pr:column headerText="status">
+                    <h:outputText value="#{job.status}"/>
+                </pr:column>
+                <pr:column headerText="action">
+                    <pr:commandButton disabled="#{job.status != 'running'}" action="#{managerView.jobManager.cancelJob(job)}" value="cancel" update="@form"/>
+                </pr:column>
+            </pr:dataTable>
+        </h:form>
+    </ui:define>
+    <ui:define name="toolboxContent"/>
 </ui:composition>
 </html>

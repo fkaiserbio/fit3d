@@ -158,43 +158,40 @@
         </pr:layoutUnit>
 
         <pr:layoutUnit position="west" size="250">
-            <h:form>
-                <pr:growl id="messages" showDetail="true"/>
-                <pr:menu>
-                    <pr:menuitem value="Home" outcome="/home.xhtml" icon="ui-icon-home"
-                                 styleClass="#{view.viewId == '/home.xhtml' ? 'active' : ''}"/>
-                    <pr:submenu label="Preprocessing">
-                        <pr:menuitem value="Extract motif" outcome="/extract.xhtml"
-                                     icon="ui-icon-seek-next"
-                                     styleClass="#{view.viewId == '/extract.xhtml' ? 'active' : ''}"/>
-                    </pr:submenu>
-                    <pr:submenu label="Motif search">
-                        <pr:menuitem value="Submit job" outcome="/submit.xhtml"
-                                     icon="ui-icon-circle-arrow-e"
-                                     styleClass="#{view.viewId == '/submit.xhtml' ? 'active' : ''}"/>
-                        <pr:menuitem value="View results" outcome="/jobs.xhtml"
-                                     icon="ui-icon-newwin"
-                                     styleClass="#{(view.viewId == '/jobs.xhtml' || view.viewId == '/result.xhtml') ? 'active' : ''}"/>
-                    </pr:submenu>
-                    <pr:submenu label="Others">
-                        <pr:menuitem value="Download" outcome="/download.xhtml"
-                                     icon="ui-icon-arrowthickstop-1-s"
-                                     styleClass="#{view.viewId == '/download.xhtml' ? 'active' : ''}"/>
-                        <pr:menuitem value="Help" outcome="/help.xhtml"
-                                     icon="ui-icon-help"
-                                     styleClass="#{view.viewId == '/help.xhtml' ? 'active' : ''}"/>
-                        <pr:menuitem value="FAQ" outcome="/faq.xhtml"
-                                     icon="ui-icon-lightbulb"
-                                     styleClass="#{view.viewId == '/faq.xhtml' ? 'active' : ''}"/>
-                        <pr:menuitem value="Citation" outcome="/citation.xhtml"
-                                     icon="ui-icon-document"
-                                     styleClass="#{view.viewId == '/citation.xhtml' ? 'active' : ''}"/>
-                        <pr:menuitem value="Contact us" outcome="/contact.xhtml"
-                                     icon="ui-icon-contact"
-                                     styleClass="#{view.viewId == '/contact.xhtml' ? 'active' : ''}"/>
-                    </pr:submenu>
-                </pr:menu>
-            </h:form>
+            <pr:menu>
+                <pr:menuitem value="Home" outcome="/home.xhtml" icon="ui-icon-home"
+                             styleClass="#{view.viewId == '/home.xhtml' ? 'active' : ''}"/>
+                <pr:submenu label="Preprocessing">
+                    <pr:menuitem value="Extract motif" outcome="/extract.xhtml"
+                                 icon="ui-icon-seek-next"
+                                 styleClass="#{view.viewId == '/extract.xhtml' ? 'active' : ''}"/>
+                </pr:submenu>
+                <pr:submenu label="Motif search">
+                    <pr:menuitem value="Submit job" outcome="/submit.xhtml"
+                                 icon="ui-icon-circle-arrow-e"
+                                 styleClass="#{view.viewId == '/submit.xhtml' ? 'active' : ''}"/>
+                    <pr:menuitem value="View results" outcome="/jobs.xhtml"
+                                 icon="ui-icon-newwin"
+                                 styleClass="#{(view.viewId == '/jobs.xhtml' || view.viewId == '/result.xhtml') ? 'active' : ''}"/>
+                </pr:submenu>
+                <pr:submenu label="Others">
+                    <pr:menuitem value="Download" outcome="/download.xhtml"
+                                 icon="ui-icon-arrowthickstop-1-s"
+                                 styleClass="#{view.viewId == '/download.xhtml' ? 'active' : ''}"/>
+                    <pr:menuitem value="Help" outcome="/help.xhtml"
+                                 icon="ui-icon-help"
+                                 styleClass="#{view.viewId == '/help.xhtml' ? 'active' : ''}"/>
+                    <pr:menuitem value="FAQ" outcome="/faq.xhtml"
+                                 icon="ui-icon-lightbulb"
+                                 styleClass="#{view.viewId == '/faq.xhtml' ? 'active' : ''}"/>
+                    <pr:menuitem value="Citation" outcome="/citation.xhtml"
+                                 icon="ui-icon-document"
+                                 styleClass="#{view.viewId == '/citation.xhtml' ? 'active' : ''}"/>
+                    <pr:menuitem value="Contact us" outcome="/contact.xhtml"
+                                 icon="ui-icon-contact"
+                                 styleClass="#{view.viewId == '/contact.xhtml' ? 'active' : ''}"/>
+                </pr:submenu>
+            </pr:menu>
             <h:link outcome="/terms" styleClass="terms-link">Terms of Service</h:link>
         </pr:layoutUnit>
 

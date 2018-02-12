@@ -10,6 +10,7 @@ import bio.fkaiser.fit3d.web.model.RmsdDistribution;
 import de.bioforscher.singa.structure.algorithms.superimposition.SubstructureSuperimposition;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
 import de.bioforscher.singa.structure.model.interfaces.LeafSubstructure;
+import de.bioforscher.singa.structure.model.interfaces.Structure;
 import de.bioforscher.singa.structure.model.oak.StructuralMotif;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureWriter;
@@ -53,18 +54,18 @@ public class ResultView implements Serializable {
     private double interCountRel;
     private double maximalRrmsd;
     private double minimalRrmsd;
-    private String currentMatchExternalPdb;
-    private String currentQueryExternalPdb;
     private Path motifPath;
+    private String getPDBIdentifier;
 
-    public StreamedContent getHitPdbFile(Fit3DMatch h) throws FileNotFoundException {
+    public StreamedContent getMatchPDBFile(Fit3DMatch match) throws FileNotFoundException {
 
-        // TODO implement
-//		String fileName = InputOutputUtils.getOutputFilename(h) + ".pdb";
-//		File motifFile = new File(this.job.getWorkingDirectory() + "/structures/" + fileName);
+        // write matches of job
+        job.writeMatches();
 
-//		return new DefaultStreamedContent(new FileInputStream(motifFile), "chemical/pdb", fileName);
-        return null;
+        String fileName = match.getSubstructureSuperimposition().getStringRepresentation() + ".pdb";
+        Path matchPath = job.getJobPath().resolve("matches").resolve(fileName);
+
+        return new DefaultStreamedContent(new FileInputStream(matchPath.toFile()), "chemical/pdb", fileName);
     }
 
     @PostConstruct
@@ -75,12 +76,6 @@ public class ResultView implements Serializable {
         }
     }
 
-    /**
-     * redirects to job selection if no job is associated to prevent direct
-     * access to result page
-     *
-     * @throws IOException
-     */
     public void redirectToJobSelection() throws IOException {
         if (job == null) {
             ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
@@ -117,42 +112,10 @@ public class ResultView implements Serializable {
 
         logger.info("single structure file {} created", singlePdbFilePath);
 
-//         TODO implement
-//        String pdbPath, motifPath;
-//        if (job instanceof Fit3DJobDummy) {
-//            pdbPath = "'data/example/all.pdb'";
-//            motifPath = "'data/example/motif.pdb'";
-//            // RequestContext.getCurrentInstance().execute(
-//            // "viewer({ pdb : 'data/example/all.pdb', clear: true, style :
-//            // 'lines', additionalPdb : { pdb : 'data/example/motif.pdb', style
-//            // : 'sticks', color : 'green', labelColor : 'rgb(255, 255, 255)',
-//            // labelSize : 22, labels : true, labelStyle : 'bold' } })");
-//            // .execute("showAllAgainstOneAlignment('data/example/all.pdb','data/example/motif.pdb')");
-//        } else {
-//            pdbPath = "'data/" + sessionManager.getSessionIdentifier() + "/" + job.getId() + "/all.pdb'";
-//            motifPath = "'data/" + sessionManager.getSessionIdentifier() + "/" + job.getId() + "/motif.pdb'";
-        // RequestContext.getCurrentInstance()
-        // .execute("showAllAgainstOneAlignment('data/" +
-        // this.sessionManager.getId() + "/"
-        // + this.job.getId() + "/all.pdb','data/" +
-        // this.sessionManager.getId() + "/"
-        // + this.job.getId() + "/motif.pdb')");
-        // .execute("viewer({ pdb : 'data/" +
-        // this.sessionManager.getId() + "/" + this.job.getId()
-        // + "/all.pdb', " + "additionalPdbs : ['data/" +
-        // this.sessionManager.getId() + "/"
-        // + this.job.getId() + "/motif.pdb'], style : 'lines' })");
-        // .execute("viewer({ pdb : 'data/" + this.sessionManager.getId()
-        // + "/" + this.job.getId() + "/all.pdb', clear : true, style :
-        // 'lines', additionalPdb : { pdb : 'data/"
-        // + this.sessionManager.getId() + "/" + this.job.getId()
-        // + "/motif.pdb', style : 'sticks', color : 'green', labelColor :
-        // 'rgb(255, 255, 255)', labelSize : 22, labels : true, labelStyle :
-        // 'bold' } })");
-//        }
         String executionString = "viewer({ pdb : '" + SessionManager.relativizePath(singlePdbFilePath)
                                  + "', clear: true, style : 'lines', additionalPdb : { pdb : '" + SessionManager.relativizePath(motifPath)
                                  + "', style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold' } })";
+
         RequestContext.getCurrentInstance().execute(executionString);
 
         // update currently shown
@@ -162,143 +125,84 @@ public class ResultView implements Serializable {
 
     }
 
-    public void showGlobalAlignment(Fit3DMatch h) throws IOException {
+    public void showGlobalAlignment(Fit3DMatch match) throws IOException {
 
-        // TODO implement
-//		Structure matchStructure = new TargetStructureParser(Fit3dConstants.PDB_DIR, h.getPdbId()).parseStructure();
-//		FileUtils.writeStringToFile(new File(this.job.getWorkingDirectory() + "/aligned_match.pdb"),
-//				matchStructure.toPDB());
-//
-//		Structure queryStructure = new QueryStructureParser(Fit3dConstants.PDB_DIR,
-//				this.job.getWorkingDirectory() + "/extract.pdb").parseStructure();
-//
-//		calculateAlignment(h, queryStructure);
-//
-//		FileUtils.writeStringToFile(new File(this.job.getWorkingDirectory() + "/aligned_query.pdb"),
-//				queryStructure.toPDB());
-//
-//		Structure queryMotif = new QueryStructureParser(Fit3dConstants.PDB_DIR,
-//				this.job.getWorkingDirectory() + "/motif.pdb").parseStructure();
-//
-//		if (!(this.job instanceof Fit3DJobDummy)) {
-//			this.currentMatchExternalPdb = "data/" + this.sessionManager.getId() + "/" + this.job.getId()
-//					+ "/aligned_match.pdb";
-//			this.currentQueryExternalPdb = "data/" + this.sessionManager.getId() + "/" + this.job.getId()
-//					+ "/aligned_query.pdb";
-//		} else {
-//
-//			this.currentMatchExternalPdb = "data/example/aligned_match.pdb";
-//			this.currentQueryExternalPdb = "data/example/aligned_query.pdb";
-//		}
-//
-//		StringBuffer sb1 = new StringBuffer();
-//		for (HitAminoAcid haa : h.getAminoAcids()) {
-//			if (sb1.length() > 0)
-//				sb1.append(",");
-//			sb1.append("'" + haa.getChainId() + "-" + haa.getResidueType() + haa.getResidueNumber() + "'");
-//		}
-//
-//		StringBuffer sb2 = new StringBuffer();
-//		for (Chain c : queryMotif.getChains()) {
-//			for (Group g : c.getAtomGroups()) {
-//				if (g instanceof AminoAcid) {
-//					if (sb2.length() > 0)
-//						sb2.append(",");
-//					sb2.append("'" + InputOutputUtils.getAminoAcidString((AminoAcid) g) + "'");
-//				}
-//			}
-//		}
-//
-//		RequestContext.getCurrentInstance()
-//				.execute("viewer({ pdb : '" + this.currentMatchExternalPdb + "', motif : [" + sb1.toString()
-//						+ "], clear : true, style : 'cartoon', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labelStyle : 'bold', alternatePosition : true, additionalPdb : { pdb
-// : '"
-//						+ this.currentQueryExternalPdb + "', style : 'cartoon', color : 'lightgrey', motif : ["
-//						+ sb2.toString() + "], labelSize : 22, labelStyle : 'bold' } })");
-//
-//		this.currentPv = matchStructure.getIdentifier() + " against <span style=\"color:#00b04b\">"
-//				+ queryStructure.getIdentifier() + "</span>";
+        logger.info("calculating global alignment for match {}", match);
+
+        Structure motifStructure = StructureParser.pdb()
+                                                  .pdbIdentifier(motif.getFirstLeafSubstructure().getPdbIdentifier())
+                                                  .everything()
+                                                  .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
+                                                  .parse();
+
+        Structure matchStructure = StructureParser.pdb()
+                                                  .pdbIdentifier(match.getCandidateMotif().getFirstLeafSubstructure().getPdbIdentifier())
+                                                  .everything()
+                                                  .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
+                                                  .parse();
+
+        // write structures
+        Path alignedMotifStructurePath = job.getJobPath().resolve("aligned_query.pdb");
+        StructureWriter.writeLeafSubstructureContainer(motifStructure, alignedMotifStructurePath);
+
+        // apply superimposition to global match structure
+        Path alignedMotifStructureExternalPath = SessionManager.relativizePath(alignedMotifStructurePath);
+        SubstructureSuperimposition substructureSuperimposition = match.getSubstructureSuperimposition();
+        List<LeafSubstructure<?>> superimposedMatchStructure = substructureSuperimposition.applyTo(matchStructure.getAllLeafSubstructures());
+
+        Path alignedMatchPath = job.getJobPath().resolve("aligned_match.pdb");
+        StructureWriter.writeLeafSubstructures(superimposedMatchStructure, alignedMatchPath);
+        Path alignedMatchExternalPath = SessionManager.relativizePath(alignedMatchPath);
+
+        String matchMotifString = match.getCandidateMotif().getAllLeafSubstructures().stream()
+                                       .map(leafSubstructure -> leafSubstructure.getIdentifier().toSimpleString() + "-" + leafSubstructure.getFamily().getThreeLetterCode())
+                                       .collect(Collectors.joining("','", "['", "']"));
+
+        String motifString = motif.getAllLeafSubstructures().stream()
+                                  .map(leafSubstructure -> leafSubstructure.getIdentifier().toSimpleString() + "-" + leafSubstructure.getFamily().getThreeLetterCode())
+                                  .collect(Collectors.joining("','", "['", "']"));
+
+        String executionString = "viewer({ pdb : '" +
+                                 alignedMatchExternalPath +
+                                 "', motif : " +
+                                 matchMotifString +
+                                 ", clear : true, style : 'cartoon', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labelStyle : 'bold', alternatePosition : " +
+                                 "true, additionalPdb : { pdb : '" +
+                                 alignedMotifStructureExternalPath +
+                                 "', style : 'cartoon', color : 'lightgrey', motif : " +
+                                 motifString +
+                                 ", labelSize : 22, labelStyle : 'bold' } })";
+
+        RequestContext.getCurrentInstance().execute(executionString);
+
+        currentPvLabel = matchStructure.getPdbIdentifier() + " against <span style=\"color:#00b04b\">" + motif.getFirstLeafSubstructure().getPdbIdentifier() + "</span>";
 
         RequestContext.getCurrentInstance().update("proteinViewerStatus");
 
     }
 
-    public void showInStructure(Fit3DMatch h) throws IOException {
+    public void showInStructure(Fit3DMatch match) throws IOException {
 
-        // create PDB directory if it not exists
-        File pdbDir = new File(System.getProperty("os.name").startsWith("Win")
-                               ? FacesContext.getCurrentInstance().getExternalContext().getRealPath("/") + "data/pdb/"
-                               : FacesContext.getCurrentInstance().getExternalContext().getRealPath("data/pdb/"));
-        if (!pdbDir.exists()) {
+        // parse structure of match
+        Structure matchStructure = StructureParser.pdb()
+                                                  .pdbIdentifier(match.getCandidateMotif().getFirstLeafSubstructure().getPdbIdentifier())
+                                                  .everything()
+                                                  .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
+                                                  .parse();
 
-            pdbDir.mkdirs();
-        }
+        Path matchStructurePath = job.getJobPath().resolve("pdb").resolve(matchStructure.getPdbIdentifier() + ".pdb");
+        StructureWriter.writeLeafSubstructureContainer(matchStructure, matchStructurePath);
+        Path matchStructureExternalPath = SessionManager.relativizePath(matchStructurePath);
 
-        // TODO implement
-//		String pdbId = h.getPdbId();
-//		String pdbFilePath = System.getProperty("os.name").startsWith("Win")
-//				? FacesContext.getCurrentInstance().getExternalContext().getRealPath("/") + "data/pdb/" + pdbId + ".pdb"
-//				: FacesContext.getCurrentInstance().getExternalContext().getRealPath("data/pdb/" + pdbId + ".pdb");
-//		File pdbFile = new File(pdbFilePath);
-//
-//		if (!pdbFile.exists()) {
-//
-//			StructureParser sp = new TargetStructureParser(Fit3dConstants.PDB_DIR, pdbId);
-//
-//			List<AminoAcid> aminoAcids = sp.parse();
-//
-//			List<Atom> atoms = new ArrayList<>();
-//			aminoAcids.stream().forEach(a -> atoms.addAll(a.getAtoms()));
-//
-//			LogHandler.LOG.info("writing PDB file for structure view to local storage");
-//
-//			BufferedWriter out = new BufferedWriter(new FileWriter(pdbFile));
-//
-//			// write all atoms to PDB file
-//			for (Atom atom : atoms) {
-//
-//				out.write(atom.toPDB());
-//			}
-//
-//			// close buffered writer
-//			out.close();
-//		}
+        String motifString = match.getCandidateMotif().getAllLeafSubstructures().stream()
+                                  .map(leafSubstructure -> leafSubstructure.getIdentifier().toSimpleString() + "-" + leafSubstructure.getFamily().getThreeLetterCode())
+                                  .collect(Collectors.joining("','", "['", "']"));
 
-        // extract motif from PDB file
-        // extractMotifFromPdb(pdbFilePath, h);
+        String executionString = "viewer({ pdb : '" + matchStructureExternalPath + "', clear : true, style : 'cartoon', labelSize : 22, labelStyle : 'bold', motif : " + motifString + " })";
+        System.out.println(executionString);
+        RequestContext.getCurrentInstance().execute(executionString);
 
-        // StringBuffer motifString = new StringBuffer("{residues:[");
-        // for (HitAminoAcid hAa : h.getAminoAcids()) {
-        //
-        // motifString.append("{chain:'" + hAa.getChainId() + "',resnum:" +
-        // hAa.getResidueNumber() + "},");
-        // }
-        // motifString.deleteCharAt(motifString.length() - 1);
-        // motifString.append("]}");
-        //
-        // //
-        // RequestContext.getCurrentInstance().execute("showInStructureAlignment('data/pdb/"
-        // // + pdbId + ".pdb'," + motifString + ")");
-        // RequestContext.getCurrentInstance().execute("viewer({ pdb :
-        // 'data/pdb/" + pdbId
-        // + ".pdb', clear : true, style : 'cartoon', highlight : " +
-        // motifString + " })");
-
-        // TODO implement
-//		StringBuffer sb = new StringBuffer();
-//		for (HitAminoAcid haa : h.getAminoAcids()) {
-//			if (sb.length() > 0)
-//				sb.append(",");
-//			sb.append("'" + haa.getChainId() + "-" + haa.getResidueType() + haa.getResidueNumber() + "'");
-//		}
-//		// System.out.println(sb.toString());
-//		RequestContext.getCurrentInstance()
-//				.execute("viewer({ pdb : 'data/pdb/" + pdbId
-//						+ ".pdb', clear : true, style : 'cartoon', labelSize : 22, labelStyle : 'bold', motif : ["
-//						+ sb.toString() + "] })");
-//
-//		// update currently shown
-//		this.currentPv = pdbId;
+        currentPvLabel = matchStructure.getPdbIdentifier();
 
         RequestContext.getCurrentInstance().update("proteinViewerStatus");
 
@@ -383,6 +287,8 @@ public class ResultView implements Serializable {
         // read motif
         motif = StructuralMotif.fromLeafSubstructures(StructureParser.local()
                                                                      .path(job.getParameters().getMotifPath())
+                                                                     .everything()
+                                                                     .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
                                                                      .parse().getAllLeafSubstructures());
         // write motif
         motifPath = job.getJobPath().resolve("motif.pdb");
@@ -492,7 +398,10 @@ public class ResultView implements Serializable {
         RequestContext.getCurrentInstance().execute("PF('mainContainer').show('east')");
     }
 
-    // TODO title mapping
+    public String getPDBIdentifier(Fit3DMatch match) {
+        return match.getCandidateMotif().getFirstLeafSubstructure().getPdbIdentifier();
+    }
+
     public StreamedContent getCsvResults() throws IOException {
         return new DefaultStreamedContent(Files.newInputStream(job.getJobPath().resolve("summary.csv")), "text/csv", "summary.csv");
     }
@@ -661,22 +570,19 @@ public class ResultView implements Serializable {
         Path zipFilePath = job.getJobPath().resolve("results.zip");
 
         // create directory zip class
-        DirectoryZip dz = new DirectoryZip(zipFilePath.toString(), job.getJobPath().toString());
+        DirectoryZip directoryZip = new DirectoryZip(zipFilePath.toString(), job.getJobPath().toString());
 
         // ignore files
         List<String> ignoreFiles = new ArrayList<>();
 
         ignoreFiles.add("all.pdb");
-        ignoreFiles.add("results.zip");
-        ignoreFiles.add("results.fit");
-        ignoreFiles.add("Fit3D.log");
-        dz.setIgnoreFiles(true);
-        dz.setIgnoreFileList(ignoreFiles);
+        ignoreFiles.add("pdb");
+        directoryZip.setIgnoreFiles(true);
+        directoryZip.setIgnoreFileList(ignoreFiles);
 
         // zip directory
-        dz.zipRecursively();
+        directoryZip.zipRecursively();
 
-        return new DefaultStreamedContent(new FileInputStream(dz.getZipFileName()), "application/octet-stream",
-                                          "results.zip");
+        return new DefaultStreamedContent(new FileInputStream(directoryZip.getZipFileName()), "application/octet-stream", "results.zip");
     }
 }

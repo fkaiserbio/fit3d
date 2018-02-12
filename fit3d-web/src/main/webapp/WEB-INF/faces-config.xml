@@ -98,6 +98,16 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <managed-bean>
+        <managed-bean-name>managerView</managed-bean-name>
+        <managed-bean-class>bio.fkaiser.fit3d.web.beans.view.ManagerView</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+        <managed-property>
+            <property-name>jobManager</property-name>
+            <property-class>bio.fkaiser.fit3d.web.beans.application.JobManager</property-class>
+            <value>#{jobManager}</value>
+        </managed-property>
+    </managed-bean>
+    <managed-bean>
         <managed-bean-name>mapBean</managed-bean-name>
         <managed-bean-class>bio.fkaiser.fit3d.web.utilities.MapBean</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>

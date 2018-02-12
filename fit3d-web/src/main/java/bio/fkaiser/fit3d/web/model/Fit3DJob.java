@@ -127,6 +127,8 @@ public class Fit3DJob implements Runnable, Serializable {
         logger.info("starting Fit3D for job {}", this);
         StructuralMotif motif = StructuralMotif.fromLeafSubstructures(StructureParser.local()
                                                                                      .path(parameters.getMotifPath())
+                                                                                     .everything()
+                                                                                     .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
                                                                                      .parse().getAllLeafSubstructures());
         StructureParser.MultiParser multiParser;
         if (parameters.isChainTargetList()) {
@@ -139,15 +141,19 @@ public class Fit3DJob implements Runnable, Serializable {
                                          .localPDB(Fit3DWebConstants.LOCAL_PDB, pdbIdentifiers)
                                          .everything();
         }
+        multiParser.setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS);
         fit3d = Fit3DBuilder.create()
                             .query(motif)
                             .targets(multiParser)
                             .limitedParallelism(Fit3DWebConstants.CORES / Fit3DWebConstants.THREAD_POOL_SIZE)
                             .atomFilter(parameters.getAtomFilterType().getFilter())
+                            .rmsdCutoff(parameters.getRmsdLimit())
                             .mapECNumbers()
                             .mapPfamIdentifiers()
                             .mapUniProtIdentifiers()
                             .run();
+
+        fit3d.writeSummaryFile(jobPath.resolve("summary.csv"));
 
         matches = fit3d.getMatches();
     }
@@ -156,7 +162,6 @@ public class Fit3DJob implements Runnable, Serializable {
         Path matchesPath = jobPath.resolve("matches");
         if (matchesPath.toFile().exists()) {
             logger.info("matches were already written for job {}", this);
-            return;
         } else {
             fit3d.writeMatches(matchesPath, Fit3DWebConstants.STRUCTURE_OUTPUT_RMSD_LIMIT);
         }
@@ -164,10 +169,28 @@ public class Fit3DJob implements Runnable, Serializable {
 
     public boolean cancel() {
         if (future != null) {
-            return future.cancel(true);
+            logger.info("job {} canceled", this);
+            boolean result = future.cancel(true);
+            if (result) {
+                failed = true;
+                running = false;
+                enqueued = false;
+                finished = false;
+                MongoClient mongoClient = new MongoClient(Fit3DWebConstants.Database.DB_HOST, Fit3DWebConstants.Database.DB_PORT);
+                MongoCollection<Document> mongoCollection = mongoClient.getDatabase(Fit3DWebConstants.Database.DB_NAME).getCollection(Fit3DWebConstants.Database.DB_COLLECTION_NAME);
+                mongoCollection.updateOne(eq("jobIdentifier", jobIdentifier.toString()), new Document("$set", new Document()
+                        .append("failed", true)
+                        .append("running", false)
+                        .append("enqueued", false)
+                        .append("finished", false)));
+                logger.info("status of job {} updated", this);
+            }else {
+                return false;
+            }
         } else {
             return false;
         }
+        return false;
     }
 
     @Override
@@ -256,6 +279,9 @@ public class Fit3DJob implements Runnable, Serializable {
         }
         if (finished) {
             return "finished";
+        }
+        if(failed){
+            return "failed";
         }
         return "new";
     }

@@ -129,7 +129,7 @@ function loadStructure(instance, id, opts) {
             motif.forEach(function (go) {
                 var tmp = go.split("-");
                 var cname = tmp[0];
-                var rnum = +tmp[1].substring(1);
+                var rnum = +tmp[1];
                 var residue = structure.residueSelect(function (res) {
                     return res.chain().name() === cname && res.num() === rnum;
                 });

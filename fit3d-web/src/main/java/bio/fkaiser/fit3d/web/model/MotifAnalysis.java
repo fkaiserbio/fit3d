@@ -63,7 +63,7 @@ public class MotifAnalysis {
             motifComplexity = MotifComplexity.HIGH;
         }
 
-        String pdbIdentifier = "n/a";
+        String pdbIdentifier = "";
         if (!structuralMotif.getFirstLeafSubstructure().getPdbIdentifier().equals(LeafIdentifier.DEFAULT_PDB_IDENTIFIER)) {
             pdbIdentifier = structuralMotif.getFirstLeafSubstructure().getPdbIdentifier();
         }
