@@ -151,8 +151,9 @@
             <h:form id="statusArea">
                 <h:outputText value="&#169; 2018 "/>
                 <pr:link styleClass="hrefLink-doi" target="_blank" href="http://www.bioforscher.de/bigM" value="bioinformatics group Mittweida"/>
-                <h:outputText value=" | online since ONLINE_SINCE | "/>
-                <h:outputText id="jobCount" value="current job load: #{jobLoadManager.enqueuedJobCount + jobLoadManager.runningJobCount} jobs" styleClass="ui-widget display"/>
+                <h:outputText value=" | online since #{jobLoadManager.genesis} | "/>
+                <h:outputText id="jobCount" value="current job load: #{jobLoadManager.enqueuedJobCount + jobLoadManager.runningJobCount} #{(jobLoadManager.enqueuedJobCount +
+                jobLoadManager.runningJobCount) == 1 ? 'job' : 'jobs'}" styleClass="ui-widget display"/>
                 <pr:poll interval="5" update="@form" widgetVar="poll"/>
             </h:form>
         </pr:layoutUnit>

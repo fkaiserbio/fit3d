@@ -1,41 +1,25 @@
 <ui:composition template="/WEB-INF/templates/layout.xhtml"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:pr="http://primefaces.org/ui">
-	<ui:define name="content">
-		<p>
-			<span class="initialcap">V</span>isit our project repository to get a
-			standalone version of the Fit3D algorithm. This can be useful if you
-			want to perform more sophisticated calculations or if integration
-			into custom processing pipelines is necessary. Furthermore, there are
-			some features exclusively available in the command line version of
-			Fit3D, such as per-atoms alignment definitions or experimental
-			features.
-		</p>
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:pr="http://primefaces.org/ui">
+    <ui:define name="content">
+        <p>
+            <span class="initialcap">A</span> standalone version of the Fit3D algorithm ad command line implementation is currently under development. Meanwhile you are encouraged to use Fit3D on API level
+            This allows to perform more sophisticated calculations or to integrate Fit3D into custom processing workflows. Furthermore, there are some features available which are not implemented in the web version.
+        </p>
 
-		<pr:panelGrid styleClass="download-field" columns="1">
+        <pr:panelGrid styleClass="download-field" columns="1">
 
-			<pr:link target="_blank"
-				href="https://bitbucket.org/fkaiser/fit3d/wiki/Home">
-				<h:graphicImage library="static" styleClass="hrefLink-bitbucket"
-					name="images/Atlassian_Bitbucket_Logo.png" id="bitbucketLogo" />
-				<pr:tooltip for="bitbucketLogo" value="visit the project repository"/>
-			</pr:link>
+            <pr:link target="_blank"
+                     href="https://bitbucket.org/fkaiser/fit3d/wiki/Home">
+                <h:graphicImage library="static" styleClass="hrefLink-singa"
+                                name="images/singa_logo_text.png" id="singaLogo"/>
+                <pr:tooltip for="singaLogo" value="visit the project repository"/>
+            </pr:link>
 
-			<pr:panelGrid styleClass="download-field-link" columns="2">
+        </pr:panelGrid>
 
-				<pr:outputLabel styleClass="ui-icon ui-icon-arrowthickstop-1-s"
-					for="download-field-url" />
-
-				<pr:link styleClass="hrefLink-download" id="download-field-url"
-					target="_blank"
-					href="https://bitbucket.org/fkaiser/fit3d/downloads/Fit3D_v005.zip"
-					value="direct download of latest stable release" />
-			</pr:panelGrid>
-		</pr:panelGrid>
-
-	</ui:define>
-	<ui:define name="toolbox" />
+    </ui:define>
+    <ui:define name="toolbox"/>
 </ui:composition>

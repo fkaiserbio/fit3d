@@ -10,6 +10,7 @@ import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserOptio
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -24,15 +25,7 @@ public final class Fit3DWebConstants {
     public static final double STRUCTURE_OUTPUT_RMSD_LIMIT = 4.0;
     public static final int ALL_AGAINST_ONE_LIMIT = 1000;
 
-
     public static final StructureParser.LocalPDB LOCAL_PDB = new StructureParser.LocalPDB("/srv/pdb/", SourceLocation.OFFLINE_PDB);
-
-    public static final String TMP_DIR = System.getProperty("java.io.tmpdir");
-
-    // public static final String FIT3D_LOCATION =
-    // "/home/fkaiser/Workspace/git/fit3d/de.bioforscher.fit3d.webserver/WebContent/WEB-INF/lib/Fit3D.jar";
-    public static final String FIT3D_LOCATION = "/var/lib/tomcat7/webapps/fit3d/WEB-INF/lib/Fit3D.jar";
-
 
     public static final int EXCHANGE_LIMIT = 3;
 
@@ -43,7 +36,7 @@ public final class Fit3DWebConstants {
     }
 
     public final static class Database {
-        public static final String DB_HOST = "localhost";
+        public static final String DB_HOST = "fit3d-web-mongodb";
         public static final int DB_PORT = 27017;
         public static final String DB_NAME = "fit3d";
         public static final String DB_COLLECTION_NAME = "jobs";
@@ -55,11 +48,18 @@ public final class Fit3DWebConstants {
                                                                                                                   StructureParserOptions.Setting.GET_IDENTIFIER_FROM_FILENAME);
     }
 
+    public final static class JobManager {
+        public static final long LOAD_UPDATE_INTERVAL = TimeUnit.SECONDS.toMillis(1);
+        public static final long CLEANUP_INTERVAL = TimeUnit.MINUTES.toMillis(1);
+        public static final int JOB_AGE_IN_HOURS = 3;
+    }
+
     public final static class Mail {
+
         public static String SMTP_PASS;
         public static String SMTP_USER;
 
-        {
+        static {
             try {
                 String credentialContent = Files.lines(Paths.get(Resources.getResourceAsFileLocation("mail_credentials.txt"))).collect(Collectors.joining(""));
                 SMTP_USER = credentialContent.split(":")[0];

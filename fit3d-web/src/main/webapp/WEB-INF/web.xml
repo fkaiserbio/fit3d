@@ -3,7 +3,7 @@
 	xmlns="http://java.sun.com/xml/ns/javaee"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	id="WebApp_ID" version="3.0">
-	<display-name>de.bioforscher.fit3d.webserver</display-name>
+	<display-name>bio.fkaiser.fit3d.web</display-name>
 	<welcome-file-list>
 		<welcome-file>home.xhtml</welcome-file>
 	</welcome-file-list>
@@ -49,7 +49,35 @@
 		<exception-type>javax.faces.application.ViewExpiredException</exception-type>
 		<location>/home.xhtml</location>
 	</error-page>
+
 	<session-config>
 		<session-timeout>60</session-timeout>
 	</session-config>
+
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <form-login-config>
+            <form-login-page>/login.xhtml</form-login-page>
+            <form-error-page>/errorpages/unauthorized.xhtml</form-error-page>
+        </form-login-config>
+    </login-config>
+
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Job Manager</web-resource-name>
+            <url-pattern>/admin</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+
+        <auth-constraint>
+            <role-name>tomcat</role-name>
+        </auth-constraint>
+
+    </security-constraint>
+    
+    <security-role>
+        <role-name>tomcat</role-name>
+    </security-role>
 </web-app>

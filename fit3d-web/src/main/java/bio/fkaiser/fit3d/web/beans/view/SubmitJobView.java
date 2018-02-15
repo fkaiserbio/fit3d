@@ -1,15 +1,15 @@
 package bio.fkaiser.fit3d.web.beans.view;
 
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import bio.fkaiser.fit3d.web.beans.application.JobExecutor;
 import bio.fkaiser.fit3d.web.beans.application.JobManager;
 import bio.fkaiser.fit3d.web.beans.session.SessionManager;
+import bio.fkaiser.fit3d.web.model.ExchangeDefinition;
 import bio.fkaiser.fit3d.web.model.Fit3DJob;
 import bio.fkaiser.fit3d.web.model.Fit3DJobParameters;
 import bio.fkaiser.fit3d.web.model.MotifAnalysis;
 import bio.fkaiser.fit3d.web.model.constant.PredefinedList;
 import bio.fkaiser.fit3d.web.model.constant.StatisticalModelType;
-import bio.fkaiser.fit3d.web.model.ExchangeDefinition;
-import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import de.bioforscher.singa.structure.model.identifiers.PDBIdentifier;
 import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter.AtomFilterType;
 import de.bioforscher.singa.structure.model.oak.StructuralMotif;
@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.context.Flash;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.Serializable;
@@ -89,12 +90,6 @@ public class SubmitJobView implements Serializable {
     private boolean pdbTargetList;
     private boolean chainTargetList;
     private List<ExchangeDefinition> exchangeDefinitions;
-
-    public SubmitJobView() {
-        jobIdentifier = UUID.randomUUID();
-        exchangeDefinitions = new ArrayList<>();
-        logger.debug("new motif submission with job-ID {} created", jobIdentifier);
-    }
 
     public void handleAdvancedOptionsToggle(ToggleEvent event) {
         if (event.getVisibility() == Visibility.VISIBLE) {
@@ -179,6 +174,8 @@ public class SubmitJobView implements Serializable {
 
     @PostConstruct
     public void init() {
+        jobIdentifier = UUID.randomUUID();
+        exchangeDefinitions = new ArrayList<>();
         jobPath = sessionManager.getSessionPath().resolve(jobIdentifier.toString());
         Path extractedMotifPath = Faces.getFlashAttribute("extractedMotifPath");
         if (extractedMotifPath != null) {
@@ -260,7 +257,7 @@ public class SubmitJobView implements Serializable {
         jobParameters.setAtomFilterType(atomFilterType);
         jobParameters.setChainTargetList(chainTargetList);
         jobParameters.setPdbTargetList(pdbTargetList);
-        if(motifPath.endsWith("4cha_motif.pdb")){
+        if (motifPath.endsWith("4cha_motif.pdb")) {
             targetListPath = motifPath.getParent().resolve("targets.txt");
             logger.info("example run detected, using short target list {}", targetListPath);
             motifPath = motifPath.getParent().resolve("4cha_motif.pdb");
@@ -273,8 +270,14 @@ public class SubmitJobView implements Serializable {
 
         Fit3DJob job = new Fit3DJob(jobIdentifier, sessionManager.getSessionIdentifier(), determineIpAddress(), description, email, jobPath, jobParameters);
 
-        // submit new job to controller
-        jobManager.addJob(job);
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        Flash flash = facesContext.getExternalContext().getFlash();
+        flash.put("job", job);
+
+//        // submit new job to controller
+//        jobManager.addJob(job);
+//
+//        logger.info("job {} with ID {} submitted", job, job.getJobIdentifier());
 
         return "success";
     }
@@ -309,35 +312,6 @@ public class SubmitJobView implements Serializable {
         RequestContext.getCurrentInstance().execute("viewer({ pdb : '" + externalMotifPath + "', clear : true, labels : true, labelSize : 22, labelStyle : 'bold' })");
 
         motifFileUploaded = true;
-//
-//        predefinedTargetList = PredefinedList.BLASTe80;
-//        description = "4CHA catalytic triad";
-//        // this.workingDirectory =
-//        // FacesContext.getCurrentInstance().getExternalContext().getRealPath("data/example/");
-//        workingDirectory = System.getProperty("os.name").startsWith("Win")
-//                           ? FacesContext.getCurrentInstance().getExternalContext().getRealPath("/") + "data/example/"
-//                           : FacesContext.getCurrentInstance().getExternalContext().getRealPath("data/example/");
-//        motifSeq = "HDS";
-//        atomFilterType = AtomFilterType.ARBITRARY;
-//        pvalueMethod = PvalueMethod.FOFANOV;
-//        predefinedTargetList = PredefinedList.BLASTe80;
-//        maxRmsd = 2.5;
-//        filtering = true;
-//        exchangeDefinitions = null;
-//        targetListFileInternalPath = null;
-//        extractPdbFileInternalPath = workingDirectory + "/extract.pdb";
-
-        // TODO implement
-//        Fit3DJobDummy job = new Fit3DJobDummy(this.jobIdentifier, this.sessionManager.getId(), new Date(), this.description,
-//                                              this.email, this.workingDirectory, generateCommandLine(),
-//                                              new Fit3DJobParameters(this.motifSeq, this.alignmentAtomSelection, this.pvalueMethod,
-//                                                                this.predefinedTargetList, this.maxRmsd, this.filtering, this.exchangeDefinitions,
-//                                                                FilenameUtils.getName(this.targetListFileInternalPath), this.extractPdbFileInternalPath,
-//                                                                this.targetListFileLabel));
-//
-//        this.jobManager.addNewJob(this.sessionManager.getId(), job);
-
-//        return "success";
     }
 
     private void analyzeMotif() {
@@ -435,14 +409,6 @@ public class SubmitJobView implements Serializable {
         this.exchangeDefinitions = exchangeDefinitions;
     }
 
-    public JobManager getJobManager() {
-        return jobManager;
-    }
-
-    public void setJobManager(JobManager jobManager) {
-        this.jobManager = jobManager;
-    }
-
     private int getJobCountOfCurrentSession() {
         List<Fit3DJob> currentJobs = jobManager.getManagedJobs().get(sessionManager.getSessionIdentifier());
         if (currentJobs != null) {
@@ -460,6 +426,14 @@ public class SubmitJobView implements Serializable {
 
     public void setJobExecutor(JobExecutor jobExecutor) {
         this.jobExecutor = jobExecutor;
+    }
+
+    public JobManager getJobManager() {
+        return jobManager;
+    }
+
+    public void setJobManager(JobManager jobManager) {
+        this.jobManager = jobManager;
     }
 
     public MotifAnalysis getMotifAnalysis() {

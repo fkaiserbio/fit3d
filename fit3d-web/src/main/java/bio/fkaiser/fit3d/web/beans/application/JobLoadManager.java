@@ -1,5 +1,8 @@
 package bio.fkaiser.fit3d.web.beans.application;
 
+import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+
 /**
  * @author fk
  */
@@ -9,6 +12,12 @@ public class JobLoadManager {
     private int enqueuedJobCount;
     private int finishedJobCount;
     private int failedJobCount;
+    private LocalDateTime genesis;
+
+    @PostConstruct
+    public void init() {
+        genesis = LocalDateTime.now();
+    }
 
     public int getEnqueuedJobCount() {
         return enqueuedJobCount;
@@ -32,6 +41,10 @@ public class JobLoadManager {
 
     public void setFinishedJobCount(int finishedJobCount) {
         this.finishedJobCount = finishedJobCount;
+    }
+
+    public LocalDateTime getGenesis() {
+        return genesis;
     }
 
     public int getRunningJobCount() {

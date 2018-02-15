@@ -1,0 +1,20 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:pr="http://primefaces.org/ui">
+    <ui:define name="content">
+        <h:form>
+            <pr:panelGrid styleClass="submit-settings-field" columns="2">
+                <pr:outputLabel value="User:" for="userInput"/>
+                <pr:inputText id="userInput" value="#{loginView.username}" required="true"/>
+                <pr:outputLabel value="Password:" for="passwordInput"/>
+                <pr:password id="passwordInput" value="#{loginView.password}" required="true"/>
+                <pr:captcha label="Captcha"/>
+                <pr:commandButton value="Login" action="#{loginView.submit}" update="@form"/>
+            </pr:panelGrid>
+            <pr:growl autoUpdate="true"/>
+        </h:form>
+    </ui:define>
+    <ui:define name="toolbox"/>
+</ui:composition>

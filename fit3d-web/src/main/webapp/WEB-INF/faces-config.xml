@@ -51,6 +51,11 @@
             <property-class>bio.fkaiser.fit3d.web.beans.application.JobLoadManager</property-class>
             <value>#{jobLoadManager}</value>
         </managed-property>
+        <managed-property>
+            <property-name>mailNotifier</property-name>
+            <property-class>bio.fkaiser.fit3d.web.beans.application.MailNotifier</property-class>
+            <value>#{mailNotifier}</value>
+        </managed-property>
     </managed-bean>
     <managed-bean>
         <managed-bean-name>jobListView</managed-bean-name>
@@ -93,6 +98,11 @@
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     <managed-bean>
+        <managed-bean-name>mailNotifier</managed-bean-name>
+        <managed-bean-class>bio.fkaiser.fit3d.web.beans.application.MailNotifier</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
         <managed-bean-name>chartView</managed-bean-name>
         <managed-bean-class>bio.fkaiser.fit3d.web.beans.view.ChartView</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
@@ -127,12 +137,27 @@
         <managed-bean-class>bio.fkaiser.fit3d.web.beans.session.SessionManager</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <managed-bean-name>confirmView</managed-bean-name>
+        <managed-bean-class>bio.fkaiser.fit3d.web.beans.view.ConfirmView</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+        <managed-property>
+            <property-name>jobManager</property-name>
+            <property-class>bio.fkaiser.fit3d.web.beans.application.JobManager</property-class>
+            <value>#{jobManager}</value>
+        </managed-property>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>loginView</managed-bean-name>
+        <managed-bean-class>bio.fkaiser.fit3d.web.beans.view.LoginView</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     <navigation-rule>
         <display-name>submit.xhtml</display-name>
         <from-view-id>/submit.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>success</from-outcome>
-            <to-view-id>/jobs.xhtml</to-view-id>
+            <to-view-id>/confirm.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
     </navigation-rule>
@@ -159,6 +184,14 @@
         <from-view-id>/jobs.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>error</from-outcome>
+            <to-view-id>/jobs.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    <navigation-rule>
+        <display-name>confirm.xhtml</display-name>
+        <from-view-id>/confirm.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>success</from-outcome>
             <to-view-id>/jobs.xhtml</to-view-id>
         </navigation-case>
     </navigation-rule>

@@ -53,6 +53,8 @@
 							library="static" name="images/ajax_loader_small.gif" />
 						<h:graphicImage rendered="#{job.finished}" library="static"
 							name="images/tick.png" />
+						<h:graphicImage rendered="#{job.failed}" library="static"
+										name="images/failed.png" />
 						<pr:poll stop="#{job.finished}" interval="5" update="@parent" />
 					</pr:panelGrid>
 				</ui:repeat>

@@ -8,6 +8,7 @@ import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter.AtomFilte
 import org.bson.Document;
 
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -48,6 +49,7 @@ public class JobConverter {
                 .append("running", job.isRunning())
                 .append("finished", job.isFinished())
                 .append("failed", job.isFailed())
+                .append("sendMail", job.isSendMail())
                 .append("parameters", parametersObject);
     }
 
@@ -81,6 +83,7 @@ public class JobConverter {
         fit3dJob.setRunning((boolean) jobDocument.get("running"));
         fit3dJob.setFinished((boolean) jobDocument.get("finished"));
         fit3dJob.setFailed((boolean) jobDocument.get("failed"));
+        fit3dJob.setSendMail((boolean) jobDocument.get("sendMail"));
         fit3dJob.setParameters(parameters);
 
         return fit3dJob;

@@ -85,16 +85,11 @@
                     </pr:inputText>
                     <pr:tooltip id="emailTip" for="email"
                                 value="Enter your email address to be notified when your request is finished."/>
-
-                    <pr:captcha label="Captcha"/>
-
-                    <pr:panelGrid styleClass="submit-settings-field" columns="1">
-                        <pr:commandButton value="Submit Job" id="submitButton" action="#{submitJobView.submit}" styleClass="ui-priority-primary" style="width:150px"
-                                          disabled="#{submitJobView.blocked}"/>
-                        <pr:tooltip id="submitTip" for="submitButton" value="Click to submit your job."/>
-                        <pr:commandButton value="Example run" id="exampleButton" action="#{submitJobView.submitExample}" style="width:150px" update="@form"/>
-                        <pr:tooltip id="exampleTip" for="exampleButton" value="Click to load example input."/>
-                    </pr:panelGrid>
+                    <pr:commandButton value="Submit Job" id="submitButton" action="#{submitJobView.submit}" styleClass="ui-priority-primary" style="width:150px"
+                                      disabled="#{submitJobView.blocked}"/>
+                    <pr:commandButton value="Example run" id="exampleButton" action="#{submitJobView.submitExample}" style="width:150px" update="@form"/>
+                    <pr:tooltip id="submitTip" for="submitButton" value="Click to submit your job."/>
+                    <pr:tooltip id="exampleTip" for="exampleButton" value="Click to load example input."/>
                 </pr:panelGrid>
                 <pr:panelGrid styleClass="submit-field-reset submit-settings-field" columns="2">
                     <pr:outputLabel styleClass="ui-icon ui-icon-refresh" for="resetButton"/>
@@ -174,7 +169,6 @@
     <ui:define name="toolboxContent">
         <div id="viewer" class="protein-viewer"/>
         <pr:separator styleClass="hr-separator"/>
-
 
         <pr:outputPanel id="motifMetaData">
             <pr:accordionPanel>

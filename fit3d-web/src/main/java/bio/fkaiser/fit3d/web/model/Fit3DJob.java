@@ -12,11 +12,17 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
@@ -55,6 +61,7 @@ public class Fit3DJob implements Runnable, Serializable {
     private List<Fit3DMatch> matches;
     private Future<?> future;
     private Fit3D fit3d;
+    private boolean sendMail;
 
     public Fit3DJob() {
 
@@ -96,6 +103,11 @@ public class Fit3DJob implements Runnable, Serializable {
         } catch (Exception e) {
             failed = true;
             running = false;
+            if (email != null) {
+                sendMail = true;
+                mongoCollection.updateOne(eq("jobIdentifier", jobIdentifier.toString()), new Document("$set", new Document()
+                        .append("sendMail", true)));
+            }
             mongoCollection.updateOne(eq("jobIdentifier", jobIdentifier.toString()), new Document("$set", new Document()
                     .append("failed", true)
                     .append("running", false)));
@@ -107,20 +119,16 @@ public class Fit3DJob implements Runnable, Serializable {
 
         finished = true;
         running = false;
+        if (email != null) {
+            sendMail = true;
+            mongoCollection.updateOne(eq("jobIdentifier", jobIdentifier.toString()), new Document("$set", new Document()
+                    .append("sendMail", true)));
+        }
 
         mongoCollection.updateOne(eq("jobIdentifier", jobIdentifier.toString()), new Document("$set", new Document()
                 .append("finished", true)
                 .append("running", false)));
         logger.info("status of job {} updated", this);
-
-//        // send email notification
-//        if (!email.isEmpty()) {
-//            try {
-//                MailNotifier.getInstance().sendNotificationMail(sessionIdentifier, this);
-//            } catch (MessagingException | IOException e) {
-//                logger.info("failed to send notification mail for job {}", this);
-//            }
-//        }
     }
 
     private void startFit3D() throws Exception {
@@ -184,13 +192,44 @@ public class Fit3DJob implements Runnable, Serializable {
                         .append("enqueued", false)
                         .append("finished", false)));
                 logger.info("status of job {} updated", this);
-            }else {
+            } else {
                 return false;
             }
         } else {
             return false;
         }
         return false;
+    }
+
+    public void delete() throws IOException {
+        Files.walkFileTree(jobPath,
+                           new SimpleFileVisitor<Path>() {
+                               @Override
+                               public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                                   Files.delete(dir);
+                                   return FileVisitResult.CONTINUE;
+                               }
+
+                               @Override
+                               public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                                   Files.delete(file);
+                                   return FileVisitResult.CONTINUE;
+                               }
+                           });
+        logger.info("files of job {} with ID deleted", this, jobIdentifier);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Fit3DJob job = (Fit3DJob) o;
+        return Objects.equals(jobIdentifier, job.jobIdentifier);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(jobIdentifier);
     }
 
     @Override
@@ -232,6 +271,10 @@ public class Fit3DJob implements Runnable, Serializable {
 
     public void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
+    }
+
+    public int getJobAgeInHours() {
+        return (int) ChronoUnit.MINUTES.between(timeStamp, LocalDateTime.now());
     }
 
     public UUID getJobIdentifier() {
@@ -280,7 +323,7 @@ public class Fit3DJob implements Runnable, Serializable {
         if (finished) {
             return "finished";
         }
-        if(failed){
+        if (failed) {
             return "failed";
         }
         return "new";
@@ -324,5 +367,13 @@ public class Fit3DJob implements Runnable, Serializable {
 
     public void setRunning(boolean running) {
         this.running = running;
+    }
+
+    public boolean isSendMail() {
+        return sendMail;
+    }
+
+    public void setSendMail(boolean sendMail) {
+        this.sendMail = sendMail;
     }
 }
