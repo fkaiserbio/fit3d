@@ -45,7 +45,7 @@ public class Fit3DCommandLineOptionsTest {
     }
 
     @Test
-    public void failWithoutInvalidRmsdCutoff() throws IOException {
+    public void failWithInvalidRmsdCutoff() throws IOException {
 
         copyResource(MOTIF_RESOURCE);
         copyResource(CHAIN_LIST_RESOURCE);

@@ -1,13 +1,18 @@
 package bio.fkaiser.fit3d.cli;
 
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.representations.RepresentationSchemeType;
+import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.FofanovEstimation;
+import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.StarkEstimation;
+import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.StatisticalModel;
 import de.bioforscher.singa.structure.model.families.AminoAcidFamily;
 import de.bioforscher.singa.structure.model.identifiers.LeafIdentifier;
 import de.bioforscher.singa.structure.model.interfaces.Atom;
 import de.bioforscher.singa.structure.model.interfaces.LeafSubstructure;
 import de.bioforscher.singa.structure.model.interfaces.Structure;
+import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter;
 import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter.AtomFilter;
 import de.bioforscher.singa.structure.model.oak.StructuralMotif;
+import de.bioforscher.singa.structure.parser.pdb.structures.SourceLocation;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserException;
 import org.apache.commons.cli.*;
@@ -26,9 +31,10 @@ import java.util.stream.Collectors;
  */
 public class Fit3DCommandLine {
 
-    private static final Logger logger = LoggerFactory.getLogger(Fit3DCommandLine.class);
-    private static final double DEFAULT_RMSD_CUTOFF = 2.0;
+    public static final double DEFAULT_RMSD_CUTOFF = 2.0;
+    public static final Predicate<Atom> DEFAULT_ATOM_FILTER = StructuralEntityFilter.AtomFilter.isArbitrary();
 
+    private static final Logger logger = LoggerFactory.getLogger(Fit3DCommandLine.class);
     private final CommandLine commandLine;
     private StructuralMotif queryMotif;
 
@@ -40,6 +46,8 @@ public class Fit3DCommandLine {
     private Path targetListPath;
     private String target;
     private boolean ecMapping;
+    private StructureParser.LocalPDB localPdb;
+    private StatisticalModel statisticalModel;
 
     public Fit3DCommandLine(CommandLine commandLine) throws ParseException {
         this.commandLine = commandLine;
@@ -96,7 +104,6 @@ public class Fit3DCommandLine {
         }
     }
 
-
     /**
      * Runs an instance of Fit3D with the specified parameters.
      */
@@ -151,7 +158,6 @@ public class Fit3DCommandLine {
             System.exit(1);
         }
 
-        // TODO set EC mapping
         // conserve non-aligned atoms
         ecMapping = commandLine.hasOption('E');
         // store path for result file if specified
@@ -179,19 +185,34 @@ public class Fit3DCommandLine {
             targetListPath = Paths.get(commandLine.getOptionValue('l'));
         }
 
-        // check if list was given
+        // check if single target was given
         if (commandLine.hasOption('t')) {
             target = commandLine.getOptionValue('t');
         }
 
+        // check if local PDB was provided
+        if (commandLine.hasOption('p')) {
+            localPdb = new StructureParser.LocalPDB(commandLine.getOptionValue('p'), SourceLocation.OFFLINE_PDB);
+        }
+
         // check if statistical model was specified
-        if (commandLine.hasOption("p")) {
+        if (commandLine.hasOption('P')) {
             createStatisticalModel();
         }
     }
 
-    private void createStatisticalModel() {
-//        FofanovEstimation.
+    private void createStatisticalModel() throws ParseException {
+        String modelString = commandLine.getOptionValue('P');
+        switch (modelString) {
+            case "S":
+                statisticalModel = new StarkEstimation();
+                break;
+            case "F":
+                statisticalModel = new FofanovEstimation(rmsd);
+                break;
+            default:
+                throw new ParseException("Statistical model must be either 'F' or 'S'.");
+        }
     }
 
     /**
@@ -203,7 +224,7 @@ public class Fit3DCommandLine {
         List<LeafIdentifier> leafIdentifiers = new ArrayList<>();
         for (String identifierString : commandLine.getOptionValue('X').split("_")) {
             try {
-                leafIdentifiers.add(LeafIdentifier.fromString(identifierString));
+                leafIdentifiers.add(LeafIdentifier.fromSimpleString(identifierString));
             } catch (NumberFormatException e) {
                 throw new Fit3DCommandLineException("Failed to parse residue identifier " + identifierString + " that should be extracted.");
             }
@@ -283,7 +304,7 @@ public class Fit3DCommandLine {
                 }
                 LeafIdentifier leafIdentifier;
                 try {
-                    leafIdentifier = LeafIdentifier.fromString(splittedExchangeDefinition[0]);
+                    leafIdentifier = LeafIdentifier.fromSimpleString(splittedExchangeDefinition[0]);
                 } catch (NumberFormatException e) {
                     throw new Fit3DCommandLineException("Exchange definition " + exchangeDefinition + " is malformed.");
                 }
@@ -306,39 +327,47 @@ public class Fit3DCommandLine {
         }
     }
 
-    public StructuralMotif getQueryMotif() {
-        return queryMotif;
-    }
-
     public Predicate<Atom> getAtomFilter() {
         return atomFilter;
+    }
+
+    public StructureParser.LocalPDB getLocalPdb() {
+        return localPdb;
+    }
+
+    public StructuralMotif getQueryMotif() {
+        return queryMotif;
     }
 
     public RepresentationSchemeType getRepresentationSchemeType() {
         return representationSchemeType;
     }
 
-    public boolean isConserveAtoms() {
-        return conserveAtoms;
-    }
-
     public Path getResultFilePath() {
         return resultFilePath;
     }
 
-    public Path getTargetListPath() {
-        return targetListPath;
+    public double getRmsd() {
+        return rmsd;
+    }
+
+    public StatisticalModel getStatisticalModel() {
+        return statisticalModel;
     }
 
     public String getTarget() {
         return target;
     }
 
-    public boolean isEcMapping() {
-        return ecMapping;
+    public Path getTargetListPath() {
+        return targetListPath;
     }
 
-    public double getRmsd() {
-        return rmsd;
+    public boolean isConserveAtoms() {
+        return conserveAtoms;
+    }
+
+    public boolean isEcMapping() {
+        return ecMapping;
     }
 }
