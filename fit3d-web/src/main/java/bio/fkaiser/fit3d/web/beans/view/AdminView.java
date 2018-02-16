@@ -8,6 +8,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.primefaces.context.RequestContext;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.List;
 /**
  * @author fk
  */
-public class ManagerView {
+public class AdminView {
 
     private List<Fit3DJob> jobs;
     private JobManager jobManager;
@@ -31,6 +32,11 @@ public class ManagerView {
             Fit3DJob job = JobConverter.toFit3DJob(document);
             jobs.add(job);
         }
+    }
+
+    public void cancelJob(Fit3DJob job) {
+        jobManager.cancelJob(job);
+        RequestContext.getCurrentInstance().update("jobForm");
     }
 
     public JobManager getJobManager() {

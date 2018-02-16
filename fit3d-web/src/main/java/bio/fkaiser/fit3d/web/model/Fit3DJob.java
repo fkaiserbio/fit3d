@@ -1,13 +1,17 @@
 package bio.fkaiser.fit3d.web.model;
 
 import bio.fkaiser.fit3d.web.Fit3DWebConstants;
+import bio.fkaiser.fit3d.web.model.constant.StatisticalModelType;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3D;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DBuilder;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
+import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.FofanovEstimation;
+import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.StarkEstimation;
 import de.bioforscher.singa.structure.model.oak.StructuralMotif;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
+import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserOptions;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +59,8 @@ public class Fit3DJob implements Runnable, Serializable {
     private boolean finished = false;
     private boolean running = false;
     private boolean failed = false;
+    private String errorMessage;
+
     /**
      * results
      */
@@ -62,6 +68,7 @@ public class Fit3DJob implements Runnable, Serializable {
     private Future<?> future;
     private Fit3D fit3d;
     private boolean sendMail;
+    private StructureParser.MultiParser multiParser;
 
     public Fit3DJob() {
 
@@ -103,14 +110,16 @@ public class Fit3DJob implements Runnable, Serializable {
         } catch (Exception e) {
             failed = true;
             running = false;
-            if (email != null) {
+            if (email != null && !email.isEmpty()) {
                 sendMail = true;
                 mongoCollection.updateOne(eq("jobIdentifier", jobIdentifier.toString()), new Document("$set", new Document()
                         .append("sendMail", true)));
             }
+            errorMessage = e.getMessage();
             mongoCollection.updateOne(eq("jobIdentifier", jobIdentifier.toString()), new Document("$set", new Document()
                     .append("failed", true)
-                    .append("running", false)));
+                    .append("running", false)
+                    .append("errorMessage", errorMessage)));
             logger.error("job {} failed with error {}", this, e.getMessage(), e);
             return;
         }
@@ -119,7 +128,7 @@ public class Fit3DJob implements Runnable, Serializable {
 
         finished = true;
         running = false;
-        if (email != null) {
+        if (email != null && !email.isEmpty()) {
             sendMail = true;
             mongoCollection.updateOne(eq("jobIdentifier", jobIdentifier.toString()), new Document("$set", new Document()
                     .append("sendMail", true)));
@@ -136,9 +145,8 @@ public class Fit3DJob implements Runnable, Serializable {
         StructuralMotif motif = StructuralMotif.fromLeafSubstructures(StructureParser.local()
                                                                                      .path(parameters.getMotifPath())
                                                                                      .everything()
-                                                                                     .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
+                                                                                     .setOptions(StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS))
                                                                                      .parse().getAllLeafSubstructures());
-        StructureParser.MultiParser multiParser;
         if (parameters.isChainTargetList()) {
             multiParser = StructureParser.local()
                                          .localPDB(Fit3DWebConstants.LOCAL_PDB)
@@ -149,17 +157,28 @@ public class Fit3DJob implements Runnable, Serializable {
                                          .localPDB(Fit3DWebConstants.LOCAL_PDB, pdbIdentifiers)
                                          .everything();
         }
-        multiParser.setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS);
-        fit3d = Fit3DBuilder.create()
-                            .query(motif)
-                            .targets(multiParser)
-                            .limitedParallelism(Fit3DWebConstants.CORES / Fit3DWebConstants.THREAD_POOL_SIZE)
-                            .atomFilter(parameters.getAtomFilterType().getFilter())
-                            .rmsdCutoff(parameters.getRmsdLimit())
-                            .mapECNumbers()
-                            .mapPfamIdentifiers()
-                            .mapUniProtIdentifiers()
-                            .run();
+        multiParser.setOptions(StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS,
+                                                                   StructureParserOptions.Setting.GET_IDENTIFIER_FROM_FILENAME,
+                                                                   StructureParserOptions.Setting.OMIT_LIGAND_INFORMATION));
+
+        Fit3DBuilder.ParameterStep parameterStep = Fit3DBuilder.create()
+                                                               .query(motif)
+                                                               .targets(multiParser)
+                                                               .limitedParallelism(Fit3DWebConstants.CORES / Fit3DWebConstants.THREAD_POOL_SIZE)
+                                                               .atomFilter(parameters.getAtomFilterType().getFilter())
+                                                               .rmsdCutoff(parameters.getRmsdLimit())
+                                                               .mapECNumbers()
+                                                               .mapPfamIdentifiers()
+                                                               .mapUniProtIdentifiers();
+
+        // attach statistical model
+        if (parameters.getStatisticalModelType() == StatisticalModelType.FOFANOV) {
+            FofanovEstimation fofanovEstimation = new FofanovEstimation(parameters.getRmsdLimit());
+            parameterStep.statisticalModel(fofanovEstimation);
+        } else if (parameters.getStatisticalModelType() == StatisticalModelType.STARK) {
+            parameterStep.statisticalModel(new StarkEstimation());
+        }
+        fit3d = parameterStep.run();
 
         fit3d.writeSummaryFile(jobPath.resolve("summary.csv"));
 
@@ -184,13 +203,19 @@ public class Fit3DJob implements Runnable, Serializable {
                 running = false;
                 enqueued = false;
                 finished = false;
+                if (email != null && !email.isEmpty()) {
+                    sendMail = true;
+                }
+                errorMessage = "cancelled manually";
                 MongoClient mongoClient = new MongoClient(Fit3DWebConstants.Database.DB_HOST, Fit3DWebConstants.Database.DB_PORT);
                 MongoCollection<Document> mongoCollection = mongoClient.getDatabase(Fit3DWebConstants.Database.DB_NAME).getCollection(Fit3DWebConstants.Database.DB_COLLECTION_NAME);
                 mongoCollection.updateOne(eq("jobIdentifier", jobIdentifier.toString()), new Document("$set", new Document()
                         .append("failed", true)
                         .append("running", false)
                         .append("enqueued", false)
-                        .append("finished", false)));
+                        .append("finished", false)
+                        .append("sendMail", sendMail)
+                        .append("errorMessage", errorMessage)));
                 logger.info("status of job {} updated", this);
             } else {
                 return false;
@@ -253,6 +278,14 @@ public class Fit3DJob implements Runnable, Serializable {
         this.email = email;
     }
 
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     public Fit3D getFit3d() {
         return fit3d;
     }
@@ -274,7 +307,7 @@ public class Fit3DJob implements Runnable, Serializable {
     }
 
     public int getJobAgeInHours() {
-        return (int) ChronoUnit.MINUTES.between(timeStamp, LocalDateTime.now());
+        return (int) ChronoUnit.HOURS.between(timeStamp, LocalDateTime.now());
     }
 
     public UUID getJobIdentifier() {
@@ -297,12 +330,24 @@ public class Fit3DJob implements Runnable, Serializable {
         return matches;
     }
 
+    public int getNumberOfQueqedStructures() {
+        return multiParser.getNumberOfQueuedStructures();
+    }
+
+    public int getNumberOfRemainingStructure() {
+        return multiParser.getNumberOfRemainingStructures();
+    }
+
     public Fit3DJobParameters getParameters() {
         return parameters;
     }
 
     public void setParameters(Fit3DJobParameters parameters) {
         this.parameters = parameters;
+    }
+
+    public int getProgress() {
+        return (int) ((double) (getNumberOfQueqedStructures() - getNumberOfRemainingStructure()) / (double) getNumberOfQueqedStructures() * 100);
     }
 
     public UUID getSessionIdentifier() {

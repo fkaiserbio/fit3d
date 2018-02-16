@@ -69,9 +69,10 @@ function viewer(opts) {
     if (typeof(opts.highlight) !== 'undefined') {
         var sel = structure.full().createEmptyView();
         opts.highlight.forEach(function (res) {
+            console.log(res);
             var tmp = res.split("-");
-            var cname = tmp[2];
-            var rnum = +tmp[3];
+            var cname = tmp[0];
+            var rnum = +tmp[1];
             var add = instance.get('structure').select({
                 cname: cname,
                 rnum: rnum
@@ -156,8 +157,8 @@ function loadStructure(instance, id, opts) {
                 motif.forEach(function (go) {
                     var tmp = go.split("-");
                     var cname = tmp[0];
-                    var rnum = +tmp[1].substring(1);
-                    if (cname == res.chain().name() && rnum == res.num()) {
+                    var rnum = +tmp[1];
+                    if (cname === res.chain().name() && rnum === res.num()) {
                         value = true;
                     }
                 });

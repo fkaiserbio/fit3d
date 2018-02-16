@@ -14,6 +14,7 @@ import de.bioforscher.singa.structure.model.identifiers.PDBIdentifier;
 import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter.AtomFilterType;
 import de.bioforscher.singa.structure.model.oak.StructuralMotif;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
+import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserOptions;
 import org.omnifaces.util.Faces;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -316,13 +317,21 @@ public class SubmitJobView implements Serializable {
 
     private void analyzeMotif() {
         // read motif
-        motif = StructuralMotif.fromLeafSubstructures(StructureParser.local()
-                                                                     .path(motifPath)
-                                                                     .everything()
-                                                                     .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
-                                                                     .parse().getAllLeafSubstructures());
+        if (!redirectedFromExtract) {
+            motif = StructuralMotif.fromLeafSubstructures(StructureParser.local()
+                                                                         .path(motifPath)
+                                                                         .everything()
+                                                                         .setOptions(StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS,
+                                                                                                                         StructureParserOptions.Setting.GET_IDENTIFIER_FROM_FILENAME))
+                                                                         .parse().getAllLeafSubstructures());
+        } else {
+            motif = StructuralMotif.fromLeafSubstructures(StructureParser.local()
+                                                                         .path(motifPath)
+                                                                         .everything()
+                                                                         .setOptions(StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS))
+                                                                         .parse().getAllLeafSubstructures());
+        }
         motifAnalysis = MotifAnalysis.of(motif);
-
     }
 
     private void analyzeTargetList() throws IOException {

@@ -5,8 +5,7 @@
       xmlns:pr="http://primefaces.org/ui">
 
 <f:metadata>
-    <f:event type="preRenderView"
-             listener="#{resultView.redirectToJobSelection}"/>
+    <f:event type="preRenderView" listener="#{resultView.redirectToJobSelection}"/>
 </f:metadata>
 
 <ui:composition template="/WEB-INF/templates/layout.xhtml">
@@ -21,8 +20,10 @@
                     <h:outputText rendered="#{resultView.job.enqueued}" value="Your job is enqueued. There are currently #{jobLoadManager.enqueuedJobCount} jobs enqueued."/>
                     <h:outputText rendered="#{resultView.job.running}" value="Your job is running."/>
                     <h:outputText rendered="#{resultView.job.finished}" value="Your job is finished."/>
-                    <h:outputText rendered="#{resultView.job.failed}" styleClass="ui-state-error" value="Your job failed."/>
+                    <h:outputText rendered="#{resultView.job.failed}" styleClass="ui-state-error" value="Your job failed with error: #{resultView.job.errorMessage}"/>
+                    <h:outputText rendered="#{resultView.job.finished and empty resultView.matches}" styleClass="ui-state-error" value="Sorry, no matches could be found for your request."/>
                 </f:facet>
+
 
                 <f:facet name="right">
                     <h:graphicImage rendered="#{resultView.job.enqueued or resultView.job.running}" library="static" name="images/ajax_loader_small.gif" styleClass="loader-img"/>
@@ -41,9 +42,10 @@
                 </f:facet>
             </pr:toolbar>
 
-
             <div style="text-align: center;">
-                <h:outputText styleClass="ui-state-error" rendered="#{resultView.job.finished and empty resultView.matches}" value="Sorry, no matches could be found for your request."/>
+                <pr:progressBar rendered="#{resultView.job.running}" widgetVar="pbAjax" ajax="true" value="#{resultView.job.progress}" labelTemplate="{value}%" styleClass="animated"
+                                global="false">
+                </pr:progressBar>
             </div>
             <pr:dataScroller styleClass="result-scroller" value="#{resultView.matches}" var="match" chunkSize="100" mode="inline" scrollHeight="400"
                              rendered="#{resultView.job.finished and not resultView.job.failed and not empty resultView.matches}">
@@ -109,7 +111,7 @@
                                     </pr:column>
                                     <pr:column headerText="EC">
                                         <h:outputLink styleClass="hrefLink-download" target="_blank"
-                                                      href="https://www.ebi.ac.uk/intenz/query?cmd=SearchEC"
+                                                      value="https://www.ebi.ac.uk/intenz/query?cmd=SearchEC"
                                                       rendered="#{not empty annotation.ecIdentifier}">
                                             <f:param name="ec" value="#{annotation.ecIdentifier}"/>
                                             #{annotation.ecIdentifier}

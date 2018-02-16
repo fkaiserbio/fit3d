@@ -23,8 +23,4 @@ public enum StatisticalModelType {
     public String getDescription() {
         return description;
     }
-
-    public StatisticalModel getStatisticalModel() throws IllegalAccessException, InstantiationException {
-        return statisticalModel.newInstance();
-    }
 }

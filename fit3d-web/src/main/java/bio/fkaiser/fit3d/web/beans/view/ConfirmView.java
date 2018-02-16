@@ -6,8 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
+import java.io.IOException;
 
 /**
  * @author fk
@@ -21,9 +23,17 @@ public class ConfirmView {
     @PostConstruct
     public void init() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        Flash flash = facesContext.getExternalContext().getFlash();
+        ExternalContext externalContext = facesContext.getExternalContext();
+        Flash flash = externalContext.getFlash();
         job = (Fit3DJob) flash.get("job");
         logger.info("received job {}", job);
+    }
+
+    public void redirectToJobSubmission() throws IOException {
+        if (job == null) {
+            ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+            externalContext.redirect(externalContext.getRequestContextPath() + "/submit");
+        }
     }
 
     public String submit() {

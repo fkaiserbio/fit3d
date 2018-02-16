@@ -21,8 +21,8 @@
 				<p>
 					The search algorithm behind Fit3D is basically a combinatorial
 					search approach that works by evaluating two constraints: <b>residue
-						composition and geometric similarity (least-root-mean-square
-						deviation/LRMSD) of match candidates.</b> In the following the basic
+						composition and geometric similarity (root-mean-square
+						deviation/RMSD) of match candidates.</b> In the following the basic
 					algorithmic procedure is elucidated:
 				</p>
 				<ul>
@@ -37,10 +37,10 @@
 							<li>combine sets with the size of the query motif, similar
 								spatial extent and matching residue composition (match
 								candidates)</li>
-							<li>determine LRMSD for match candidates</li>
+							<li>determine RMSD for match candidates</li>
 						</ul></li>
 				</ul>
-				<b>Pairwise distance filtering</b> can be used to eliminate match candidates with inter-residue distances not compatible to the query motif. 
+				<b>Pairwise distance filtering</b> can be used to eliminate match candidates with inter-residue distances not compatible to the query motif.
 					For detailed information on how the algorithm works and why it is a valuable structural motif search method, please refer to Kaiser et al. 2015, <a
 					target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/25695840"
 					class="ui-icon ui-icon-extlink" style="display: inline-block" />.
@@ -59,9 +59,9 @@
 			</pr:panelGrid>
 			<ul>
 				<li>the <b>query structural motif in PDB format</b> (you can
-					also use our <h:link styleClass="hrefLink-download"
+					also the our <h:link styleClass="hrefLink-download"
 						outcome="/extract">extraction wizard</h:link> or our <h:link
-						styleClass="hrefLink-download" outcome="/download">command line tool</h:link>
+						styleClass="hrefLink-download" outcome="/download">API</h:link>
 					to extract a query motif)
 				</li>
 				<li>(optional) <b>a list of search targets</b> as text file
@@ -73,7 +73,7 @@
 					<pr:outputLabel styleClass="ui-icon ui-icon-arrowthickstop-1-s"
 						for="download-lists-url" />
 					<pr:link styleClass="hrefLink-download" id="download-lists-url"
-						target="_blank" href="data/predefined_lists.zip"
+						target="_blank" href="data/target_lists.zip"
 						value="download archive of predefined lists used by Fit3D" />
 				</pr:panelGrid>
 			</center>
@@ -148,7 +148,7 @@
 							<li>Select a predefined target list of search targets or
 								upload your own target list by clicking <b>"+target list"</b>.
 							</li>
-							<li>Choose a LRMSD limit up to which matches will be
+							<li>Choose a RMSD limit up to which matches will be
 								reported.</li>
 							<li>(optional) Enter a representative description and an
 								email address in order to be notified after your job has
@@ -230,25 +230,25 @@
 						<h:panelGroup>
 							<p>
 								When viewing the results of your job, motif matches are ranked
-								based on the lowest least-root-mean-square deviation (LRMSD).
-								Hints on how to understand and interpret the LRMSD are given in
+								based on the lowest least-root-mean-square deviation (RMSD).
+								Hints on how to understand and interpret the RMSD are given in
 								the
 								<h:link styleClass="hrefLink-download" outcome="/faq">FAQ section</h:link>. If you want to investigate a single match in detail, just
 								click on "Show" or "Show in structure". Furthermore, you can
 								directly access the corresponding Protein Data Bank (PDB) entry
 								of the structure. Note that you can download all results or the
-								LRMSD distribution plot by clicking on the "Action" drop down
+								RMSD distribution plot by clicking on the "Action" drop down
 								menu on the toolbar at the very top of the result page.
 							</p>
 						</h:panelGroup>
 					</pr:panelGrid>
-					<center>
+					<div style="text-align: center;">
 						<h:graphicImage id="resultPageImage" library="static"
 							name="images/result_page.png" styleClass="help-image" />
-					</center>
+					</div>
 				</pr:outputPanel>
 			</pr:tab>
-			<pr:tab title="&lt;i&gt;p&lt;/i&gt;-value theory" collapsed="true"
+			<pr:tab title="p-value theory" collapsed="true"
 				toggleable="true" toggleSpeed="500" styleClass="fieldset">
 				<pr:outputPanel>
 					<pr:panelGrid styleClass="inner-panel-grid" columns="2">
@@ -260,7 +260,7 @@
 								true positives intuitively. <b>However, a significant <i>p</i>-value
 									does not necessarily indicate a true positive match
 								</b> because the underlying models are based solely on the
-								distribution of LRMSD values. Hints on how to understand and
+								distribution of RMSD values. Hints on how to understand and
 								interpret the <i>p</i>-value are given in the
 								<h:link styleClass="hrefLink-download" outcome="/faq">FAQ section</h:link>.
 								No biological features are represented by those models. To
@@ -274,7 +274,7 @@
 									href="http://www.ncbi.nlm.nih.gov/pubmed/25695840"
 									class="ui-icon ui-icon-extlink" style="display: inline-block" />)
 								</li>
-								<li>empirical derived model according to Stark et al. 2003 <a
+								<li>empirically derived model according to Stark et al. 2003 <a
 									target="_blank"
 									href="http://www.ncbi.nlm.nih.gov/pubmed/12595245"
 									class="ui-icon ui-icon-extlink" style="display: inline-block" />
@@ -287,7 +287,7 @@
 								id="pValueImage" library="static"
 								name="images/statistical_model.png" />
 							<h:outputText
-								value="Illustration of a statistical model to estimate significance of local similartities in protein structures according to Fofanov et al. 2008. A kernel density esimation of the match LRMSD distribution is calculated using the Sheather-Jones bandwidth selection algorithm. Additionally, a point-weight correction (pwt) is applied to estimate matches beyond the LRMSD limit by a maximum likelihood approach." />
+								value="Illustration of a statistical model to estimate significance of local similartities in protein structures according to Fofanov et al. 2008. A kernel density esimation of the match RMSD distribution is calculated using the Sheather-Jones bandwidth selection algorithm. Additionally, a point-weight correction (pwt) is applied to estimate matches beyond the RMSD limit by a maximum likelihood approach." />
 						</pr:panelGrid>
 					</pr:panelGrid>
 				</pr:outputPanel>

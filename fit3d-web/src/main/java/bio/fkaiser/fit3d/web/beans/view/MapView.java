@@ -1,4 +1,4 @@
-package bio.fkaiser.fit3d.web.utilities;
+package bio.fkaiser.fit3d.web.beans.view;
 
 import org.primefaces.event.map.OverlaySelectEvent;
 import org.primefaces.model.map.DefaultMapModel;
@@ -6,17 +6,18 @@ import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.MapModel;
 import org.primefaces.model.map.Marker;
 
-import java.io.Serializable;
+/**
+ * @author fk
+ */
+public class MapView {
 
-public class MapBean implements Serializable {
-
-    private static final long serialVersionUID = 2944836997545953281L;
-    private MapModel model = new DefaultMapModel();
+    private MapModel model;
     private Marker marker;
 
-    public MapBean() {
-        Marker m = new Marker(new LatLng(50.989325, 12.970540), "bigM", null, "resources/static/images/marker.png");
-        model.addOverlay(m);
+    public MapView() {
+        model = new DefaultMapModel();
+        marker = new Marker(new LatLng(50.9882602,12.9711203), "Haus 06 - Grunert de Jacome Bau");
+        model.addOverlay(marker);
     }
 
     public void onMarkerSelect(OverlaySelectEvent event) {
@@ -25,10 +26,6 @@ public class MapBean implements Serializable {
 
     public Marker getMarker() {
         return marker;
-    }
-
-    public void setMarker(Marker marker) {
-        this.marker = marker;
     }
 
     public MapModel getModel() {

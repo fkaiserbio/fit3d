@@ -42,6 +42,13 @@ public class MailNotifier {
             }
             emailContent = emailContent.replace("[JOBURL]", "https://biosciences.hs-mittweida.de/fit3d/jobs?id=" + job.getSessionIdentifier());
 
+            // add error message
+            if (job.isFailed() && job.getErrorMessage().isEmpty()) {
+                emailContent = emailContent.replace("[JOB_ERROR]", "unknown error");
+            } else if (job.isFailed() && !job.getErrorMessage().isEmpty()) {
+                emailContent = emailContent.replace("[JOB_ERROR]", job.getErrorMessage());
+            }
+
             Properties properties = new Properties();
             properties.put("mail.smtp.host", "mail.hs-mittweida.de");
             // properties.put("mail.smtp.port", "PORTNUMBER");
@@ -76,7 +83,7 @@ public class MailNotifier {
 
             logger.info("notification mail sent for job {}", job);
         } catch (IOException | MessagingException e) {
-            logger.error("failed to send mail notification for job {}", job, e);
+            logger.error("failed to send mail notification for job: {}", job, e);
         }
     }
 }

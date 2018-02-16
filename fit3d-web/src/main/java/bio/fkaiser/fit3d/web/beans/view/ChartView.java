@@ -36,7 +36,7 @@ public class ChartView implements Serializable {
 
 	private void createLineModels() {
         lineModel1 = initLinearModel();
-        lineModel1.setTitle("LRMSD distribution");
+        lineModel1.setTitle("RMSD distribution");
         lineModel1.setLegendPosition("e");
 		Axis yAxis = lineModel1.getAxis(AxisType.Y);
 		yAxis.setMin(0);

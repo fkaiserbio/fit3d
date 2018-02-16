@@ -169,7 +169,7 @@ public class Fit3DCommandLine {
             try {
                 rmsd = Double.valueOf(commandLine.getOptionValue('r'));
             } catch (NumberFormatException e) {
-                logger.error("failed to parse LRMSD cutoff", e);
+                logger.error("failed to parse RMSD cutoff", e);
                 System.exit(1);
             }
         }

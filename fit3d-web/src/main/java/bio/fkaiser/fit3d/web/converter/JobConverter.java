@@ -50,6 +50,7 @@ public class JobConverter {
                 .append("finished", job.isFinished())
                 .append("failed", job.isFailed())
                 .append("sendMail", job.isSendMail())
+                .append("errorMessage", job.getErrorMessage())
                 .append("parameters", parametersObject);
     }
 
@@ -84,6 +85,7 @@ public class JobConverter {
         fit3dJob.setFinished((boolean) jobDocument.get("finished"));
         fit3dJob.setFailed((boolean) jobDocument.get("failed"));
         fit3dJob.setSendMail((boolean) jobDocument.get("sendMail"));
+        fit3dJob.setErrorMessage((String) jobDocument.get("errorMessage"));
         fit3dJob.setParameters(parameters);
 
         return fit3dJob;

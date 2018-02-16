@@ -136,7 +136,7 @@ public class Fit3DCommandLineOptions {
         options.addOption(refSize);
 
         // maximal RMSD
-        Option rmsd = new Option("r", "maximal allowed LRMSD for hits  (default: 2.0 \u212B)");
+        Option rmsd = new Option("r", "maximal allowed RMSD for hits  (default: 2.0 \u212B)");
         rmsd.setLongOpt("rmsd");
         rmsd.setArgs(1);
         options.addOption(rmsd);

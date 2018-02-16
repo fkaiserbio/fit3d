@@ -2,7 +2,13 @@
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:pr="http://primefaces.org/ui">
+
+    <f:metadata>
+        <f:event type="preRenderView" listener="#{confirmView.redirectToJobSubmission}"/>
+    </f:metadata>
+
     <ui:define name="content">
         <h:form>
             <h3>

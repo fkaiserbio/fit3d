@@ -11,6 +11,7 @@ import de.bioforscher.singa.structure.model.oak.OakStructure;
 import de.bioforscher.singa.structure.model.oak.StructuralMotif;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserException;
+import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserOptions;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureWriter;
 import org.omnifaces.util.Faces;
 import org.primefaces.context.RequestContext;
@@ -67,7 +68,6 @@ public class ExtractView implements Serializable {
             Structure structure = StructureParser.local()
                                                  .path(extractPdbFilePath)
                                                  .everything()
-                                                 .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
                                                  .parse();
             List<LeafIdentifier> leafIdentifiers = new ArrayList<>();
             for (String extractAminoAcid : extractAminoAcids) {
@@ -77,7 +77,7 @@ public class ExtractView implements Serializable {
             extractedMotif = StructuralMotif.fromLeafIdentifiers(structure, leafIdentifiers);
 
             // determine consecutive number of extracted motif
-            int consecutiveCount = (int) Files.walk(sessionManager.getSessionPath())
+            int consecutiveCount = (int) Files.walk(sessionManager.getSessionPath(), 1)
                                               .filter(path -> path.toFile().getName().startsWith("motif"))
                                               .count() + 1;
 
@@ -101,6 +101,8 @@ public class ExtractView implements Serializable {
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                                                         "Your motif was rated as too complex to be calculated on the web server. Please use the command line implementation or API.");
                 FacesContext.getCurrentInstance().addMessage(null, message);
+            }else{
+                blocked = false;
             }
 
             // update motif meta data
@@ -181,7 +183,7 @@ public class ExtractView implements Serializable {
                 Structure structure = StructureParser.pdb()
                                                      .pdbIdentifier(pdbIdentifier)
                                                      .everything()
-                                                     .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
+                                                     .setOptions(StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS))
                                                      .parse();
                 // generate amino acid identifiers
                 leafIdentifierStrings = structure.getAllLeafSubstructures().stream()
@@ -204,7 +206,8 @@ public class ExtractView implements Serializable {
                 Structure structure = StructureParser.local()
                                                      .path(extractPdbFilePath)
                                                      .everything()
-                                                     .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
+                                                     .setOptions(StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS,
+                                                                                                     StructureParserOptions.Setting.GET_IDENTIFIER_FROM_FILENAME))
                                                      .parse();
 
                 // block wizard for structures with less than two amino acids

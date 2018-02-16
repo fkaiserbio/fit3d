@@ -5,8 +5,8 @@
 
 <ui:composition template="/WEB-INF/templates/layout.xhtml">
     <ui:define name="content">
-        <h:form>
-            <pr:dataTable var="job" value="#{managerView.jobs}" id="jobTable">
+        <h:form id="jobForm">
+            <pr:dataTable var="job" value="#{adminView.jobs}" id="jobTable">
                 <pr:column headerText="timestamp">
                     <h:outputText value="#{job.timeStamp}"/>
                 </pr:column>
@@ -14,7 +14,7 @@
                     <h:outputText value="#{job.jobAgeInHours}"/>
                 </pr:column>
                 <pr:column headerText="description">
-                    <h:outputText value="#{job.description}"/>
+                    <h:outputText value="#{not empty job.description ? job.description : 'n/a'}"/>
                 </pr:column>
                 <pr:column headerText="IP">
                     <h:outputText value="#{job.ipAddress}"/>
@@ -23,13 +23,16 @@
                     <h:outputText value="#{job.sessionIdentifier}"/>
                 </pr:column>
                 <pr:column headerText="job">
-                    <h:outputText value="#{job.sessionIdentifier}"/>
+                    <h:outputText value="#{job.jobIdentifier}"/>
                 </pr:column>
                 <pr:column headerText="status">
                     <h:outputText value="#{job.status}"/>
                 </pr:column>
+                <pr:column headerText="error message">
+                    <h:outputText value="#{not empty job.errorMessage ? job.errorMessage : 'n/a'}"/>
+                </pr:column>
                 <pr:column headerText="action">
-                    <pr:commandButton disabled="#{job.status != 'running'}" action="#{managerView.jobManager.cancelJob(job)}" value="cancel" update="@form"/>
+                    <pr:commandButton disabled="#{job.status != 'running'}" action="#{adminView.cancelJob(job)}" value="cancel"/>
                 </pr:column>
             </pr:dataTable>
         </h:form>

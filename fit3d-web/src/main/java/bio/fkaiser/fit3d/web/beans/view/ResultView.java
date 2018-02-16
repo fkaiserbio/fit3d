@@ -13,6 +13,7 @@ import de.bioforscher.singa.structure.model.interfaces.LeafSubstructure;
 import de.bioforscher.singa.structure.model.interfaces.Structure;
 import de.bioforscher.singa.structure.model.oak.StructuralMotif;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
+import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserOptions;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureWriter;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultStreamedContent;
@@ -55,7 +56,6 @@ public class ResultView implements Serializable {
     private double maximalRrmsd;
     private double minimalRrmsd;
     private Path motifPath;
-    private String getPDBIdentifier;
 
     public StreamedContent getMatchPDBFile(Fit3DMatch match) throws FileNotFoundException {
 
@@ -132,13 +132,12 @@ public class ResultView implements Serializable {
         Structure motifStructure = StructureParser.pdb()
                                                   .pdbIdentifier(motif.getFirstLeafSubstructure().getPdbIdentifier())
                                                   .everything()
-                                                  .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
                                                   .parse();
 
         Structure matchStructure = StructureParser.pdb()
                                                   .pdbIdentifier(match.getCandidateMotif().getFirstLeafSubstructure().getPdbIdentifier())
                                                   .everything()
-                                                  .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
+                                                  .setOptions(StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS))
                                                   .parse();
 
         // write structures
@@ -187,7 +186,7 @@ public class ResultView implements Serializable {
         Structure matchStructure = StructureParser.pdb()
                                                   .pdbIdentifier(match.getCandidateMotif().getFirstLeafSubstructure().getPdbIdentifier())
                                                   .everything()
-                                                  .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
+                                                  .setOptions(StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS))
                                                   .parse();
 
         Path matchStructurePath = job.getJobPath().resolve("pdb").resolve(matchStructure.getPdbIdentifier() + ".pdb");
@@ -199,7 +198,6 @@ public class ResultView implements Serializable {
                                   .collect(Collectors.joining("','", "['", "']"));
 
         String executionString = "viewer({ pdb : '" + matchStructureExternalPath + "', clear : true, style : 'cartoon', labelSize : 22, labelStyle : 'bold', motif : " + motifString + " })";
-        System.out.println(executionString);
         RequestContext.getCurrentInstance().execute(executionString);
 
         currentPvLabel = matchStructure.getPdbIdentifier();
@@ -221,53 +219,12 @@ public class ResultView implements Serializable {
                                                         + SessionManager.relativizePath(motifPath) +
                                                         "', style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold', alternatePosition :" +
                                                         " true } })");
-            currentPvLabel = match.getCandidateMotif().toString();
+            currentPvLabel = match.getCandidateMotif().toString() + " against <span style=\"color:#00b04b\">query motif</span>";
             RequestContext.getCurrentInstance().update("proteinViewerStatus");
         } else {
             currentPvLabel = "no structure available";
         }
-
-        // TODO implement
-//		String pdbPath, motifPath;
-//		if (this.job instanceof Fit3DJobDummy) {
-//			pdbPath = "'data/example/structures/" + InputOutputUtils.getOutputFilename(h) + ".pdb'";
-//			motifPath = "'data/example/motif.pdb'";
-//			// RequestContext.getCurrentInstance().execute("showPairwiseAlignment('data/example/structures/"
-//			// + InputOutputUtils.getOutputFilename(h) +
-//			// ".pdb','data/example/motif.pdb','viewer')");
-//			// RequestContext.getCurrentInstance().execute("viewer({ pdb :
-//			// 'data/example/structures/" +
-//			// InputOutputUtils.getOutputFilename(h)
-//			// + ".pdb', style : 'cartoon', clear : true, additionalPdb : { pdb
-//			// : 'data/example/motif.pdb', style : 'cartoon' } })");
-//		} else {
-//			pdbPath = "'data/" + this.sessionManager.getId() + "/" + this.job.getId() + "/structures/"
-//					+ InputOutputUtils.getOutputFilename(h) + ".pdb'";
-//			motifPath = "'data/" + this.sessionManager.getId() + "/" + this.job.getId() + "/motif.pdb'";
-//			// RequestContext.getCurrentInstance()
-//			// .execute("showPairwiseAlignment('data/" +
-//			// this.sessionManager.getId() + "/" + this.job.getId()
-//			// + "/structures/" + InputOutputUtils.getOutputFilename(h)
-//			// + ".pdb','data/"
-//			// + this.sessionManager.getId() + "/" + this.job.getId()
-//			// + "/motif.pdb','viewer')");
-//			// .execute("viewer({ pdb : 'data/" + this.sessionManager.getId()
-//			// + "/" + this.job.getId() + "/structures/" +
-//			// InputOutputUtils.getOutputFilename(h)
-//			// + ".pdb', additionalPdbs : ['data/" +
-//			// this.sessionManager.getId() + "/" + this.job.getId() +
-//			// "/motif.pdb'] })");
-//		}
-
-        // TODO implement
-//		RequestContext.getCurrentInstance().execute("viewer({ pdb : " + pdbPath
-//				+ ", style : 'sticks', labels : true, labelSize : 22, labelStyle : 'bold', clear : true, additionalPdb : { pdb : "
-//				+ motifPath
-//				+ ", style : 'sticks', color : 'green', labelColor : 'rgb(0, 255, 0)', labelSize : 22, labels : true, labelStyle : 'bold', alternatePosition : true } })");
-
-        // update currently shown
         RequestContext.getCurrentInstance().update("proteinViewerStatus");
-
     }
 
     public List<Fit3DMatchAnnotation> getAnnotations(Fit3DMatch match) {
@@ -288,7 +245,6 @@ public class ResultView implements Serializable {
         motif = StructuralMotif.fromLeafSubstructures(StructureParser.local()
                                                                      .path(job.getParameters().getMotifPath())
                                                                      .everything()
-                                                                     .setOptions(Fit3DWebConstants.Singa.STRUCTURE_PARSER_OPTIONS)
                                                                      .parse().getAllLeafSubstructures());
         // write motif
         motifPath = job.getJobPath().resolve("motif.pdb");
@@ -486,84 +442,9 @@ public class ResultView implements Serializable {
         this.sessionManager = sessionManager;
     }
 
-    // private void extractMotifFromPdb(String pdbFilePath, Hit h)
-    // throws IOException {
-    //
-    // StructureParser sp = new QueryStructureParser(Fit3dConstants.PDB_DIR,
-    // pdbFilePath);
-    //
-    // List<AminoAcid> motifInStructure = new ArrayList<>();
-    // for (HitAminoAcid hAa : h.getAminoAcids()) {
-    //
-    // for (AminoAcid aa : sp.parse()) {
-    //
-    // if (aa.getChainId().equals(String.valueOf(hAa.getChainId()))
-    // && aa.getResidueNumber().getSeqNum() == hAa
-    // .getResidueNumber()) {
-    //
-    // if (hAa.getInsCode() != null
-    // && aa.getResidueNumber().getInsCode() != null) {
-    //
-    // if (hAa.getInsCode().equals(
-    // aa.getResidueNumber().getInsCode())) {
-    //
-    // motifInStructure.add(aa);
-    // }
-    // } else {
-    //
-    // motifInStructure.add(aa);
-    // }
-    // }
-    // }
-    // }
-    //
-    // List<Atom> atoms = new ArrayList<>();
-    // motifInStructure.stream().forEach(a -> atoms.addAll(a.getAtoms()));
-    //
-    // LogHandler.LOG
-    // .info("writing PDB file for structure view to local storage");
-    //
-    // BufferedWriter out = new BufferedWriter(new FileWriter(FacesContext
-    // .getCurrentInstance().getExternalContext()
-    // .getRealPath("data/pdb/motif.pdb")));
-    //
-    // // write all atoms to PDB file
-    // for (Atom atom : atoms) {
-    //
-    // out.write(atom.toPDB());
-    // }
-    //
-    // // close buffered writer
-    // out.close();
-    // }
-
     public int getStructureCount() {
         return structureCount;
     }
-
-    // TODO implement
-//	/**
-//	 * superimposes two structures by biojava's svd then calculating
-//	 * ca-ca-distances of corresponding atoms
-//	 *
-//	 * @param s1
-//	 *            a structure
-//	 * @param s2
-//	 *            yet another structure
-//	 * @param queryMotif2
-//	 * @return the rmsd of the alignment
-//	 * @throws StructureException
-//	 *             svd's internal errors propagated
-//	 * @throws IOException
-//	 */
-//	// TODO: rework, error-handling - not essential though
-//	private void calculateAlignment(Hit h, Structure queryStructure) throws StructureException, IOException {
-//
-//		LogHandler.LOG.info("aligning structure " + queryStructure.getIdentifier() + " against " + h);
-//
-//		Calc.rotate(queryStructure, h.getRotation());
-//		Calc.shift(queryStructure, h.getShift());
-//	}
 
     public StreamedContent getZippedResults() throws IOException {
 

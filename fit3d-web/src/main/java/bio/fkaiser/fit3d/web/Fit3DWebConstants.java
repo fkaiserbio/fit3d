@@ -25,7 +25,7 @@ public final class Fit3DWebConstants {
     public static final double STRUCTURE_OUTPUT_RMSD_LIMIT = 4.0;
     public static final int ALL_AGAINST_ONE_LIMIT = 1000;
 
-    public static final StructureParser.LocalPDB LOCAL_PDB = new StructureParser.LocalPDB("/srv/pdb/", SourceLocation.OFFLINE_PDB);
+    public static final StructureParser.LocalPDB LOCAL_PDB = new StructureParser.LocalPDB("/srv/pdb/", SourceLocation.OFFLINE_MMTF);
 
     public static final int EXCHANGE_LIMIT = 3;
 
@@ -36,22 +36,18 @@ public final class Fit3DWebConstants {
     }
 
     public final static class Database {
-        public static final String DB_HOST = "fit3d-web-mongodb";
+//        public static final String DB_HOST = "fit3d-web-mongodb";
+        public static final String DB_HOST = "localhost";
         public static final int DB_PORT = 27017;
         public static final String DB_NAME = "fit3d";
         public static final String DB_COLLECTION_NAME = "jobs";
         public static final boolean DROP_DB_ON_RESTART = true;
     }
 
-    public final static class Singa {
-        public static final StructureParserOptions STRUCTURE_PARSER_OPTIONS = StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS,
-                                                                                                                  StructureParserOptions.Setting.GET_IDENTIFIER_FROM_FILENAME);
-    }
-
     public final static class JobManager {
         public static final long LOAD_UPDATE_INTERVAL = TimeUnit.SECONDS.toMillis(1);
-        public static final long CLEANUP_INTERVAL = TimeUnit.MINUTES.toMillis(1);
-        public static final int JOB_AGE_IN_HOURS = 3;
+        public static final long CLEANUP_INTERVAL = TimeUnit.HOURS.toMillis(1);
+        public static final int JOB_AGE_IN_HOURS = 72;
     }
 
     public final static class Mail {
