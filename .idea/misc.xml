@@ -8,7 +8,6 @@
       <list>
         <option value="$PROJECT_DIR$/fit3d-cli/pom.xml" />
         <option value="$PROJECT_DIR$/fit3d-web/pom.xml" />
-        <option value="$PROJECT_DIR$/fit3d-app/pom.xml" />
       </list>
     </option>
   </component>

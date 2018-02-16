@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/fit3d-app/fit3d-app.iml" filepath="$PROJECT_DIR$/fit3d-app/fit3d-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/fit3d-cli/fit3d-cli.iml" filepath="$PROJECT_DIR$/fit3d-cli/fit3d-cli.iml" />
       <module fileurl="file://$PROJECT_DIR$/fit3d-web/fit3d-web.iml" filepath="$PROJECT_DIR$/fit3d-web/fit3d-web.iml" />
     </modules>
