@@ -20,11 +20,9 @@
                 <pr:outputPanel>
                     <p>
                         Errors during the upload of a PDB file can have several reasons.
-                        As Fit3D relies on the BioJava framework to read PDB files, they
-                        have to be well-formed and correctly formatted. Further, <b>there
+                        To read PDB files, they have to be well-formed and correctly formatted. Further, <b>there
                         need to be Cα atoms present for the residues of interest</b>. If
-                        parsing fails for any reason, a BioJava <b>StructureException</b>
-                        will be thrown, which may give a clue why the problem occurred.
+                        parsing fails for any reason, an exception will occur, which may give a clue why the problem occurred.
                         Additionally, the PDB file upload is restricted to the file ending
                         <b>*.pdb</b> (not *.pdb.txt, which may be masked as *.pdb by the
                         operating system) and to a <b>maximum file size of 10MB for
@@ -120,8 +118,7 @@
                 <pr:outputPanel>
                     <p>
                         <b>With increasing RMSD limit, more alignments have to be
-                            performed</b> using the Singular Value Decomposition (SVD) method
-                        offered by BioJava. SVD minimizes the root-mean-square deviation
+                            performed</b> using Singular Value Decomposition (SVD). SVD minimizes the root-mean-square deviation
                         between two sets of three-dimensional points of the same size.
                         Consequently, the computational load is significantly increased.
                         Please consider to use our
