@@ -32,7 +32,10 @@ import java.util.stream.Collectors;
 public class Fit3DCommandLine {
 
     public static final double DEFAULT_RMSD_CUTOFF = 2.0;
+    public static final double DEFAULT_DISTANCE_TOLERANCE = 1.0;
     public static final Predicate<Atom> DEFAULT_ATOM_FILTER = StructuralEntityFilter.AtomFilter.isArbitrary();
+
+    public static final int DEFAULT_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 
     private static final Logger logger = LoggerFactory.getLogger(Fit3DCommandLine.class);
     private final CommandLine commandLine;
@@ -41,22 +44,27 @@ public class Fit3DCommandLine {
     private Predicate<Atom> atomFilter;
     private RepresentationSchemeType representationSchemeType;
     private double rmsd = DEFAULT_RMSD_CUTOFF;
-    private boolean conserveAtoms;
+    private Double distanceTolerance = DEFAULT_DISTANCE_TOLERANCE;
     private Path resultFilePath;
     private Path targetListPath;
     private String target;
     private boolean ecMapping;
+    private boolean pfamMapping;
+    private boolean uniProtMapping;
     private StructureParser.LocalPDB localPdb;
+    private boolean mmtf;
     private StatisticalModel statisticalModel;
+    private int numberOfThreads = DEFAULT_NUMBER_OF_THREADS;
+    private Path outputDirectoryPath;
 
     public Fit3DCommandLine(CommandLine commandLine) throws ParseException {
         this.commandLine = commandLine;
-        initializeParameters();
         try {
+            initializeParameters();
+            initializeOutput();
             initializeRun();
         } catch (Fit3DCommandLineException e) {
             logger.error("Fit3D run failed.", e);
-            System.exit(1);
         }
     }
 
@@ -74,7 +82,7 @@ public class Fit3DCommandLine {
                            + "\n     _\\/\\\\\\_____________\\/\\\\\\____\\/\\\\\\_/\\\\___/\\\\\\______/\\\\\\__\\/\\\\\\_______/\\\\\\__"
                            + "\n      _\\/\\\\\\_____________\\/\\\\\\____\\//\\\\\\\\\\___\\///\\\\\\\\\\\\\\\\\\/___\\/\\\\\\\\\\\\\\\\\\\\\\\\/___"
                            + "\n       _\\///______________\\///______\\/////______\\/////////_____\\////////////_____"
-                           + "\n          Copyright (C) 2013-2017 Florian Kaiser, bioinformatics group Mittweida\n");
+                           + "\n               Copyright (C) 2018 Florian Kaiser (contact@fkaiser.bio)\n");
 
         // create instance of command line options
         Fit3DCommandLineOptions commandLineOptions = Fit3DCommandLineOptions.create();
@@ -87,14 +95,13 @@ public class Fit3DCommandLine {
         options.addOptionGroup(commandLineOptions.getTargetOptions());
         // add representation option group
         options.addOptionGroup(commandLineOptions.getRepresentationOptions());
-        // add verbosity option group
-        options.addOptionGroup(commandLineOptions.getVerbosityOptions());
 
         DefaultParser defaultParser = new DefaultParser();
         try {
             CommandLine commandLine = defaultParser.parse(options, args);
             new Fit3DCommandLine(commandLine);
         } catch (ParseException e) {
+            logger.error("Command line options are invalid.", e);
             HelpFormatter help = new HelpFormatter();
             help.setWidth(256);
             help.setSyntaxPrefix("usage: ");
@@ -105,13 +112,26 @@ public class Fit3DCommandLine {
     }
 
     /**
+     * Initializes the settings for output of results.
+     */
+    private void initializeOutput() {
+        if (commandLine.hasOption('o')) {
+            outputDirectoryPath = Paths.get(commandLine.getOptionValue('o'));
+        }
+        // store path for result file if specified
+        if (commandLine.hasOption('f')) {
+            resultFilePath = Paths.get(commandLine.getOptionValue('f'));
+        }
+    }
+
+    /**
      * Runs an instance of Fit3D with the specified parameters.
      */
     private void initializeRun() throws Fit3DCommandLineException {
         new Fit3DCommandLineRunner(this);
     }
 
-    private void initializeParameters() throws ParseException {
+    private void initializeParameters() throws ParseException, Fit3DCommandLineException {
 
         // parse motif
         Path motifPath = Paths.get(commandLine.getOptionValue('m'));
@@ -123,7 +143,7 @@ public class Fit3DCommandLine {
             queryMotif = StructuralMotif.fromLeafSubstructures(motifStructure.getAllLeafSubstructures());
         } catch (StructureParserException | UncheckedIOException e) {
             logger.error("failed to load query motif from path {}", motifPath, e);
-            System.exit(1);
+            throw new Fit3DCommandLineException("Initialization of parameters failed.");
         }
 
         // only use a defined subset of the input structure (extract motif functionality)
@@ -132,7 +152,7 @@ public class Fit3DCommandLine {
                 extractResiduesFromQuery();
             } catch (Fit3DCommandLineException e) {
                 logger.error("failed to extract specified residues from query structure", e);
-                System.exit(1);
+                throw new Fit3DCommandLineException("Initialization of parameters failed.");
             }
         }
 
@@ -144,25 +164,30 @@ public class Fit3DCommandLine {
             createRepresentation();
         } catch (Fit3DCommandLineException e) {
             logger.error("failed to define custom atoms", e);
-            System.exit(1);
+            throw new Fit3DCommandLineException("Initialization of parameters failed.");
         }
-
-        // conserve non-aligned atoms
-        conserveAtoms = commandLine.hasOption('c');
 
         // assign exchanges to query motif
         try {
             assignExchanges();
         } catch (Fit3DCommandLineException e) {
             logger.error("failed to define exchanges", e);
-            System.exit(1);
+            throw new Fit3DCommandLineException("Initialization of parameters failed.");
         }
 
-        // conserve non-aligned atoms
+        // check for mappings of annotations
         ecMapping = commandLine.hasOption('E');
-        // store path for result file if specified
-        if (commandLine.hasOption('f')) {
-            resultFilePath = Paths.get(commandLine.getOptionValue('f'));
+        uniProtMapping = commandLine.hasOption('U');
+        pfamMapping = commandLine.hasOption('M');
+
+        // number of threads
+        if (commandLine.hasOption('n')) {
+            try {
+                numberOfThreads = Integer.valueOf(commandLine.getOptionValue('n'));
+            } catch (NumberFormatException e) {
+                logger.error("failed to parse number of threads", e);
+                throw new Fit3DCommandLineException("Initialization of parameters failed.");
+            }
         }
 
         // show help dialog
@@ -176,9 +201,20 @@ public class Fit3DCommandLine {
                 rmsd = Double.valueOf(commandLine.getOptionValue('r'));
             } catch (NumberFormatException e) {
                 logger.error("failed to parse RMSD cutoff", e);
-                System.exit(1);
+                throw new Fit3DCommandLineException("Initialization of parameters failed.");
             }
         }
+
+        // set distance tolerance value
+        if (commandLine.hasOption('d')) {
+            try {
+                distanceTolerance = Double.valueOf(commandLine.getOptionValue('d'));
+            } catch (NumberFormatException e) {
+                logger.error("failed to parse distance tolerance", e);
+                throw new Fit3DCommandLineException("Initialization of parameters failed.");
+            }
+        }
+
 
         // check if list was given
         if (commandLine.hasOption('l')) {
@@ -190,9 +226,18 @@ public class Fit3DCommandLine {
             target = commandLine.getOptionValue('t');
         }
 
-        // check if local PDB was provided
+        // check if MMTF should be used
+        if (commandLine.hasOption('F')) {
+            mmtf = true;
+        }
+
+        // check if local PDB was provided an use MMTF if specified
         if (commandLine.hasOption('p')) {
-            localPdb = new StructureParser.LocalPDB(commandLine.getOptionValue('p'), SourceLocation.OFFLINE_PDB);
+            if (mmtf) {
+                localPdb = new StructureParser.LocalPDB(commandLine.getOptionValue('p'), SourceLocation.OFFLINE_MMTF);
+            } else {
+                localPdb = new StructureParser.LocalPDB(commandLine.getOptionValue('p'), SourceLocation.OFFLINE_PDB);
+            }
         }
 
         // check if statistical model was specified
@@ -331,8 +376,20 @@ public class Fit3DCommandLine {
         return atomFilter;
     }
 
+    public Double getDistanceTolerance() {
+        return distanceTolerance;
+    }
+
     public StructureParser.LocalPDB getLocalPdb() {
         return localPdb;
+    }
+
+    public int getNumberOfThreads() {
+        return numberOfThreads;
+    }
+
+    public Path getOutputDirectoryPath() {
+        return outputDirectoryPath;
     }
 
     public StructuralMotif getQueryMotif() {
@@ -363,11 +420,19 @@ public class Fit3DCommandLine {
         return targetListPath;
     }
 
-    public boolean isConserveAtoms() {
-        return conserveAtoms;
-    }
-
     public boolean isEcMapping() {
         return ecMapping;
+    }
+
+    public boolean isMmtf() {
+        return mmtf;
+    }
+
+    public boolean isPfamMapping() {
+        return pfamMapping;
+    }
+
+    public boolean isUniProtMapping() {
+        return uniProtMapping;
     }
 }

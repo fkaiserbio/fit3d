@@ -6,9 +6,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author fk
@@ -69,8 +72,14 @@ public class Fit3DCommandLineOptionsTest {
         copyResource(MOTIF_RESOURCE);
         copyResource(CHAIN_LIST_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE, "-l", CHAIN_LIST_RESOURCE};
+        String[] commandLineArguments = new String[]{"-m",
+                                                     folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-l",
+                                                     folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
+                                                     "-f",
+                                                     folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
+        assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
     }
 
     @Test
@@ -79,8 +88,11 @@ public class Fit3DCommandLineOptionsTest {
         copyResource(MOTIF_RESOURCE);
         copyResource(TARGET_FILE_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE, "-t", folder.getRoot().toString() + "/" + TARGET_FILE_RESOURCE};
+        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-t", folder.getRoot().toString() + "/" + TARGET_FILE_RESOURCE,
+                                                     "-f", folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
+        assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
     }
 
     @Test
@@ -88,8 +100,11 @@ public class Fit3DCommandLineOptionsTest {
 
         copyResource(MOTIF_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE, "-t", "4cha"};
+        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-t", "4cha",
+                                                     "-f", folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
+        assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
     }
 
     @Test
@@ -97,7 +112,47 @@ public class Fit3DCommandLineOptionsTest {
 
         copyResource(MOTIF_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE, "-t", "4cha_B"};
+        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-t", "4cha_B",
+                                                     "-f", folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
+        assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
+    }
+
+    @Test
+    public void runWithLocalPdb() throws IOException {
+
+        copyResource(MOTIF_RESOURCE);
+        copyResource(CHAIN_LIST_RESOURCE);
+
+        String[] commandLineArguments = new String[]{"-m",
+                                                     folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-l",
+                                                     folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
+                                                     "-f",
+                                                     folder.getRoot().toString() + "/summary.csv",
+                                                     "-p",
+                                                     "/srv/pdb"};
+        Fit3DCommandLine.main(commandLineArguments);
+
+    }
+
+    @Test
+    public void runWithLocalMmtf() throws IOException {
+
+        copyResource(MOTIF_RESOURCE);
+        copyResource(CHAIN_LIST_RESOURCE);
+
+        String[] commandLineArguments = new String[]{"-m",
+                                                     folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-l",
+                                                     folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
+                                                     "-f",
+                                                     folder.getRoot().toString() + "/summary.csv",
+                                                     "-p",
+                                                     "/srv/pdb",
+                                                     "-F"};
+        Fit3DCommandLine.main(commandLineArguments);
+
     }
 }

@@ -2,26 +2,25 @@ package bio.fkaiser.fit3d.cli;
 
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3D;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DBuilder;
-import de.bioforscher.singa.structure.model.identifiers.PDBIdentifier;
-import de.bioforscher.singa.structure.model.interfaces.Atom;
+import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
 import de.bioforscher.singa.structure.model.interfaces.LeafSubstructureContainer;
-import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserOptions;
+import me.tongfei.progressbar.ProgressBar;
+import me.tongfei.progressbar.ProgressBarStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * @author fk
@@ -30,12 +29,12 @@ public class Fit3DCommandLineRunner {
 
     public static final Pattern IDENTIFIER_PATTERN = Pattern.compile("([1-9a-zA-Z][0-9a-zA-Z]{3})(_[\\w]+)*");
 
-
     private static final Logger logger = LoggerFactory.getLogger(Fit3DCommandLineRunner.class);
     private static final StructureParserOptions STRUCTURE_PARSER_SETTINGS = StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS,
                                                                                                                 StructureParserOptions.Setting.OMIT_LIGAND_INFORMATION);
     private final Fit3DCommandLine commandLine;
     private Fit3D fit3d;
+    private StructureParser.MultiParser multiParser;
 
     public Fit3DCommandLineRunner(Fit3DCommandLine commandLine) throws Fit3DCommandLineException {
         this.commandLine = commandLine;
@@ -44,7 +43,7 @@ public class Fit3DCommandLineRunner {
 
     private void run() throws Fit3DCommandLineException {
 
-        Fit3DBuilder.AtomStep atomStep = null;
+        Fit3DBuilder.AtomStep atomStep;
         if (commandLine.getTarget() != null) {
 
             Path targetPath = Paths.get(commandLine.getTarget());
@@ -92,11 +91,10 @@ public class Fit3DCommandLineRunner {
 
             logger.info("target structure contains {} residues", targetStructure.getAllLeafSubstructures().size());
 
-        } else if (commandLine.getTargetListPath() != null) {
+        } else {
 
+            // target list is used
             try {
-
-                StructureParser.MultiParser multiParser;
 
                 // setup local PDB if provided
                 if (commandLine.getLocalPdb() != null) {
@@ -106,15 +104,20 @@ public class Fit3DCommandLineRunner {
                                                  .setOptions(STRUCTURE_PARSER_SETTINGS);
                 } else {
                     // otherwise use online MMTF
-                    multiParser = StructureParser.mmtf()
-                                                 .chainList(commandLine.getTargetListPath())
-                                                 .setOptions(STRUCTURE_PARSER_SETTINGS);
+                    StructureParser.IdentifierStep identifierStep;
+                    if (commandLine.isMmtf()) {
+                        identifierStep = StructureParser.mmtf();
+                    } else {
+                        identifierStep = StructureParser.pdb();
+                    }
+                    multiParser = identifierStep
+                            .chainList(commandLine.getTargetListPath())
+                            .setOptions(STRUCTURE_PARSER_SETTINGS);
                 }
-
                 atomStep = Fit3DBuilder.create()
                                        .query(commandLine.getQueryMotif())
                                        .targets(multiParser)
-                                       .maximalParallelism();
+                                       .limitedParallelism(commandLine.getNumberOfThreads());
 
             } catch (UncheckedIOException e) {
                 throw new Fit3DCommandLineException("Failed to read provided target list.");
@@ -137,7 +140,83 @@ public class Fit3DCommandLineRunner {
             parameterStep.statisticalModel(commandLine.getStatisticalModel());
         }
 
+        // define mappings
+        if (commandLine.isEcMapping()) {
+            parameterStep.mapECNumbers();
+        }
+        if (commandLine.isPfamMapping()) {
+            parameterStep.mapPfamIdentifiers();
+        }
+        if (commandLine.isUniProtMapping()) {
+            parameterStep.mapUniProtIdentifiers();
+        }
+
+        Timer timer = null;
+        ProgressTask progressTask = null;
+        if (multiParser != null) {
+            timer = new Timer(true);
+            progressTask = new ProgressTask();
+            timer.schedule(progressTask, 0, 100);
+            logger.info("running Fit3D against {} target structures\n", multiParser.getNumberOfQueuedStructures());
+        } else {
+            logger.info("running against single target\n");
+        }
+
         fit3d = parameterStep.rmsdCutoff(commandLine.getRmsd())
+                             .distanceTolerance(commandLine.getDistanceTolerance())
                              .run();
+
+        // ensure graceful termination of progress monitor
+        if (timer != null) {
+            timer.cancel();
+            progressTask.run();
+        }
+
+        List<Fit3DMatch> matches = fit3d.getMatches();
+        logger.info("found {} matches: ", matches.size());
+
+        if (!matches.isEmpty()) {
+
+            System.out.print("\n" + Fit3DMatch.CSV_HEADER);
+            matches.stream()
+                   .map(Fit3DMatch::toCsvLine)
+                   .forEach(System.out::println);
+
+            // write result file
+            if (commandLine.getResultFilePath() != null) {
+                logger.info("writing result file {}", commandLine.getResultFilePath());
+                try {
+                    fit3d.writeSummaryFile(commandLine.getResultFilePath());
+                } catch (IOException e) {
+                    throw new Fit3DCommandLineException("Failed to write result file to: '" + commandLine.getResultFilePath() + "' " + e.getMessage());
+                }
+            }
+
+            // write result structures
+            if (commandLine.getOutputDirectoryPath() != null) {
+                logger.info("writing structures to {}", commandLine.getOutputDirectoryPath());
+                fit3d.writeMatches(commandLine.getOutputDirectoryPath());
+            }
+        }
+    }
+
+    private class ProgressTask extends TimerTask {
+
+        ProgressBar progressBar = new ProgressBar("Progress", multiParser.getNumberOfQueuedStructures(), ProgressBarStyle.ASCII);
+
+        public ProgressTask() {
+            progressBar.start();
+        }
+
+        @Override
+        public void run() {
+            if (multiParser != null) {
+                progressBar.stepTo(multiParser.getNumberOfQueuedStructures() - multiParser.getNumberOfRemainingStructures());
+                if (!multiParser.hasNext()) {
+                    progressBar.stepTo(multiParser.getNumberOfQueuedStructures());
+                    progressBar.stop();
+                }
+            }
+        }
     }
 }

@@ -15,12 +15,12 @@ public class Fit3DCommandLineOptions {
     private final OptionGroup targetOptions = new OptionGroup();
     private final OptionGroup representationOptions = new OptionGroup();
     private final OptionGroup verbosityOptions = new OptionGroup();
+
     private Fit3DCommandLineOptions() {
         generateOptions();
         generateInputOptions();
         generateTargetOptions();
         generateRepresentationOptions();
-        generateVerbosityOptions();
     }
 
     public static Fit3DCommandLineOptions create() {
@@ -54,14 +54,9 @@ public class Fit3DCommandLineOptions {
     private void generateOptions() {
 
         // align output
-        Option alignOutputStructures = new Option("g", "align output structures (default: false)");
+        Option alignOutputStructures = new Option("g", "align output structures (default: true)");
         alignOutputStructures.setLongOpt("align-output");
         options.addOption(alignOutputStructures);
-
-        // conserve atoms
-        Option conserve = new Option("c", "conserve atoms for structure output");
-        conserve.setLongOpt("conserve");
-        options.addOption(conserve);
 
         // distance tolerance
         Option distanceTolerance = new Option("d", "allowed tolerance of query motif spatial extent (default: 1.0 \u212B)\n" +
@@ -77,12 +72,6 @@ public class Fit3DCommandLineOptions {
         exchangeResidues.setLongOpt("exchange-residues");
         exchangeResidues.setArgs(1);
         options.addOption(exchangeResidues);
-
-        // EC mapping
-        Option ecMapping = new Option("E", "map EC numbers by getting RESTful data from RCSB\n" +
-                                           " WARNING: requires internet connection and decreases performance");
-        ecMapping.setLongOpt("ec-mapping");
-        options.addOption(ecMapping);
 
         // result file
         Option resultFile = new Option("f", "result file");
@@ -113,6 +102,11 @@ public class Fit3DCommandLineOptions {
         pdb.setArgs(1);
         options.addOption(pdb);
 
+        // PDB directory
+        Option mmtf = new Option("F", "use MMTF format for local PDB and as online resource (default: false)");
+        mmtf.setLongOpt("mmtf");
+        options.addOption(mmtf);
+
         // p-value calculation
         Option pvalueCalculation = new Option("P", "calculate p-values for matches according to Fafoanov et al. 2008 (F) or Stark et al. 2003 (S) (default: false)\n" +
                                                    "WARNING: F needs R in path with package sfsmisc installed");
@@ -122,29 +116,28 @@ public class Fit3DCommandLineOptions {
         options.addOption(pvalueCalculation);
 
         // Pfam annotation mapping
-        Option pfamMapping = new Option("M", "map Pfam annotation by getting RESTful data from RCSB\n" +
-                                             " WARNING: requires internet connection and decreases performance");
+        Option pfamMapping = new Option("M", "map Pfam annotation using SIFTS (default: true)\n" +
+                                             " WARNING: requires internet access");
         pfamMapping.setLongOpt("pfam-mapping");
         options.addOption(pfamMapping);
 
-        // reference population size for Fofanov et al.
-        Option refSize = new Option("N", "size of reference population for p-value calculation to estimate point-weight correction according to Fofanov et al. 2008 (default: " +
-                                         FofanovEstimation.DEFAULT_REFERENCE_SIZE + ")\n" +
-                                         " WARNING: changing this parameter requires knowledge of the underlying method");
-        refSize.setLongOpt("ref-size");
-        refSize.setArgs(1);
-        options.addOption(refSize);
+        // UniProt annotation mapping
+        Option uniProtMapping = new Option("U", "map UniProt annotation using SIFTS (default: true)\n" +
+                                             " WARNING: requires internet access");
+        uniProtMapping.setLongOpt("uniprot-mapping");
+        options.addOption(uniProtMapping);
+
+        // EC annotation mapping
+        Option ecMapping = new Option("E", "map Enzyme Commission numbers using SIFTS (default: true)\n" +
+                                                " WARNING: requires internet access");
+        ecMapping.setLongOpt("ec-mapping");
+        options.addOption(ecMapping);
 
         // maximal RMSD
         Option rmsd = new Option("r", "maximal allowed RMSD for hits  (default: 2.0 \u212B)");
         rmsd.setLongOpt("rmsd");
         rmsd.setArgs(1);
         options.addOption(rmsd);
-
-        // PDB directory split
-        Option pdbSplit = new Option("s", "disable PDB directory split (default: false)");
-        pdbSplit.setLongOpt("no-pdb-split");
-        options.addOption(pdbSplit);
 
         // title mapping
         Option titleMapping = new Option("T", "map structure titles assigned by PDB");
@@ -161,7 +154,7 @@ public class Fit3DCommandLineOptions {
     }
 
     /**
-     * generate command line options for input definition
+     * Generates command line options for input definition.
      */
     private void generateInputOptions() {
 
@@ -177,7 +170,7 @@ public class Fit3DCommandLineOptions {
     }
 
     /**
-     * generate command line options for target definition
+     * Generates command line options for target definition.
      */
     private void generateTargetOptions() {
 
@@ -200,7 +193,7 @@ public class Fit3DCommandLineOptions {
     }
 
     /**
-     * generated command line options for structure representation
+     * Generates command line options for structure representation.
      */
     private void generateRepresentationOptions() {
 
@@ -218,23 +211,5 @@ public class Fit3DCommandLineOptions {
         atoms.setArgName("CA,CB,CG,CD,...");
         atoms.setArgs(1);
         representationOptions.addOption(atoms);
-    }
-
-    /**
-     * generate command line options for verbosity
-     */
-    private void generateVerbosityOptions() {
-
-        Option quiet = new Option("q", "show only results");
-        quiet.setLongOpt("quiet");
-        verbosityOptions.addOption(quiet);
-
-        Option verbose = new Option("v", "verbose output");
-        verbose.setLongOpt("verbose");
-        verbosityOptions.addOption(verbose);
-
-        Option extraVerbose = new Option("x", "extra verbose output");
-        extraVerbose.setLongOpt("vverbose");
-        verbosityOptions.addOption(extraVerbose);
     }
 }

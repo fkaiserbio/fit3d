@@ -1,100 +1,100 @@
-1b5z_A
-1bnb_A
-1cfg_A
-1dlf_L
-1fu1_B
-1fvg_A
-1gai_A
-1gdx_A
-1gh0_A
-1go3_F
-1gq8_A
-1ip7_A
-1k52_B
-1lld_A
-1m2b_A
-1n4x_L
-1o7d_C
-1q9b_A
-1qlw_A
-1sy6_A
-1u02_A
-1uj0_A
-1v7r_A
-1vor_3
-1wap_A
-1wil_A
-1xjh_A
-1yz4_A
-1z9h_A
-2awg_A
-2b3f_A
-2edd_A
-2ef0_A
-2emz_A
-2i06_A
-2i1u_A
-2iyv_A
-2j5o_A
-2jvj_A
-2jvu_A
-2oqb_A
-2ovo_A
-2ppt_A
-2r2p_A
-2rky_B
-2vpg_B
-2vyx_C
-2wkf_B
-2y2y_A
-2yc1_A
-2zys_A
-3by7_B
-3cnl_A
-3dc5_C
-3eyx_A
-3f02_D
-3fqd_B
-3g7p_A
-3ged_B
-3h3b_D
-3hkz_K
-3hyu_B
-3iln_A
-3izs_S
-3jyn_A
-3lcz_A
-3ndh_A
-3nqb_A
-3ny4_A
-3ogp_A
-3p9n_A
-3q12_A
-3rpz_A
-3tfo_C
-3uws_B
-3v47_C
-3v8v_A
-3wj2_B
-3x1u_G
-4bjs_D
-4btd_0
-4eqa_A
-4f21_D
-4fle_A
-4hi0_E
-4ija_A
-4jlr_C
-4m3j_B
-4nik_B
-4nzr_M
-4p7d_B
-4y28_E
-4yk2_A
-5ak1_A
-5b0e_B
-5boe_A
-5cdp_B
-5cor_A
-5do9_A
-5e65_B
+1b5z	A
+1bnb	A
+1cfg	A
+1dlf	L
+1fu1	B
+1fvg	A
+1gai	A
+1gdx	A
+1gh0	A
+1go3	F
+1gq8	A
+1ip7	A
+1k52	B
+1lld	A
+1m2b	A
+1n4x	L
+1o7d	C
+1q9b	A
+1qlw	A
+1sy6	A
+1u02	A
+1uj0	A
+1v7r	A
+1vor	3
+1wap	A
+1wil	A
+1xjh	A
+1yz4	A
+1z9h	A
+2awg	A
+2b3f	A
+2edd	A
+2ef0	A
+2emz	A
+2i06	A
+2i1u	A
+2iyv	A
+2j5o	A
+2jvj	A
+2jvu	A
+2oqb	A
+2ovo	A
+2ppt	A
+2r2p	A
+2rky	B
+2vpg	B
+2vyx	C
+2wkf	B
+2y2y	A
+2yc1	A
+2zys	A
+3by7	B
+3cnl	A
+3dc5	C
+3eyx	A
+3f02	D
+3fqd	B
+3g7p	A
+3ged	B
+3h3b	D
+3hkz	K
+3hyu	B
+3iln	A
+3izs	S
+3jyn	A
+3lcz	A
+3ndh	A
+3nqb	A
+3ny4	A
+3ogp	A
+3p9n	A
+3q12	A
+3rpz	A
+3tfo	C
+3uws	B
+3v47	C
+3v8v	A
+3wj2	B
+3x1u	G
+4bjs	D
+4btd	0
+4eqa	A
+4f21	D
+4fle	A
+4hi0	E
+4ija	A
+4jlr	C
+4m3j	B
+4nik	B
+4nzr	M
+4p7d	B
+4y28	E
+4yk2	A
+5ak1	A
+5b0e	B
+5boe	A
+5cdp	B
+5cor	A
+5do9	A
+5e65	B
