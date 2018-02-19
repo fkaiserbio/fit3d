@@ -2,6 +2,7 @@ package bio.fkaiser.fit3d.cli;
 
 import de.bioforscher.singa.core.utility.Resources;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -119,6 +120,7 @@ public class Fit3DCommandLineOptionsTest {
     }
 
     @Test
+    @Ignore("only works with local PDB installation in PDB format")
     public void runWithLocalPdb() throws IOException {
 
         copyResource(MOTIF_RESOURCE);
@@ -136,6 +138,7 @@ public class Fit3DCommandLineOptionsTest {
     }
 
     @Test
+    @Ignore("only works with local PDB installation in MMTF format")
     public void runWithLocalMmtf() throws IOException {
 
         copyResource(MOTIF_RESOURCE);
