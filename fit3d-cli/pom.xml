@@ -4,9 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <fit3d-cli.version>0.0.1</fit3d-cli.version>
+    </properties>
+
     <groupId>bio.fkaiser.fit3d</groupId>
     <artifactId>fit3d-cli</artifactId>
-    <version>0.0.1</version>
+    <version>${fit3d-cli.version}</version>
 
     <build>
         <plugins>
@@ -24,7 +28,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
-                    <finalName>fit3d</finalName>
+                    <finalName>fit3d-${fit3d-cli.version}</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
