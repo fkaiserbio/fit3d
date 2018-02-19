@@ -79,7 +79,6 @@ public class Fit3DCommandLineOptionsTest {
                                                      "-f",
                                                      folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
-        assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
     }
 
     @Test
@@ -90,7 +89,8 @@ public class Fit3DCommandLineOptionsTest {
 
         String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
                                                      "-t", folder.getRoot().toString() + "/" + TARGET_FILE_RESOURCE,
-                                                     "-f", folder.getRoot().toString() + "/summary.csv"};
+                                                     "-f", folder.getRoot().toString() + "/summary.csv",
+                                                     "-M"};
         Fit3DCommandLine.main(commandLineArguments);
         assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
     }
@@ -116,7 +116,6 @@ public class Fit3DCommandLineOptionsTest {
                                                      "-t", "4cha_B",
                                                      "-f", folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
-        assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
     }
 
     @Test
@@ -134,7 +133,6 @@ public class Fit3DCommandLineOptionsTest {
                                                      "-p",
                                                      "/srv/pdb"};
         Fit3DCommandLine.main(commandLineArguments);
-
     }
 
     @Test
@@ -153,6 +151,6 @@ public class Fit3DCommandLineOptionsTest {
                                                      "/srv/pdb",
                                                      "-F"};
         Fit3DCommandLine.main(commandLineArguments);
-
+        assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
     }
 }
