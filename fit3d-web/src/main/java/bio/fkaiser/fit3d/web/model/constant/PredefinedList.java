@@ -9,9 +9,7 @@ public enum PredefinedList {
     NONE(null, "none"),
     BLASTe7(SessionManager.BASE_PATH.resolve("nrpdb_041416_BLAST_e-7.txt"), "BLASTe-7"),
     BLASTe40(SessionManager.BASE_PATH.resolve("nrpdb_041416_BLAST_e-40.txt"), "BLASTe-40"),
-    BLASTe80(SessionManager.BASE_PATH.resolve("nrpdb_041416_BLAST_e-80.txt"), "BLASTe-80"),
-    TEST(SessionManager.BASE_PATH.resolve("test.txt"), "test");
-
+    BLASTe80(SessionManager.BASE_PATH.resolve("nrpdb_041416_BLAST_e-80.txt"), "BLASTe-80");
     private Path path;
     private String label;
 
