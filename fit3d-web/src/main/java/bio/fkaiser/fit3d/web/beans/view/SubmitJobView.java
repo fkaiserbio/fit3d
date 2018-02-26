@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -92,6 +93,13 @@ public class SubmitJobView implements Serializable {
     private boolean chainTargetList;
     private List<ExchangeDefinition> exchangeDefinitions;
 
+    private static void createJobDirectory(Path jobPath) throws IOException {
+        if (!jobPath.toFile().exists()) {
+            logger.info("initially creating job path {}", jobPath);
+            Files.createDirectories(jobPath);
+        }
+    }
+
     public void handleAdvancedOptionsToggle(ToggleEvent event) {
         if (event.getVisibility() == Visibility.VISIBLE) {
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning", "Changing advanced options can have a strong impact on algorithm performance.");
@@ -104,19 +112,16 @@ public class SubmitJobView implements Serializable {
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "A query motif file is required before exchangeDefinitions can be defined.");
             FacesContext.getCurrentInstance().addMessage(null, message);
         } else {
-            // initialize motif file exchangeDefinitions
+            // initialize motif file exchange definition
             initializeExchangeDefinitions();
         }
     }
 
     public void handleMotifUpload(FileUploadEvent event) throws IOException {
         motifPath = jobPath.resolve("motif.pdb");
-        if (!jobPath.toFile().exists()) {
-            logger.info("initially creating job path {}", jobPath);
-            Files.createDirectories(jobPath);
-        }
+        createJobDirectory(jobPath);
 
-        Files.copy(event.getFile().getInputstream(), motifPath);
+        Files.copy(event.getFile().getInputstream(), motifPath, StandardCopyOption.REPLACE_EXISTING);
         logger.info("copied motif file to working directory: {}", motifPath);
 
         // update file name to indicate uploaded file
@@ -143,16 +148,14 @@ public class SubmitJobView implements Serializable {
     }
 
     public void handleTargetListSelected() {
-        if (predefinedList.equals(PredefinedList.NONE)) {
-            targetListSelected = false;
-        } else {
-            targetListSelected = true;
-        }
+        targetListSelected = !predefinedList.equals(PredefinedList.NONE);
     }
 
     public void handleTargetListUpload(FileUploadEvent event) throws IOException {
         targetListPath = jobPath.resolve("targets.txt");
-        Files.copy(event.getFile().getInputstream(), targetListPath);
+        createJobDirectory(jobPath);
+
+        Files.copy(event.getFile().getInputstream(), targetListPath, StandardCopyOption.REPLACE_EXISTING);
         logger.info("copied target list file to working directory: {}", targetListPath);
         targetListFileLabel = event.getFile().getFileName();
 
@@ -178,9 +181,13 @@ public class SubmitJobView implements Serializable {
         jobIdentifier = UUID.randomUUID();
         exchangeDefinitions = new ArrayList<>();
         jobPath = sessionManager.getSessionPath().resolve(jobIdentifier.toString());
-        Path extractedMotifPath = Faces.getFlashAttribute("extractedMotifPath");
-        if (extractedMotifPath != null) {
-            handleExtractedMotifSubmission(extractedMotifPath);
+        Flash flash = Faces.getFlash();
+        String key = "extractedMotifPath";
+        if (flash.containsKey(key)) {
+            Path extractedMotifPath = Faces.getFlashAttribute(key);
+            if (extractedMotifPath != null) {
+                handleExtractedMotifSubmission(extractedMotifPath);
+            }
         }
     }
 
@@ -275,11 +282,6 @@ public class SubmitJobView implements Serializable {
         Flash flash = facesContext.getExternalContext().getFlash();
         flash.put("job", job);
 
-//        // submit new job to controller
-//        jobManager.addJob(job);
-//
-//        logger.info("job {} with ID {} submitted", job, job.getJobIdentifier());
-
         return "success";
     }
 
@@ -332,51 +334,78 @@ public class SubmitJobView implements Serializable {
                                                                          .parse().getAllLeafSubstructures());
         }
         motifAnalysis = MotifAnalysis.of(motif);
+
+        // only allow all-atom for mixed motifs
+        if (motifAnalysis.isMixedMotif()) {
+            atomFilterType = AtomFilterType.ARBITRARY;
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning", "Your motif contains a non-amino acid element. Only all-atom alignment is supported.");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            RequestContext.getCurrentInstance().update("mainForm:atomFilterType");
+        } else {
+            RequestContext.getCurrentInstance().update("mainForm:atomFilterType");
+        }
     }
 
     private void analyzeTargetList() throws IOException {
 
         // check if target list contains exclusively PDB-IDs
         List<String> pdbIdentifiers = Files.lines(targetListPath)
-                                           .filter(PDBIdentifier.PATTERN.asPredicate())
+                                           .filter(Pattern.compile("^" + PDBIdentifier.PATTERN.pattern() + "$").asPredicate())
                                            .distinct()
                                            .collect(Collectors.toList());
 
         List<String> chainIdentifiers = Files.lines(targetListPath)
-                                             .filter(Pattern.compile(PDBIdentifier.PATTERN.pattern() + "\\s[0-9A-Za-z]+").asPredicate())
-                                             .filter(line -> PDBIdentifier.PATTERN.asPredicate().test(line.split("\t")[0]))
+                                             .filter(Pattern.compile("^" + PDBIdentifier.PATTERN.pattern() + "\\s[0-9A-Za-z]+$").asPredicate())
                                              .distinct()
                                              .collect(Collectors.toList());
 
-        // decide whether user uploaded PDB-ID list or chain ID list
-        if (pdbIdentifiers.isEmpty() && chainIdentifiers.isEmpty()) {
-            blocked = true;
-            RequestContext.getCurrentInstance().update("mainForm");
-            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Your target list does not contain valid PDB-IDs.");
-            FacesContext.getCurrentInstance().addMessage(null, message);
-        } else if (!pdbIdentifiers.isEmpty() && chainIdentifiers.isEmpty()) {
-            targetListSize = pdbIdentifiers.size();
-            chainTargetList = false;
-            pdbTargetList = true;
-            targetListPath = jobPath.resolve("targets.txt");
-            Files.write(jobPath.resolve("targets.txt"), pdbIdentifiers.stream()
-                                                                      .collect(Collectors.joining("\n"))
-                                                                      .getBytes());
-            logger.info("copied PDB-ID target list to {}", targetListPath);
-        } else if (pdbIdentifiers.isEmpty()) {
-            targetListSize = chainIdentifiers.size();
-            pdbTargetList = false;
-            chainTargetList = true;
-            targetListPath = jobPath.resolve("targets.txt");
-            Files.write(targetListPath, chainIdentifiers.stream()
-                                                        .collect(Collectors.joining("\n"))
-                                                        .getBytes());
-            logger.info("copied chain-ID target list to {}", targetListPath);
-        } else {
-            blocked = true;
-            RequestContext.getCurrentInstance().update("mainForm");
+        if (!pdbIdentifiers.isEmpty() && !chainIdentifiers.isEmpty()) {
+
+            if (!blocked) {
+                blocked = true;
+                RequestContext.getCurrentInstance().update("mainForm:submitButton");
+            }
+
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Your target list is a mix of PDB-IDs and chain-IDs.");
             FacesContext.getCurrentInstance().addMessage(null, message);
+        } else {
+            if (!pdbIdentifiers.isEmpty()) {
+                targetListSize = pdbIdentifiers.size();
+                chainTargetList = false;
+                pdbTargetList = true;
+
+                if (blocked) {
+                    blocked = false;
+                    RequestContext.getCurrentInstance().update("mainForm:submitButton");
+                }
+                targetListPath = jobPath.resolve("targets.txt");
+                Files.write(jobPath.resolve("targets.txt"), pdbIdentifiers.stream()
+                                                                          .collect(Collectors.joining("\n"))
+                                                                          .getBytes());
+                logger.info("copied PDB-ID target list to {}", targetListPath);
+            } else if (!chainIdentifiers.isEmpty()) {
+                targetListSize = chainIdentifiers.size();
+                pdbTargetList = false;
+                chainTargetList = true;
+
+                if (blocked) {
+                    blocked = false;
+                    RequestContext.getCurrentInstance().update("mainForm:submitButton");
+                }
+
+                targetListPath = jobPath.resolve("targets.txt");
+                Files.write(targetListPath, chainIdentifiers.stream()
+                                                            .collect(Collectors.joining("\n"))
+                                                            .getBytes());
+                logger.info("copied chain-ID target list to {}", targetListPath);
+            } else {
+                if (!blocked) {
+                    blocked = true;
+                    RequestContext.getCurrentInstance().update("mainForm:submitButton");
+                }
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Your target list does not contain valid PDB-IDs.");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
         }
     }
 

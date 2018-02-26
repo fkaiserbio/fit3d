@@ -30,8 +30,7 @@
                     <pr:fileUpload required="true" id="motifFile"
                                    fileUploadListener="#{submitJobView.handleMotifUpload}"
                                    mode="advanced" update="messages" auto="true" sizeLimit="1000000"
-                                   allowTypes="/(\.|\/)(pdb)$/" fileLimit="1" style="width:600px"
-                                   fileLimitMessage="Please reset input to correct your upload"
+                                   allowTypes="/(\.|\/)(pdb)$/" style="width:600px"
                                    invalidFileMessage="Invalid file type, only *.pdb is accepted."
                                    disabled="#{submitJobView.redirectedFromExtract}"/>
                     <pr:tooltip id="motifFileTip" for="motifFile"
@@ -46,11 +45,10 @@
                                    disabled="#{submitJobView.targetListSelected}"
                                    fileUploadListener="#{submitJobView.handleTargetListUpload}"
                                    mode="advanced" update="messages" auto="true" sizeLimit="1000000"
-                                   allowTypes="/(\.|\/)(txt)$/" style="width:600px" fileLimit="1"
-                                   fileLimitMessage="Please reset input to correct your upload"
+                                   allowTypes="/(\.|\/)(txt)$/" style="width:600px"
                                    invalidFileMessage="Invalid file type, only *.txt is accepted."/>
                     <pr:tooltip id="targetListFileTip" for="targetListFile"
-                                value="Upload your own target list as a text file containing PDB-IDs sepearted by line break."/>
+                                value="Upload target list containing PDB-IDs (and chain IDs) sepearted by line break (see FAQ)."/>
 
                     <pr:outputLabel for="targetList" value="predefined target list"/>
                     <pr:selectOneMenu id="targetList"
@@ -74,7 +72,7 @@
                     <pr:inputText id="description" value="#{submitJobView.description}"
                                   placeholder="new Fit3D job"
                                   validatorMessage="invalid job description">
-                        <f:validateLength minimum="3" maximum="20"/>
+                        <f:validateLength minimum="3" maximum="50"/>
                     </pr:inputText>
                     <pr:tooltip id="descriptionTip" for="description"
                                 value="Assign a name to your job."/>
@@ -116,7 +114,7 @@
                                 value="Choose the method of p-value estimation. Please refer to the help section for further explanations (default: Fofanov et al. 2008)."/>
 
                     <pr:outputLabel for="atomFilterType" value="atom filter"/>
-                    <pr:selectOneMenu value="#{submitJobView.atomFilterType}" id="atomFilterType" style="width:240px">
+                    <pr:selectOneMenu value="#{submitJobView.atomFilterType}" id="atomFilterType" style="width:240px" disabled="#{submitJobView.motifAnalysis.mixedMotif}">
                         <f:selectItems value="#{dataProvider.atomFilterTypes}" var="atomFilterType" itemValue="#{atomFilterType}" itemLabel="#{atomFilterType.description}"/>
                     </pr:selectOneMenu>
                     <pr:tooltip id="atomsTooltip" for="atomFilterType"

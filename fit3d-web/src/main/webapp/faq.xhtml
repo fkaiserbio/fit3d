@@ -38,9 +38,10 @@
                         Fit3D only accepts plain text target lists that have the extension
                         <b>*.txt</b> and a <b>file size below 1MB</b>. All target
                         structures must be separated by a line break and identified by
-                        their four-character PDB-ID (e.g. 4CHA). Chain-IDs must be omitted
-                        because Fit3D searches in all chains, due to the inter-meolecular
-                        search approach.
+                        their four-character PDB-ID (e.g. 4cha). If chain IDs are omitted,
+                        Fit3D will use all chains during the search to discover inter-molecular matches.
+                        If chains are specified (separated by tabulator, e.g. 4cha[tabulator]A), only these chains are used during searching. The target list is only allowed to either contain
+                        PDB-IDs without chain ID, or PDB-IDs with chain ID. Mixing of entries with and without chain ID is not permitted.
                     </p>
                 </pr:outputPanel>
             </pr:tab>

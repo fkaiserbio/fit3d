@@ -1,5 +1,6 @@
 package bio.fkaiser.fit3d.web.beans.application;
 
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import bio.fkaiser.fit3d.web.model.constant.PredefinedList;
 import bio.fkaiser.fit3d.web.model.constant.StatisticalModelType;
 import de.bioforscher.singa.structure.model.families.AminoAcidFamily;
@@ -15,7 +16,9 @@ public class DataProvider {
     }
 
     public AtomFilterType[] getAtomFilterTypes() {
-        return AtomFilterType.values();
+        return Stream.of(AtomFilterType.values())
+                .filter(Fit3DWebConstants.DefaultJobParameters.ENABLED_ATOM_FILTERS::contains)
+                .toArray(AtomFilterType[]::new);
     }
 
     public PredefinedList[] getPredefinedLists() {

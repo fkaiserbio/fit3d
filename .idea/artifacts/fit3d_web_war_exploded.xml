@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="fit3d-web:war exploded">
-    <output-path>$PROJECT_DIR$/fit3d-web/target/fit3d-web-0.1.0</output-path>
+    <output-path>$PROJECT_DIR$/fit3d-web/target/fit3d-web-0.1.1</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
@@ -40,7 +40,7 @@
         </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/fit3d-web/target/fit3d-web-0.1.0/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/fit3d-web/target/fit3d-web-0.1.1/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="fit3d-web/web/Web" />
     </root>

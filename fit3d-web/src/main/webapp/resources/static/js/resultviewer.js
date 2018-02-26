@@ -184,7 +184,7 @@ function labels(instance, structure, opts) {
         var currentChain = structure.chains()[i];
         for (var j = 0; j < currentChain.residues().length; j++) {
             var currentResidue = currentChain.residues()[j];
-            var pos = opts.alternatePosition ? currentResidue.atom("CA").pos() : currentResidue.center();
+            var pos = currentResidue.center();
             instance.label("label",
                 currentChain.name() + "-" + currentResidue.num() + "-" + convertThreeLetterCode(currentResidue.name()),
                 pos,

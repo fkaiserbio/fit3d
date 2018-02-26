@@ -2,16 +2,17 @@ package bio.fkaiser.fit3d.web;
 
 import bio.fkaiser.fit3d.web.model.constant.StatisticalModelType;
 import de.bioforscher.singa.core.utility.Resources;
-import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter;
+import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter.AtomFilterType;
 import de.bioforscher.singa.structure.parser.pdb.structures.SourceLocation;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
-import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserOptions;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author fk
@@ -30,14 +31,16 @@ public final class Fit3DWebConstants {
     public static final int EXCHANGE_LIMIT = 3;
 
     public final static class DefaultJobParameters {
-        public static final StructuralEntityFilter.AtomFilterType DEFAULT_ATOM_FILTER_TYPE = StructuralEntityFilter.AtomFilterType.ARBITRARY;
+        public static final AtomFilterType DEFAULT_ATOM_FILTER_TYPE = AtomFilterType.ARBITRARY;
+        public static final Set<AtomFilterType> ENABLED_ATOM_FILTERS = Stream.of(AtomFilterType.ALPHA_CARBON, AtomFilterType.ARBITRARY, AtomFilterType.BACKBONE, AtomFilterType.SIDE_CHAIN)
+                                                                             .collect(Collectors.toSet());
         public static final double DEFAULT_RMSD_LIMIT = 2.0;
         public static final StatisticalModelType DEFAULT_STATISTICAL_MODEL_TYPE = StatisticalModelType.FOFANOV;
     }
 
     public final static class Database {
-//        public static final String DB_HOST = "fit3d-web-mongodb";
-        public static final String DB_HOST = "localhost";
+                public static final String DB_HOST = "fit3d-web-mongodb";
+//        public static final String DB_HOST = "localhost";
         public static final int DB_PORT = 27017;
         public static final String DB_NAME = "fit3d";
         public static final String DB_COLLECTION_NAME = "jobs";

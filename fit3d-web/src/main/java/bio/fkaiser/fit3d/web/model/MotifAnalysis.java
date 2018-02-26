@@ -22,14 +22,17 @@ public class MotifAnalysis {
     private final StructuralMotif.Type motifType;
     private final MotifComplexity motifComplexity;
     private final String pdbIdentifier;
+    private final boolean mixedMotif;
 
-    public MotifAnalysis(int motifAminoAcidCount, double motifExtent, String motifSequence, StructuralMotif.Type motifType, MotifComplexity motifComplexity, String pdbIdentifier) {
+    public MotifAnalysis(int motifAminoAcidCount, double motifExtent, String motifSequence, StructuralMotif.Type motifType, MotifComplexity motifComplexity, String pdbIdentifier, boolean mixedMotif) {
         this.motifAminoAcidCount = motifAminoAcidCount;
         this.motifExtent = motifExtent;
         this.motifSequence = motifSequence;
         this.motifType = motifType;
         this.motifComplexity = motifComplexity;
         this.pdbIdentifier = pdbIdentifier;
+        this.mixedMotif = mixedMotif;
+
     }
 
     public static MotifAnalysis of(StructuralMotif structuralMotif) {
@@ -68,7 +71,9 @@ public class MotifAnalysis {
             pdbIdentifier = structuralMotif.getFirstLeafSubstructure().getPdbIdentifier();
         }
 
-        return new MotifAnalysis(motifAminoAcidCount, motifExtent, motifSequence, motifType, motifComplexity, pdbIdentifier);
+        boolean mixedMotif = structuralMotif.getAllAminoAcids().size() != structuralMotif.size();
+
+        return new MotifAnalysis(motifAminoAcidCount, motifExtent, motifSequence, motifType, motifComplexity, pdbIdentifier, mixedMotif);
     }
 
     public int getMotifAminoAcidCount() {
@@ -93,5 +98,9 @@ public class MotifAnalysis {
 
     public String getPdbIdentifier() {
         return pdbIdentifier;
+    }
+
+    public boolean isMixedMotif() {
+        return mixedMotif;
     }
 }
