@@ -21,7 +21,6 @@
                     <h:outputText rendered="#{resultView.job.running}" value="Your job is running."/>
                     <h:outputText rendered="#{resultView.job.finished}" value="Your job is finished."/>
                     <h:outputText rendered="#{resultView.job.failed}" styleClass="ui-state-error" value="Your job failed with error: #{resultView.job.errorMessage}"/>
-                    <h:outputText rendered="#{resultView.job.finished and empty resultView.matches}" styleClass="ui-state-error" value="Sorry, no matches could be found for your request."/>
                 </f:facet>
 
 
@@ -43,9 +42,8 @@
             </pr:toolbar>
 
             <div style="text-align: center;">
-                <pr:progressBar rendered="#{resultView.job.running}" widgetVar="pbAjax" ajax="true" value="#{resultView.job.progress}" labelTemplate="{value}%" styleClass="animated"
-                                global="false">
-                </pr:progressBar>
+                <pr:progressBar rendered="#{resultView.job.running}" widgetVar="pbAjax" ajax="true" value="#{resultView.job.progress}" labelTemplate="{value}%" styleClass="animated" global="false"/>
+                <h:outputText rendered="#{resultView.job.finished and empty resultView.matches}" styleClass="ui-state-error" value="Sorry, no matches could be found for your request."/>
             </div>
             <pr:dataScroller styleClass="result-scroller" value="#{resultView.matches}" var="match" chunkSize="100" mode="inline" scrollHeight="400"
                              rendered="#{resultView.job.finished and not resultView.job.failed and not empty resultView.matches}">

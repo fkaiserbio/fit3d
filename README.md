@@ -21,7 +21,7 @@ The Fit3D software uses the fabulous [SiNGA](https://github.com/cleberecht/singa
 
 ### Usage
 An online version of Fit3D is available at [biosciences.hs-mittweida.de/fit3d](https://biosciences.hs-mittweida.de/fit3d/home). 
-For detailed instructions on how to use the command line implementation please refer to the [wiki pages](https://github.com/enauz/mmm/wiki).
+For detailed instructions on how to use the command line implementation please refer to the [wiki pages](https://github.com/fkaiserbio/fit3d/wiki).
 
 ---
 
