@@ -19,7 +19,11 @@
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-114722483-1"/>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
         gtag('js', new Date());
         gtag('config', 'UA-114722483-1');
     </script>
@@ -143,7 +147,7 @@
             <h:form id="statusArea">
                 <h:outputText value="&#169; 2018 "/>
                 <pr:link styleClass="hrefLink-doi" target="_blank" href="http://www.bioforscher.de/bigM" value="bioinformatics group Mittweida"/>
-                <h:outputText value=" | online since #{jobLoadManager.genesis} | "/>
+                <h:outputText value=" | Fit3D received #{jobLoadManager.totalJobs} #{jobLoadManager.totalJobs == 1 ? 'job' : 'jobs'} in total | "/>
                 <h:outputText id="jobCount" value="current job load: #{jobLoadManager.enqueuedJobCount + jobLoadManager.runningJobCount} #{(jobLoadManager.enqueuedJobCount +
                 jobLoadManager.runningJobCount) == 1 ? 'job' : 'jobs'}" styleClass="ui-widget display"/>
                 <pr:poll interval="5" update="@form" widgetVar="poll"/>

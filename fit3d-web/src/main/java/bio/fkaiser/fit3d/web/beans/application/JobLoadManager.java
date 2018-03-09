@@ -1,5 +1,10 @@
 package bio.fkaiser.fit3d.web.beans.application;
 
+import bio.fkaiser.fit3d.web.Fit3DWebConstants;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
+
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 
@@ -13,6 +18,8 @@ public class JobLoadManager {
     private int finishedJobCount;
     private int failedJobCount;
     private LocalDateTime genesis;
+    private MongoCollection<Document> mongoCollection;
+    private int totalJobs;
 
     @PostConstruct
     public void init() {
@@ -55,4 +62,13 @@ public class JobLoadManager {
         this.runningJobCount = runningJobCount;
     }
 
+    public int getTotalJobs() {
+        return totalJobs;
+    }
+
+    public void updateTotalJobs(){
+        MongoClient mongoClient = new MongoClient(Fit3DWebConstants.Database.DB_HOST, Fit3DWebConstants.Database.DB_PORT);
+        mongoCollection = mongoClient.getDatabase(Fit3DWebConstants.Database.DB_NAME).getCollection(Fit3DWebConstants.Database.DB_COLLECTION_NAME);
+        totalJobs = (int) mongoCollection.count();
+    }
 }

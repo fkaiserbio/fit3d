@@ -40,6 +40,8 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static bio.fkaiser.fit3d.web.beans.session.SessionManager.BASE_PATH;
+
 public class SubmitJobView implements Serializable {
 
     private static final long serialVersionUID = -4697699771578104350L;
@@ -288,7 +290,13 @@ public class SubmitJobView implements Serializable {
     private String determineIpAddress() {
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-        return request.getRemoteAddr();
+        String ipAddress = request.getHeader("X-FORWARDED-FOR");
+        if (ipAddress != null) {
+            ipAddress = ipAddress.replaceFirst(",.*", "");
+        } else {
+            ipAddress = request.getRemoteAddr();
+        }
+        return ipAddress;
     }
 
     public void submitExample() {
@@ -296,9 +304,9 @@ public class SubmitJobView implements Serializable {
         predefinedList = PredefinedList.BLASTe7;
         description = "trypsin active site";
 
-        // read example motif
+        // read example motif (path for example motif differs from usual motif submission)
         String exampleMotifFileName = "4cha_motif.pdb";
-        motifPath = SessionManager.BASE_PATH.resolve("example").resolve(exampleMotifFileName);
+        motifPath = BASE_PATH.getParent().resolve("example").resolve(exampleMotifFileName);
         externalMotifPath = SessionManager.relativizePath(motifPath);
 
         motifFileName = exampleMotifFileName;

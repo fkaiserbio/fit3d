@@ -18,7 +18,7 @@ import java.util.UUID;
 
 public class SessionManager implements Serializable {
 
-    public static final Path BASE_PATH = Paths.get(FacesContext.getCurrentInstance().getExternalContext().getRealPath("/data"));
+    public static final Path BASE_PATH = Paths.get(FacesContext.getCurrentInstance().getExternalContext().getRealPath("/data/jobs"));
     private static final long serialVersionUID = 3604747342156591226L;
     private static final Logger logger = LoggerFactory.getLogger(SessionManager.class);
     private UUID sessionIdentifier;
@@ -33,7 +33,7 @@ public class SessionManager implements Serializable {
      * @return The relativzed {@link Path} for external static access.
      */
     public static Path relativizePath(Path path) {
-        return Paths.get("data/").resolve(BASE_PATH.relativize(path));
+        return Paths.get("data/jobs").resolve(BASE_PATH.relativize(path));
     }
 
     @PostConstruct
@@ -41,13 +41,6 @@ public class SessionManager implements Serializable {
         sessionIdentifier = UUID.randomUUID();
         logger.info("initializing new session with id {}", sessionIdentifier);
         sessionPath = BASE_PATH.resolve(sessionIdentifier.toString());
-        //create directories
-        try {
-            Files.createDirectories(sessionPath);
-        } catch (IOException e) {
-            logger.error("failed to create working directory for session {}", sessionIdentifier, e);
-        }
-        logger.info("created working path of session is {}", sessionPath);
     }
 
     public JobManager getJobManager() {

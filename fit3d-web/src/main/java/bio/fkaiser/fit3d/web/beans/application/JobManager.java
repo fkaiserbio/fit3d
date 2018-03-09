@@ -30,11 +30,13 @@ public class JobManager implements Serializable {
     private Map<UUID, List<Fit3DJob>> managedJobs = new HashMap<>();
 
     public JobManager() {
-        logger.info("creating new database collection '{}' in database '{}'", Fit3DWebConstants.Database.DB_COLLECTION_NAME, Fit3DWebConstants.Database.DB_NAME);
+        MongoClient mongoClient = new MongoClient(Fit3DWebConstants.Database.DB_HOST, Fit3DWebConstants.Database.DB_PORT);
+        mongoCollection = mongoClient.getDatabase(Fit3DWebConstants.Database.DB_NAME).getCollection(Fit3DWebConstants.Database.DB_COLLECTION_NAME);
         if (Fit3DWebConstants.Database.DROP_DB_ON_RESTART) {
-            MongoClient mongoClient = new MongoClient(Fit3DWebConstants.Database.DB_HOST, Fit3DWebConstants.Database.DB_PORT);
-            mongoCollection = mongoClient.getDatabase(Fit3DWebConstants.Database.DB_NAME).getCollection(Fit3DWebConstants.Database.DB_COLLECTION_NAME);
+            logger.info("creating new database collection '{}' in database '{}'", Fit3DWebConstants.Database.DB_COLLECTION_NAME, Fit3DWebConstants.Database.DB_NAME);
             mongoCollection.drop();
+        } else {
+            logger.info("using old collection '{}' in database '{}'", Fit3DWebConstants.Database.DB_COLLECTION_NAME, Fit3DWebConstants.Database.DB_NAME);
         }
     }
 
@@ -42,6 +44,7 @@ public class JobManager implements Serializable {
 
         Document jobObject = JobConverter.toDocument(job);
         mongoCollection.insertOne(jobObject);
+        jobLoadManager.updateTotalJobs();
         logger.info("new job {} added to database", job);
 
         // add jobs to existing jobs of current session
@@ -143,9 +146,9 @@ public class JobManager implements Serializable {
             @Override
             public void run() {
                 List<Fit3DJob> notifiableJobs = managedJobs.values().stream()
-                                                    .flatMap(Collection::stream)
-                                                    .filter(Fit3DJob::isSendMail)
-                                                    .collect(Collectors.toList());
+                                                           .flatMap(Collection::stream)
+                                                           .filter(Fit3DJob::isSendMail)
+                                                           .collect(Collectors.toList());
                 for (Fit3DJob job : notifiableJobs) {
                     mailNotifier.sendMail(job);
                     job.setSendMail(false);

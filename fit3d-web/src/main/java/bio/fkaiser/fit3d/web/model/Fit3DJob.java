@@ -16,6 +16,7 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.FileVisitResult;
@@ -241,7 +242,23 @@ public class Fit3DJob implements Runnable, Serializable {
                                    return FileVisitResult.CONTINUE;
                                }
                            });
-        logger.info("files of job {} with ID deleted", this, jobIdentifier);
+        // delete job path if empty
+        File jobPathFile = jobPath.toFile();
+        String[] jobPathFileList = jobPathFile.list();
+        if (jobPathFileList != null && jobPathFileList.length == 0) {
+            jobPathFile.delete();
+        }
+
+        logger.info("files of job {} with ID {} deleted", this, jobIdentifier);
+
+        // delete session path if empty
+        Path sessionPath = jobPath.getParent();
+        File sessionPathFile = sessionPath.toFile();
+        String[] sessionPathFileList = sessionPathFile.list();
+        if (sessionPathFileList != null && sessionPathFileList.length == 0) {
+            sessionPathFile.delete();
+            logger.info("session directory {} of job {} empty and deleted", sessionPath, this);
+        }
     }
 
     @Override
