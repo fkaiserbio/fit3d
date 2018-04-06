@@ -3,7 +3,8 @@ Fit3D is a software for the template-based detection of substructure similarity 
 
 <img src="fit3d-web/src/main/webapp/resources/static/images/logo.png" height="125"/>
 
-[![Build Status](https://travis-ci.org/fkaiserbio/fit3d.svg?branch=master)](https://travis-ci.org/fkaiserbio/fit3d) ![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)
+[![Build Status](https://travis-ci.org/fkaiserbio/fit3d.svg?branch=master)](https://travis-ci.org/fkaiserbio/fit3d) ![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg) [![MMTF support](https://img.shields.io/badge/MMTF-supported-blue.svg)](https://mmtf.rcsb.org/)
+
 
 ## Background
 The biological function of proteins and nucleic acids, such as riboswitches or ribozymes, relies on the correct arrangement of small substructural units to catalyze substrates, bind ligands, or to 
