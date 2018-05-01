@@ -96,7 +96,7 @@
         <dependency>
             <groupId>de.bioforscher.singa</groupId>
             <artifactId>singa-structure</artifactId>
-            <version>0.3.2-alpha</version>
+            <version>0.3.2</version>
         </dependency>
         <dependency>
             <groupId>me.tongfei</groupId>

@@ -2,18 +2,14 @@ package bio.fkaiser.fit3d.web.beans.session;
 
 import bio.fkaiser.fit3d.web.beans.application.JobManager;
 import bio.fkaiser.fit3d.web.model.Fit3DJob;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.UUID;
 
 public class SessionManager implements Serializable {

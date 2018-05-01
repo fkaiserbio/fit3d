@@ -15,13 +15,13 @@
     <orderEntry type="library" name="R User Library" level="project" />
     <orderEntry type="library" name="R Skeletons" level="application" />
     <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.4" level="project" />
-    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-structure:0.3.2-alpha" level="project" />
-    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-mathematics:0.3.2-alpha" level="project" />
-    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-core:0.3.2-alpha" level="project" />
-    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-features:0.3.2-alpha" level="project" />
-    <orderEntry type="library" name="Maven: tec.units:unit-ri:1.0" level="project" />
+    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-structure:0.3.2" level="project" />
+    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-mathematics:0.3.2" level="project" />
+    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-core:0.3.2" level="project" />
+    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-features:0.3.2" level="project" />
+    <orderEntry type="library" name="Maven: tec.uom:uom-se:1.0.8" level="project" />
     <orderEntry type="library" name="Maven: javax.measure:unit-api:1.0" level="project" />
-    <orderEntry type="library" name="Maven: tec.uom.lib:uom-lib-common:1.0" level="project" />
+    <orderEntry type="library" name="Maven: tec.uom.lib:uom-lib-common:1.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.rcsb:mmtf-codec:1.0.7" level="project" />
     <orderEntry type="library" name="Maven: org.rcsb:mmtf-serialization:1.0.7" level="project" />
     <orderEntry type="library" name="Maven: org.msgpack:jackson-dataformat-msgpack:0.7.1" level="project" />
