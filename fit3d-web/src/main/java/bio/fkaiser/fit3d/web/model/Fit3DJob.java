@@ -165,6 +165,8 @@ public class Fit3DJob implements Runnable, Serializable {
         Fit3DBuilder.ParameterStep parameterStep = Fit3DBuilder.create()
                                                                .query(motif)
                                                                .targets(multiParser)
+                                                               .skipAlphaCarbonTargets()
+                                                               .skipBackboneTargets()
                                                                .limitedParallelism(Fit3DWebConstants.CORES / Fit3DWebConstants.THREAD_POOL_SIZE)
                                                                .atomFilter(parameters.getAtomFilterType().getFilter())
                                                                .rmsdCutoff(parameters.getRmsdLimit())
