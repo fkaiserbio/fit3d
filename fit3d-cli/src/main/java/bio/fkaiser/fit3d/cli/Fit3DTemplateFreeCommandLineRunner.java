@@ -5,9 +5,6 @@ import bio.fkaiser.mmm.ItemsetMinerRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 /**
  * @author fk
  */
@@ -24,10 +21,11 @@ public class Fit3DTemplateFreeCommandLineRunner {
 
     private void run() throws Fit3DCommandLineException {
         try {
-            new ItemsetMinerRunner(commandLine.getItemsetMinerConfiguration());
-        } catch (IOException | URISyntaxException e) {
-            logger.error("an error occurred during template-free detection", e);
-            throw new Fit3DCommandLineException("Failed to run Fit3D in template-free mode.");
+            logger.info("running template-free detection");
+            ItemsetMinerRunner itemsetMinerRunner = new ItemsetMinerRunner(commandLine.getItemsetMinerConfiguration());
+            logger.info("finished, found {} significant itemsets backing structural motifs", itemsetMinerRunner.getItemsetMiner().getTotalItemsets().size());
+        } catch (Exception e) {
+            throw new Fit3DCommandLineException("Failed to run Fit3D in template-free mode: " + e.getMessage());
         }
     }
 }

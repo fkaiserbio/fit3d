@@ -1,100 +1,100 @@
-1b5z	A
-1bnb	A
-1cfg	A
-1dlf	L
-1fu1	B
-1fvg	A
-1gai	A
-1gdx	A
-1gh0	A
-1go3	F
-1gq8	A
-1ip7	A
-1k52	B
-1lld	A
-1m2b	A
-1n4x	L
-1o7d	C
-1q9b	A
-1qlw	A
-1sy6	A
-1u02	A
-1uj0	A
-1v7r	A
-1vor	3
-1wap	A
-1wil	A
-1xjh	A
-1yz4	A
-1z9h	A
-2awg	A
-2b3f	A
-2edd	A
-2ef0	A
-2emz	A
-2i06	A
-2i1u	A
-2iyv	A
-2j5o	A
-2jvj	A
-2jvu	A
-2oqb	A
-2ovo	A
-2ppt	A
-2r2p	A
-2rky	B
-2vpg	B
-2vyx	C
-2wkf	B
-2y2y	A
-2yc1	A
-2zys	A
-3by7	B
-3cnl	A
-3dc5	C
-3eyx	A
-3f02	D
-3fqd	B
-3g7p	A
-3ged	B
-3h3b	D
-3hkz	K
-3hyu	B
-3iln	A
-3izs	S
-3jyn	A
-3lcz	A
-3ndh	A
-3nqb	A
-3ny4	A
-3ogp	A
-3p9n	A
-3q12	A
-3rpz	A
-3tfo	C
-3uws	B
-3v47	C
-3v8v	A
-3wj2	B
-3x1u	G
-4bjs	D
-4btd	0
-4eqa	A
-4f21	D
-4fle	A
-4hi0	E
-4ija	A
-4jlr	C
-4m3j	B
-4nik	B
-4nzr	M
-4p7d	B
-4y28	E
-4yk2	A
-5ak1	A
-5b0e	B
-5boe	A
-5cdp	B
-5cor	A
-5do9	A
-5e65	B
+1b5z.A
+1bnb.A
+1cfg.A
+1dlf.L
+1fu1.B
+1fvg.A
+1gai.A
+1gdx.A
+1gh0.A
+1go3.F
+1gq8.A
+1ip7.A
+1k52.B
+1lld.A
+1m2b.A
+1n4x.L
+1o7d.C
+1q9b.A
+1qlw.A
+1sy6.A
+1u02.A
+1uj0.A
+1v7r.A
+1vor.3
+1wap.A
+1wil.A
+1xjh.A
+1yz4.A
+1z9h.A
+2awg.A
+2b3f.A
+2edd.A
+2ef0.A
+2emz.A
+2i06.A
+2i1u.A
+2iyv.A
+2j5o.A
+2jvj.A
+2jvu.A
+2oqb.A
+2ovo.A
+2ppt.A
+2r2p.A
+2rky.B
+2vpg.B
+2vyx.C
+2wkf.B
+2y2y.A
+2yc1.A
+2zys.A
+3by7.B
+3cnl.A
+3dc5.C
+3eyx.A
+3f02.D
+3fqd.B
+3g7p.A
+3ged.B
+3h3b.D
+3hkz.K
+3hyu.B
+3iln.A
+3izs.S
+3jyn.A
+3lcz.A
+3ndh.A
+3nqb.A
+3ny4.A
+3ogp.A
+3p9n.A
+3q12.A
+3rpz.A
+3tfo.C
+3uws.B
+3v47.C
+3v8v.A
+3wj2.B
+3x1u.G
+4bjs.D
+4btd.0
+4eqa.A
+4f21.D
+4fle.A
+4hi0.E
+4ija.A
+4jlr.C
+4m3j.B
+4nik.B
+4nzr.M
+4p7d.B
+4y28.E
+4yk2.A
+5ak1.A
+5b0e.B
+5boe.A
+5cdp.B
+5cor.A
+5do9.A
+5e65.B

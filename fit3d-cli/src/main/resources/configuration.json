@@ -9,11 +9,11 @@
   "reference-chain": null,
   "data-point-reader-configuration": {
     "type": "DATA_POINT_READER_CONFIGURATION",
-    "pdb-location": "/srv/pdb",
+    "pdb-location": null,
     "mmtf": false,
     "chain-list-separator": "\t",
     "parse-ligands": false,
-    "pdb-sequence-cluster": "IDENTITY_40",
+    "pdb-sequence-cluster": null,
     "ligand-label-whitelist": [],
     "parse-nucleotides": false,
     "parse-water": false,
@@ -46,7 +46,7 @@
       "maximal-consensus": 0.6,
       "cluster-cutoff-value": 0.5,
       "level-of-parallelism": -1,
-      "atom-filter-type": "ALPHA_CARBON",
+      "atom-filter-type": "ARBITRARY",
       "representation-scheme-type": null,
       "align-within-clusters": true
     }

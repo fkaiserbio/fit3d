@@ -38,13 +38,15 @@ public class TemplateBasedCommandLineOptionsTest {
 
     @Test
     public void failWithoutMotif() {
-        String[] commandLineArguments = new String[]{"template-based", "-t", CHAIN_LIST_RESOURCE};
+        String[] commandLineArguments = new String[]{"template-based",
+                                                     "-t", CHAIN_LIST_RESOURCE};
         Fit3DCommandLine.main(commandLineArguments);
     }
 
     @Test
     public void failWithoutTarget() {
-        String[] commandLineArguments = new String[]{"template-based", "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE};
+        String[] commandLineArguments = new String[]{"template-based",
+                                                     "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE};
         Fit3DCommandLine.main(commandLineArguments);
     }
 
@@ -54,7 +56,10 @@ public class TemplateBasedCommandLineOptionsTest {
         copyResource(MOTIF_RESOURCE);
         copyResource(CHAIN_LIST_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"template-based", "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE, "-l", CHAIN_LIST_RESOURCE, "-r", "2.11x"};
+        String[] commandLineArguments = new String[]{"template-based",
+                                                     "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-l", CHAIN_LIST_RESOURCE,
+                                                     "-r", "2.11x"};
         Fit3DCommandLine.main(commandLineArguments);
     }
 
@@ -63,7 +68,9 @@ public class TemplateBasedCommandLineOptionsTest {
 
         copyResource(MOTIF_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"template-based", "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE, "-t", "4444"};
+        String[] commandLineArguments = new String[]{"template-based",
+                                                     "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-t", "4444"};
         Fit3DCommandLine.main(commandLineArguments);
     }
 
@@ -73,12 +80,10 @@ public class TemplateBasedCommandLineOptionsTest {
         copyResource(MOTIF_RESOURCE);
         copyResource(CHAIN_LIST_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"template-based", "-m",
-                                                     folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
-                                                     "-l",
-                                                     folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
-                                                     "-f",
-                                                     folder.getRoot().toString() + "/summary.csv"};
+        String[] commandLineArguments = new String[]{"template-based",
+                                                     "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-l", folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
+                                                     "-f", folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
     }
 
@@ -88,7 +93,8 @@ public class TemplateBasedCommandLineOptionsTest {
         copyResource(MOTIF_RESOURCE);
         copyResource(TARGET_FILE_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"template-based", "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+        String[] commandLineArguments = new String[]{"template-based",
+                                                     "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
                                                      "-t", folder.getRoot().toString() + "/" + TARGET_FILE_RESOURCE,
                                                      "-f", folder.getRoot().toString() + "/summary.csv",
                                                      "-M"};
@@ -101,7 +107,8 @@ public class TemplateBasedCommandLineOptionsTest {
 
         copyResource(MOTIF_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"template-based", "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+        String[] commandLineArguments = new String[]{"template-based",
+                                                     "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
                                                      "-t", "4cha",
                                                      "-f", folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
@@ -113,8 +120,9 @@ public class TemplateBasedCommandLineOptionsTest {
 
         copyResource(MOTIF_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"template-based", "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
-                                                     "-t", "4cha_B",
+        String[] commandLineArguments = new String[]{"template-based",
+                                                     "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-t", "4cha.B",
                                                      "-f", folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
     }
@@ -126,14 +134,11 @@ public class TemplateBasedCommandLineOptionsTest {
         copyResource(MOTIF_RESOURCE);
         copyResource(CHAIN_LIST_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"template-based", "-m",
-                                                     folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
-                                                     "-l",
-                                                     folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
-                                                     "-f",
-                                                     folder.getRoot().toString() + "/summary.csv",
-                                                     "-p",
-                                                     "/srv/pdb"};
+        String[] commandLineArguments = new String[]{"template-based",
+                                                     "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-l", folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
+                                                     "-f", folder.getRoot().toString() + "/summary.csv",
+                                                     "-p", "/srv/pdb"};
         Fit3DCommandLine.main(commandLineArguments);
         assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
     }
@@ -145,14 +150,11 @@ public class TemplateBasedCommandLineOptionsTest {
         copyResource(MOTIF_RESOURCE);
         copyResource(CHAIN_LIST_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"template-based", "-m",
-                                                     folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
-                                                     "-l",
-                                                     folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
-                                                     "-f",
-                                                     folder.getRoot().toString() + "/summary.csv",
-                                                     "-p",
-                                                     "/srv/pdb",
+        String[] commandLineArguments = new String[]{"template-based",
+                                                     "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-l", folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
+                                                     "-f", folder.getRoot().toString() + "/summary.csv",
+                                                     "-p", "/srv/pdb",
                                                      "-F"};
         Fit3DCommandLine.main(commandLineArguments);
         assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());

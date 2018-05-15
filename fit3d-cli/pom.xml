@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <fit3d-cli.version>0.0.1</fit3d-cli.version>
+        <fit3d-cli.version>0.1.0</fit3d-cli.version>
     </properties>
 
     <groupId>bio.fkaiser.fit3d</groupId>
@@ -82,6 +82,13 @@
                 <targetPath>${project.build.directory}</targetPath>
                 <includes>
                     <include>log4j.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <targetPath>${project.build.directory}/classes</targetPath>
+                <includes>
+                    <include>configuration.json</include>
                 </includes>
             </resource>
         </resources>

@@ -25,8 +25,9 @@ public class TemplateFreeCommandLineOptions extends AbstractCommandLineOptions {
     }
 
     private void generateOptions() {
+
         // target chain
-        Option referenceChain = new Option("t", "reference chain");
+        Option referenceChain = new Option("n", "reference chain");
         referenceChain.setLongOpt("reference-chain");
         referenceChain.setArgs(1);
         referenceChain.setRequired(false);
@@ -34,21 +35,36 @@ public class TemplateFreeCommandLineOptions extends AbstractCommandLineOptions {
 
         // use user-provided JSON config
         Option configLocation = new Option("c", "user-defined config file");
-        referenceChain.setLongOpt("config");
-        referenceChain.setArgs(1);
-        referenceChain.setRequired(false);
+        configLocation.setLongOpt("config");
+        configLocation.setArgs(1);
+        configLocation.setRequired(false);
         options.addOption(configLocation);
 
         // representative level
-        Option representativeLevel = new Option("r", "redundancy level used for automatic retrieval of representative structures (one of: "
+        Option representativeLevel = new Option("r", "redundancy level used for automatic retrieval of representative structures via PDB REST API (one of: "
                                                      + Stream.of(PDBSequenceCluster.PDBSequenceClusterIdentity.values())
                                                              .map(PDBSequenceCluster.PDBSequenceClusterIdentity::getIdentity)
                                                              .map(String::valueOf)
-                                                             .collect(Collectors.joining(",", "[", "}")) + "; default: 70)");
-        referenceChain.setLongOpt("representative-level");
-        referenceChain.setArgs(1);
-        referenceChain.setRequired(false);
+                                                             .collect(Collectors.joining(",", "[", "]")) + "; default: 70)");
+        representativeLevel.setLongOpt("representative-level");
+        representativeLevel.setArgs(1);
+        representativeLevel.setRequired(false);
         options.addOption(representativeLevel);
+
+        // output directory
+        Option outputLocation = new Option("o", "output directory for results*");
+        outputLocation.setLongOpt("output-directory");
+        outputLocation.setArgs(1);
+        outputLocation.setRequired(true);
+        options.addOption(outputLocation);
+
+        // mapping rule
+        Option mappingRule = new Option("m", "use one of the mapping schemes to group residues: " +
+                                             "chemical groups, functional groups");
+        mappingRule.setLongOpt("mapping");
+        mappingRule.setArgs(1);
+        mappingRule.setArgName("CH|FG");
+        options.addOption(mappingRule);
     }
 
     /**
@@ -64,18 +80,18 @@ public class TemplateFreeCommandLineOptions extends AbstractCommandLineOptions {
         inputOptions.addOption(targetChain);
 
         // target list
-        Option targetChainList = new Option("l", "target list of chains*");
-        targetChainList.setLongOpt("target-chain-list**");
+        Option targetChainList = new Option("l", "target list of chains**");
+        targetChainList.setLongOpt("target-chain-list");
         targetChainList.setArgs(1);
         targetChainList.setRequired(true);
         inputOptions.addOption(targetChainList);
 
 
         // target structure directory
-        Option targetStructureDirectory = new Option("d", "directory with target structures*");
-        targetChainList.setLongOpt("target-structures**");
-        targetChainList.setArgs(1);
-        targetChainList.setRequired(true);
+        Option targetStructureDirectory = new Option("d", "directory with target structures**");
+        targetStructureDirectory.setLongOpt("target-structures");
+        targetStructureDirectory.setArgs(1);
+        targetStructureDirectory.setRequired(true);
         inputOptions.addOption(targetStructureDirectory);
     }
 

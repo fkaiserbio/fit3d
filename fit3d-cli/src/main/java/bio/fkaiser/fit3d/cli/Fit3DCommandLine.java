@@ -1,6 +1,10 @@
 package bio.fkaiser.fit3d.cli;
 
 import bio.fkaiser.mmm.model.configurations.ItemsetMinerConfiguration;
+import bio.fkaiser.mmm.model.configurations.metrics.ConsensusMetricConfiguration;
+import bio.fkaiser.mmm.model.mapping.MappingRule;
+import bio.fkaiser.mmm.model.mapping.rules.ChemicalGroupsMappingRule;
+import bio.fkaiser.mmm.model.mapping.rules.FunctionalGroupsMappingRule;
 import de.bioforscher.singa.core.utility.Resources;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.representations.RepresentationSchemeType;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.FofanovEstimation;
@@ -14,6 +18,8 @@ import de.bioforscher.singa.structure.model.interfaces.Structure;
 import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter;
 import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter.AtomFilter;
 import de.bioforscher.singa.structure.model.oak.StructuralMotif;
+import de.bioforscher.singa.structure.parser.pdb.rest.cluster.PDBSequenceCluster;
+import de.bioforscher.singa.structure.parser.pdb.rest.cluster.PDBSequenceCluster.PDBSequenceClusterIdentity;
 import de.bioforscher.singa.structure.parser.pdb.structures.SourceLocation;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
 import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserException;
@@ -23,20 +29,27 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author fk
  */
 public class Fit3DCommandLine {
 
+    public static final Pattern IDENTIFIER_PATTERN = Pattern.compile("([1-9a-zA-Z][0-9a-zA-Z]{3})(\\.[\\w]+)");
+
     public static final double DEFAULT_RMSD_CUTOFF = 2.0;
     public static final double DEFAULT_DISTANCE_TOLERANCE = 1.0;
     public static final Predicate<Atom> DEFAULT_ATOM_FILTER = StructuralEntityFilter.AtomFilter.isArbitrary();
+    public static final PDBSequenceClusterIdentity DEFAULT_SEQUENCE_CLUSTER_IDENTITY = PDBSequenceClusterIdentity.IDENTITY_70;
 
     public static final int DEFAULT_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 
@@ -45,10 +58,11 @@ public class Fit3DCommandLine {
     private final CommandLine commandLine;
     private StructuralMotif queryMotif;
 
-    private String configurationLocation;
     private Predicate<Atom> atomFilter;
     private RepresentationSchemeType representationSchemeType;
     private double rmsd = DEFAULT_RMSD_CUTOFF;
+    private PDBSequenceClusterIdentity pdbSequenceClusterIdentity = DEFAULT_SEQUENCE_CLUSTER_IDENTITY;
+    private MappingRule<String> mappingRule;
     private Double distanceTolerance = DEFAULT_DISTANCE_TOLERANCE;
     private Path resultFilePath;
     private Path targetListPath;
@@ -150,12 +164,12 @@ public class Fit3DCommandLine {
         switch (mode) {
             case TEMPLATE_BASED:
                 help.printHelp("java -jar Fit3D.jar template-based -m <arg> [-t <arg> | -l <arg>] [OPTIONS]\n", options);
-                System.out.println("\n* = required");
                 break;
             case TEMPLATE_FREE:
-                help.printHelp("java -jar Fit3D.jar template-free [-t <arg> | -l <arg>] [OPTIONS]\n", options);
+                help.printHelp("java -jar Fit3D.jar template-free [-t <arg> | -l <arg> | -d <arg>] -o <arg> [OPTIONS]\n", options);
                 break;
         }
+        System.out.println("\n* = required");
         System.out.println("** = one of these required");
     }
 
@@ -190,16 +204,6 @@ public class Fit3DCommandLine {
 
     private void initializeParameters() throws ParseException, Fit3DCommandLineException {
 
-
-        switch (mode) {
-            case TEMPLATE_BASED:
-                initializeTemplateBasedParameters();
-                break;
-            case TEMPLATE_FREE:
-                initializeTemplateFreeParameters();
-                break;
-        }
-
         // set custom atom filter (default: all non-hydrogen atoms)
         atomFilter = AtomFilter.isHydrogen().negate();
         try {
@@ -223,21 +227,139 @@ public class Fit3DCommandLine {
             }
         }
 
+        switch (mode) {
+            case TEMPLATE_BASED:
+                initializeTemplateBasedParameters();
+                break;
+            case TEMPLATE_FREE:
+                initializeTemplateFreeParameters();
+                break;
+        }
     }
 
     private void initializeTemplateFreeParameters() throws Fit3DCommandLineException {
 
         try {
+
             // check if config is provided
             if (commandLine.hasOption('c')) {
-                itemsetMinerConfiguration = ItemsetMinerConfiguration.from(Paths.get(commandLine.getOptionValue('c')));
+                Path configurationPath = Paths.get(commandLine.getOptionValue('c'));
+                itemsetMinerConfiguration = ItemsetMinerConfiguration.from(configurationPath);
+                logger.info("using predefined configuration file {}", configurationPath);
+                return;
             } else {
                 // read template config
                 itemsetMinerConfiguration = ItemsetMinerConfiguration.from(Resources.getResourceAsStream("configuration.json"));
             }
 
             // determine input
+            if (commandLine.hasOption('t')) {
+                String inputChain = commandLine.getOptionValue('t');
+                Matcher matcher = IDENTIFIER_PATTERN.matcher(inputChain);
+                if (!matcher.matches()) {
+                    throw new Fit3DCommandLineException("Input chain specification is not valid, must be [PDB-ID].[chain-ID].");
+                }
+                itemsetMinerConfiguration.setInputChain(inputChain);
+                itemsetMinerConfiguration.setInputDirectoryLocation(null);
+                itemsetMinerConfiguration.setInputListLocation(null);
+                logger.info("using single chain input {}", inputChain);
+            } else if (commandLine.hasOption('l')) {
+                String inputListLocation = commandLine.getOptionValue('l');
+                itemsetMinerConfiguration.getDataPointReaderConfiguration().setChainListSeparator("\\.");
+                itemsetMinerConfiguration.setInputListLocation(inputListLocation);
+                logger.info("using single chain list input {}", inputListLocation);
+                String defaultReferenceChain = Files.lines(Paths.get(inputListLocation))
+                                                    .filter(IDENTIFIER_PATTERN.asPredicate())
+                                                    .findFirst()
+                                                    .orElseThrow(() -> new Fit3DCommandLineException("Input chain list does not contain any valid structures in the format [PDB-ID].[chain-ID]."));
+                itemsetMinerConfiguration.setReferenceChain(defaultReferenceChain);
+                itemsetMinerConfiguration.setInputChain(null);
+                itemsetMinerConfiguration.setInputDirectoryLocation(null);
+            } else if (commandLine.hasOption('d')) {
+                String inputDirectoryLocation = commandLine.getOptionValue('d');
+                itemsetMinerConfiguration.setInputDirectoryLocation(inputDirectoryLocation);
+                logger.info("using directory input {}", inputDirectoryLocation);
+                itemsetMinerConfiguration.setInputChain(null);
+                itemsetMinerConfiguration.setInputListLocation(null);
+            }
 
+            // representation for consensus metric
+            Optional<ConsensusMetricConfiguration> consensusMetricConfigurationOptional = itemsetMinerConfiguration.getExtractionDependentMetricConfigurations().stream()
+                                                                                                                   .filter(ConsensusMetricConfiguration.class::isInstance)
+                                                                                                                   .map(ConsensusMetricConfiguration.class::cast)
+                                                                                                                   .findFirst();
+            if (consensusMetricConfigurationOptional.isPresent()) {
+                if (representationSchemeType != null) {
+                    consensusMetricConfigurationOptional.get().setRepresentationSchemeType(representationSchemeType);
+                    logger.info("using representation scheme {}", representationSchemeType);
+                } else {
+                    logger.info("using atom filter");
+                    consensusMetricConfigurationOptional.get().setAtomFilter(atomFilter);
+                }
+            }
+
+            // overwrite reference chain
+            if (commandLine.hasOption('n')) {
+                String referenceChain = commandLine.getOptionValue('n');
+                Matcher matcher = IDENTIFIER_PATTERN.matcher(referenceChain);
+                if (!matcher.matches()) {
+                    throw new Fit3DCommandLineException("Reference chain specification is not valid, must be [PDB-ID].[chain-ID].");
+                }
+                itemsetMinerConfiguration.setReferenceChain(referenceChain);
+                logger.info("reference chain used will be {}", itemsetMinerConfiguration.getReferenceChain());
+            }
+            if (itemsetMinerConfiguration.getInputDirectoryLocation() != null && !commandLine.hasOption('n')) {
+                throw new Fit3DCommandLineException("Reference chain specification is mandatory if using structures in input directory.");
+            }
+
+            // set representative level
+            if (commandLine.hasOption('r')) {
+                try {
+                    Integer representativeLevel = Integer.valueOf(commandLine.getOptionValue('r'));
+                    Optional<PDBSequenceClusterIdentity> clusterIdentityOptional = Stream.of(PDBSequenceClusterIdentity.values())
+                                                                                         .filter(pdbSequenceClusterIdentity -> pdbSequenceClusterIdentity.getIdentity() == representativeLevel)
+                                                                                         .findFirst();
+                    clusterIdentityOptional.ifPresent(clusterIdentity -> pdbSequenceClusterIdentity = clusterIdentity);
+
+                    logger.info("using representative level {}", pdbSequenceClusterIdentity);
+                } catch (NumberFormatException e) {
+                    logger.error("invalid representative level");
+                    throw new Fit3DCommandLineException("Representative level must be one of the following: " + Stream.of(PDBSequenceCluster.PDBSequenceClusterIdentity.values())
+                                                                                                                      .map(PDBSequenceCluster.PDBSequenceClusterIdentity::getIdentity)
+                                                                                                                      .map(String::valueOf)
+                                                                                                                      .collect(Collectors.joining(",", "[", "]")));
+                }
+            }
+            itemsetMinerConfiguration.getDataPointReaderConfiguration().setPdbSequenceCluster(pdbSequenceClusterIdentity);
+
+
+            // set output directory
+            String outputLocation = commandLine.getOptionValue('o');
+            itemsetMinerConfiguration.setOutputLocation(outputLocation);
+            logger.info("results will be written to {}", outputLocation);
+
+            // set local PDB
+            if (localPdb != null) {
+                itemsetMinerConfiguration.getDataPointReaderConfiguration().setLocalPDB(localPdb);
+                itemsetMinerConfiguration.getDataPointReaderConfiguration().setMmtf(mmtf);
+                logger.info("using {}", localPdb);
+            }
+
+            // set mapping rule
+            if (commandLine.hasOption('m')) {
+                switch (commandLine.getOptionValue('m')) {
+                    case "CG":
+                        mappingRule = new ChemicalGroupsMappingRule();
+                        break;
+                    case "FG":
+                        mappingRule = new FunctionalGroupsMappingRule();
+                        break;
+                    default:
+                        throw new Fit3DCommandLineException("Mapping rule specification is invalid.");
+                }
+                itemsetMinerConfiguration.setMappingRules(Stream.of(mappingRule).collect(Collectors.toList()));
+                logger.info("using mapping rule {}", mappingRule);
+            }
 
         } catch (IOException e) {
             logger.error("failed to initialize from given parameters", e);
@@ -419,7 +541,7 @@ public class Fit3DCommandLine {
                     representationSchemeType = RepresentationSchemeType.SIDE_CHAIN_CENTROID;
                     break;
                 default:
-                    throw new Fit3DCommandLineException("Representation scheme specification is invalid");
+                    throw new Fit3DCommandLineException("Representation scheme specification is invalid.");
             }
         }
     }

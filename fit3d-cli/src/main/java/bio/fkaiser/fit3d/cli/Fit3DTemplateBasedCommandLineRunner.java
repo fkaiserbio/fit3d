@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  */
 public class Fit3DTemplateBasedCommandLineRunner {
 
-    public static final Pattern IDENTIFIER_PATTERN = Pattern.compile("([1-9a-zA-Z][0-9a-zA-Z]{3})(_[\\w]+)*");
+    public static final Pattern IDENTIFIER_PATTERN = Pattern.compile("([1-9a-zA-Z][0-9a-zA-Z]{3})(\\.[\\w]+)*");
 
     private static final Logger logger = LoggerFactory.getLogger(Fit3DTemplateBasedCommandLineRunner.class);
     private static final StructureParserOptions STRUCTURE_PARSER_SETTINGS = StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS,
@@ -100,7 +100,7 @@ public class Fit3DTemplateBasedCommandLineRunner {
                 if (commandLine.getLocalPdb() != null) {
                     multiParser = StructureParser.local()
                                                  .localPDB(commandLine.getLocalPdb())
-                                                 .chainList(commandLine.getTargetListPath())
+                                                 .chainList(commandLine.getTargetListPath(), "\\.")
                                                  .setOptions(STRUCTURE_PARSER_SETTINGS);
                 } else {
                     // otherwise use online MMTF
@@ -111,7 +111,7 @@ public class Fit3DTemplateBasedCommandLineRunner {
                         identifierStep = StructureParser.pdb();
                     }
                     multiParser = identifierStep
-                            .chainList(commandLine.getTargetListPath())
+                            .chainList(commandLine.getTargetListPath(), "\\.")
                             .setOptions(STRUCTURE_PARSER_SETTINGS);
                 }
                 atomStep = Fit3DBuilder.create()
