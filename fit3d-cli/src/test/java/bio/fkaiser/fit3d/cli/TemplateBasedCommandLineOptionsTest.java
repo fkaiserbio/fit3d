@@ -135,6 +135,7 @@ public class TemplateBasedCommandLineOptionsTest {
                                                      "-p",
                                                      "/srv/pdb"};
         Fit3DCommandLine.main(commandLineArguments);
+        assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
     }
 
     @Test
