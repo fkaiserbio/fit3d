@@ -7,8 +7,11 @@ addons:
       - oracle-java8-installer
 
 before_install:
-  - git clone -b fit3d-features https://github.com/cleberecht/singa.git
+  - git clone -b development https://github.com/cleberecht/singa.git
   - cd singa/singa-all
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - git clone -b development https://github.com/fkaiserbio/mmm.git
+  - cd mmm/mmm-all
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
   - cd  ../../fit3d-cli
 
