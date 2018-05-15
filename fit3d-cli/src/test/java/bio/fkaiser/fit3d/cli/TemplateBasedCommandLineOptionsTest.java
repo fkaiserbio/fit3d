@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author fk
  */
-public class Fit3DCommandLineOptionsTest {
+public class TemplateBasedCommandLineOptionsTest {
 
     public static final String MOTIF_RESOURCE = "motif_HDS.pdb";
     public static final String TARGET_FILE_RESOURCE = "4cha.pdb";
@@ -38,13 +38,13 @@ public class Fit3DCommandLineOptionsTest {
 
     @Test
     public void failWithoutMotif() {
-        String[] commandLineArguments = new String[]{"-t", CHAIN_LIST_RESOURCE};
+        String[] commandLineArguments = new String[]{"template-based", "-t", CHAIN_LIST_RESOURCE};
         Fit3DCommandLine.main(commandLineArguments);
     }
 
     @Test
     public void failWithoutTarget() {
-        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE};
+        String[] commandLineArguments = new String[]{"template-based", "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE};
         Fit3DCommandLine.main(commandLineArguments);
     }
 
@@ -54,7 +54,7 @@ public class Fit3DCommandLineOptionsTest {
         copyResource(MOTIF_RESOURCE);
         copyResource(CHAIN_LIST_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE, "-l", CHAIN_LIST_RESOURCE, "-r", "2.11x"};
+        String[] commandLineArguments = new String[]{"template-based", "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE, "-l", CHAIN_LIST_RESOURCE, "-r", "2.11x"};
         Fit3DCommandLine.main(commandLineArguments);
     }
 
@@ -63,7 +63,7 @@ public class Fit3DCommandLineOptionsTest {
 
         copyResource(MOTIF_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE, "-t", "4444"};
+        String[] commandLineArguments = new String[]{"template-based", "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE, "-t", "4444"};
         Fit3DCommandLine.main(commandLineArguments);
     }
 
@@ -73,7 +73,7 @@ public class Fit3DCommandLineOptionsTest {
         copyResource(MOTIF_RESOURCE);
         copyResource(CHAIN_LIST_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"-m",
+        String[] commandLineArguments = new String[]{"template-based", "-m",
                                                      folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
                                                      "-l",
                                                      folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
@@ -88,7 +88,7 @@ public class Fit3DCommandLineOptionsTest {
         copyResource(MOTIF_RESOURCE);
         copyResource(TARGET_FILE_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+        String[] commandLineArguments = new String[]{"template-based", "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
                                                      "-t", folder.getRoot().toString() + "/" + TARGET_FILE_RESOURCE,
                                                      "-f", folder.getRoot().toString() + "/summary.csv",
                                                      "-M"};
@@ -101,7 +101,7 @@ public class Fit3DCommandLineOptionsTest {
 
         copyResource(MOTIF_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+        String[] commandLineArguments = new String[]{"template-based", "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
                                                      "-t", "4cha",
                                                      "-f", folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
@@ -113,7 +113,7 @@ public class Fit3DCommandLineOptionsTest {
 
         copyResource(MOTIF_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+        String[] commandLineArguments = new String[]{"template-based", "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
                                                      "-t", "4cha_B",
                                                      "-f", folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
@@ -126,7 +126,7 @@ public class Fit3DCommandLineOptionsTest {
         copyResource(MOTIF_RESOURCE);
         copyResource(CHAIN_LIST_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"-m",
+        String[] commandLineArguments = new String[]{"template-based", "-m",
                                                      folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
                                                      "-l",
                                                      folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
@@ -144,7 +144,7 @@ public class Fit3DCommandLineOptionsTest {
         copyResource(MOTIF_RESOURCE);
         copyResource(CHAIN_LIST_RESOURCE);
 
-        String[] commandLineArguments = new String[]{"-m",
+        String[] commandLineArguments = new String[]{"template-based", "-m",
                                                      folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
                                                      "-l",
                                                      folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,

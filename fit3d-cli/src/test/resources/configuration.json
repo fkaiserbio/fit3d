@@ -1,0 +1,63 @@
+{
+  "type": "ITEMSET_MINER_CONFIGURATION",
+  "creation-user": "fkaiser",
+  "creation-date": "2018-05-02T20:45:21.071",
+  "input-chain": null,
+  "input-list-location": null,
+  "input-directory-location": null,
+  "output-location": null,
+  "reference-chain": null,
+  "data-point-reader-configuration": {
+    "type": "DATA_POINT_READER_CONFIGURATION",
+    "pdb-location": "/srv/pdb",
+    "mmtf": false,
+    "chain-list-separator": "\t",
+    "parse-ligands": false,
+    "pdb-sequence-cluster": "IDENTITY_40",
+    "ligand-label-whitelist": [],
+    "parse-nucleotides": false,
+    "parse-water": false,
+    "consecutive-sequence-numbering": true
+  },
+  "mapping-rules": [],
+  "simple-metrics": [
+    {
+      "type": "SUPPORT",
+      "minimal-support": 0.8
+    }
+  ],
+  "extraction-metric": {
+    "type": "COHESION",
+    "maximal-cohesion": 10.0,
+    "vertex-one": false,
+    "level-of-parallelism": -1,
+    "representation-scheme-type": null
+  },
+  "extraction-dependent-metric": [
+    {
+      "type": "SEPARATION",
+      "maximal-separation": 50.0,
+      "optimal-separation": 5.0,
+      "morse-well-depth": 500.0,
+      "morse-shape": 0.2
+    },
+    {
+      "type": "CONSENSUS",
+      "maximal-consensus": 0.6,
+      "cluster-cutoff-value": 0.5,
+      "level-of-parallelism": -1,
+      "atom-filter-type": "ALPHA_CARBON",
+      "representation-scheme-type": null,
+      "align-within-clusters": true
+    }
+  ],
+  "itemset-comparator-type": "CONSENSUS",
+  "maximal-epochs": -1,
+  "significance-estimator-configuration": {
+    "significance-type": "CONSENSUS",
+    "ks-cutoff": 0.1,
+    "significance-cutoff": 0.001,
+    "level-of-parallelism": -1,
+    "sample-size": 5
+  }
+}

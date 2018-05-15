@@ -1,6 +1,5 @@
 package bio.fkaiser.fit3d.cli;
 
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.FofanovEstimation;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
@@ -8,44 +7,20 @@ import org.apache.commons.cli.Options;
 /**
  * @author fk
  */
-public class Fit3DCommandLineOptions {
+public class TemplateBasedCommandLineOptions extends AbstractCommandLineOptions {
 
-    private final Options options = new Options();
     private final OptionGroup inputOptions = new OptionGroup();
     private final OptionGroup targetOptions = new OptionGroup();
-    private final OptionGroup representationOptions = new OptionGroup();
-    private final OptionGroup verbosityOptions = new OptionGroup();
 
-    private Fit3DCommandLineOptions() {
+    private TemplateBasedCommandLineOptions() {
+        super();
         generateOptions();
         generateInputOptions();
         generateTargetOptions();
-        generateRepresentationOptions();
     }
 
-    public static Fit3DCommandLineOptions create() {
-        return new Fit3DCommandLineOptions();
-    }
-
-
-    public Options getOptions() {
-        return options;
-    }
-
-    public OptionGroup getInputOptions() {
-        return inputOptions;
-    }
-
-    public OptionGroup getTargetOptions() {
-        return targetOptions;
-    }
-
-    public OptionGroup getRepresentationOptions() {
-        return representationOptions;
-    }
-
-    public OptionGroup getVerbosityOptions() {
-        return verbosityOptions;
+    public static TemplateBasedCommandLineOptions create() {
+        return new TemplateBasedCommandLineOptions();
     }
 
     /**
@@ -79,11 +54,6 @@ public class Fit3DCommandLineOptions {
         resultFile.setArgs(1);
         options.addOption(resultFile);
 
-        // help
-        Option help = new Option("h", "show help dialog");
-        help.setLongOpt("help");
-        options.addOption(help);
-
         // number of threads
         Option numThreads = new Option("n", "number of threads used for calculation (default: all available)");
         numThreads.setLongOpt("num-threads");
@@ -95,17 +65,6 @@ public class Fit3DCommandLineOptions {
         outputFile.setLongOpt("output-structures");
         outputFile.setArgs(1);
         options.addOption(outputFile);
-
-        // PDB directory
-        Option pdb = new Option("p", "path to local PDB directory");
-        pdb.setLongOpt("pdb");
-        pdb.setArgs(1);
-        options.addOption(pdb);
-
-        // PDB directory
-        Option mmtf = new Option("F", "use MMTF format for local PDB and as online resource (default: false)");
-        mmtf.setLongOpt("mmtf");
-        options.addOption(mmtf);
 
         // p-value calculation
         Option pvalueCalculation = new Option("P", "calculate p-values for matches according to Fafoanov et al. 2008 (F) or Stark et al. 2003 (S) (default: false)\n" +
@@ -123,13 +82,13 @@ public class Fit3DCommandLineOptions {
 
         // UniProt annotation mapping
         Option uniProtMapping = new Option("U", "map UniProt annotation using SIFTS (default: true)\n" +
-                                             " WARNING: requires internet access");
+                                                " WARNING: requires internet access");
         uniProtMapping.setLongOpt("uniprot-mapping");
         options.addOption(uniProtMapping);
 
         // EC annotation mapping
         Option ecMapping = new Option("E", "map Enzyme Commission numbers using SIFTS (default: true)\n" +
-                                                " WARNING: requires internet access");
+                                           " WARNING: requires internet access");
         ecMapping.setLongOpt("ec-mapping");
         options.addOption(ecMapping);
 
@@ -192,24 +151,11 @@ public class Fit3DCommandLineOptions {
         targetOptions.setRequired(true);
     }
 
-    /**
-     * Generates command line options for structure representation.
-     */
-    private void generateRepresentationOptions() {
+    public OptionGroup getInputOptions() {
+        return inputOptions;
+    }
 
-        // representation scheme
-        Option representationScheme = new Option("R", "use one of the representation schemes to represent residues: " +
-                                                      "alpha-carbon, beta carbon, centroid, last heavy side chain, side chain centroid");
-        representationScheme.setLongOpt("scheme");
-        representationScheme.setArgs(1);
-        representationScheme.setArgName("CA|CB|CO|LH|SC");
-        representationOptions.addOption(representationScheme);
-
-        // atoms
-        Option atoms = new Option("a", "PDB identifier of atoms used for alignment (default: all non-hydrogen motif atoms)");
-        atoms.setLongOpt("atoms");
-        atoms.setArgName("CA,CB,CG,CD,...");
-        atoms.setArgs(1);
-        representationOptions.addOption(atoms);
+    public OptionGroup getTargetOptions() {
+        return targetOptions;
     }
 }

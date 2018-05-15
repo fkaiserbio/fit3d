@@ -1,5 +1,7 @@
 package bio.fkaiser.fit3d.cli;
 
+import bio.fkaiser.mmm.model.configurations.ItemsetMinerConfiguration;
+import de.bioforscher.singa.core.utility.Resources;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.representations.RepresentationSchemeType;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.FofanovEstimation;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.StarkEstimation;
@@ -19,6 +21,7 @@ import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,9 +41,11 @@ public class Fit3DCommandLine {
     public static final int DEFAULT_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 
     private static final Logger logger = LoggerFactory.getLogger(Fit3DCommandLine.class);
+    private final Fit3DMode mode;
     private final CommandLine commandLine;
     private StructuralMotif queryMotif;
 
+    private String configurationLocation;
     private Predicate<Atom> atomFilter;
     private RepresentationSchemeType representationSchemeType;
     private double rmsd = DEFAULT_RMSD_CUTOFF;
@@ -56,8 +61,10 @@ public class Fit3DCommandLine {
     private StatisticalModel statisticalModel;
     private int numberOfThreads = DEFAULT_NUMBER_OF_THREADS;
     private Path outputDirectoryPath;
+    private ItemsetMinerConfiguration<String> itemsetMinerConfiguration;
 
-    public Fit3DCommandLine(CommandLine commandLine) throws ParseException {
+    public Fit3DCommandLine(Fit3DMode mode, CommandLine commandLine) throws ParseException {
+        this.mode = mode;
         this.commandLine = commandLine;
         try {
             initializeParameters();
@@ -84,31 +91,72 @@ public class Fit3DCommandLine {
                            + "\n       _\\///______________\\///______\\/////______\\/////////_____\\////////////_____"
                            + "\n               Copyright (C) 2018 Florian Kaiser (contact@fkaiser.bio)\n");
 
-        // create instance of command line options
-        Fit3DCommandLineOptions commandLineOptions = Fit3DCommandLineOptions.create();
+        // decide whether template-based or template-free mode is used
+        Fit3DMode mode = null;
+        if (args.length == 0) {
+            logger.error("Command line options cannot be empty.");
+            System.out.println("usage: java -jar Fit3D.jar [template-based | template-free] [OPTIONS]\n");
+            System.exit(0);
+        } else {
+            if (args[0].equals(Fit3DMode.TEMPLATE_BASED.getCommandLineFlag())) {
+                mode = Fit3DMode.TEMPLATE_BASED;
+            } else if (args[0].equals(Fit3DMode.TEMPLATE_FREE.getCommandLineFlag())) {
+                mode = Fit3DMode.TEMPLATE_FREE;
+            } else {
+                logger.error("Invalid mode specified, must be either: \"template-based\" or \"template-free\"");
+                System.exit(0);
+            }
+        }
 
-        // get Fit3D options
-        Options options = commandLineOptions.getOptions();
-        // add input option group
-        options.addOptionGroup(commandLineOptions.getInputOptions());
-        // add target option group
-        options.addOptionGroup(commandLineOptions.getTargetOptions());
-        // add representation option group
-        options.addOptionGroup(commandLineOptions.getRepresentationOptions());
+        Options options = null;
+        switch (mode) {
+            case TEMPLATE_BASED:
+                // create instance of command line options
+                TemplateBasedCommandLineOptions templateBasedCommandLineOptions = TemplateBasedCommandLineOptions.create();
+                // get Fit3D TB options
+                options = templateBasedCommandLineOptions.getOptions();
+                // add input option group
+                options.addOptionGroup(templateBasedCommandLineOptions.getInputOptions());
+                // add target option group
+                options.addOptionGroup(templateBasedCommandLineOptions.getTargetOptions());
+                // add representation option group
+                options.addOptionGroup(templateBasedCommandLineOptions.getRepresentationOptions());
+                break;
+            case TEMPLATE_FREE:
+                TemplateFreeCommandLineOptions templateFreeCommandLineOptions = TemplateFreeCommandLineOptions.create();
+                //get Fit3D TF options
+                options = templateFreeCommandLineOptions.getOptions();
+                // add input option group
+                options.addOptionGroup(templateFreeCommandLineOptions.getInputOptions());
+                // add representation option group
+                options.addOptionGroup(templateFreeCommandLineOptions.getRepresentationOptions());
+                break;
+        }
 
         DefaultParser defaultParser = new DefaultParser();
         try {
             CommandLine commandLine = defaultParser.parse(options, args);
-            new Fit3DCommandLine(commandLine);
+            new Fit3DCommandLine(mode, commandLine);
         } catch (ParseException e) {
             logger.error("Command line options are invalid.", e);
-            HelpFormatter help = new HelpFormatter();
-            help.setWidth(256);
-            help.setSyntaxPrefix("usage: ");
-            help.printHelp("java -jar Fit3D.jar -m <arg> [-t <arg> | -l <arg>] [OPTIONS]\n", options);
-            System.out.println("\n* = required");
-            System.out.println("** = one of these required");
+            printHelp(mode, options);
         }
+    }
+
+    private static void printHelp(Fit3DMode mode, Options options) {
+        HelpFormatter help = new HelpFormatter();
+        help.setWidth(256);
+        help.setSyntaxPrefix("usage: ");
+        switch (mode) {
+            case TEMPLATE_BASED:
+                help.printHelp("java -jar Fit3D.jar template-based -m <arg> [-t <arg> | -l <arg>] [OPTIONS]\n", options);
+                System.out.println("\n* = required");
+                break;
+            case TEMPLATE_FREE:
+                help.printHelp("java -jar Fit3D.jar template-free [-t <arg> | -l <arg>] [OPTIONS]\n", options);
+                break;
+        }
+        System.out.println("** = one of these required");
     }
 
     /**
@@ -128,11 +176,76 @@ public class Fit3DCommandLine {
      * Runs an instance of Fit3D with the specified parameters.
      */
     private void initializeRun() throws Fit3DCommandLineException {
-        new Fit3DCommandLineRunner(this);
+        switch (mode) {
+            case TEMPLATE_BASED:
+                logger.info("running Fit3D in template-based mode");
+                new Fit3DTemplateBasedCommandLineRunner(this);
+                break;
+            case TEMPLATE_FREE:
+                logger.info("running Fit3D in template-free mode");
+                new Fit3DTemplateFreeCommandLineRunner(this);
+                break;
+        }
     }
 
     private void initializeParameters() throws ParseException, Fit3DCommandLineException {
 
+
+        switch (mode) {
+            case TEMPLATE_BASED:
+                initializeTemplateBasedParameters();
+                break;
+            case TEMPLATE_FREE:
+                initializeTemplateFreeParameters();
+                break;
+        }
+
+        // set custom atom filter (default: all non-hydrogen atoms)
+        atomFilter = AtomFilter.isHydrogen().negate();
+        try {
+            createRepresentation();
+        } catch (Fit3DCommandLineException e) {
+            logger.error("failed to define custom atoms", e);
+            throw new Fit3DCommandLineException("Initialization of parameters failed.");
+        }
+
+        // check if MMTF should be used
+        if (commandLine.hasOption('F')) {
+            mmtf = true;
+        }
+
+        // check if local PDB was provided an use MMTF if specified
+        if (commandLine.hasOption('p')) {
+            if (mmtf) {
+                localPdb = new StructureParser.LocalPDB(commandLine.getOptionValue('p'), SourceLocation.OFFLINE_MMTF);
+            } else {
+                localPdb = new StructureParser.LocalPDB(commandLine.getOptionValue('p'), SourceLocation.OFFLINE_PDB);
+            }
+        }
+
+    }
+
+    private void initializeTemplateFreeParameters() throws Fit3DCommandLineException {
+
+        try {
+            // check if config is provided
+            if (commandLine.hasOption('c')) {
+                itemsetMinerConfiguration = ItemsetMinerConfiguration.from(Paths.get(commandLine.getOptionValue('c')));
+            } else {
+                // read template config
+                itemsetMinerConfiguration = ItemsetMinerConfiguration.from(Resources.getResourceAsStream("configuration.json"));
+            }
+
+            // determine input
+
+
+        } catch (IOException e) {
+            logger.error("failed to initialize from given parameters", e);
+            throw new Fit3DCommandLineException("Initialization of parameters failed.");
+        }
+    }
+
+    private void initializeTemplateBasedParameters() throws Fit3DCommandLineException, ParseException {
         // parse motif
         Path motifPath = Paths.get(commandLine.getOptionValue('m'));
         queryMotif = null;
@@ -157,15 +270,6 @@ public class Fit3DCommandLine {
         }
 
         logger.info("query motif contains {} residues", queryMotif.getAllLeafSubstructures().size());
-
-        // set custom atom filter (default: all non-hydrogen atoms)
-        atomFilter = AtomFilter.isHydrogen().negate();
-        try {
-            createRepresentation();
-        } catch (Fit3DCommandLineException e) {
-            logger.error("failed to define custom atoms", e);
-            throw new Fit3DCommandLineException("Initialization of parameters failed.");
-        }
 
         // assign exchanges to query motif
         try {
@@ -224,20 +328,6 @@ public class Fit3DCommandLine {
         // check if single target was given
         if (commandLine.hasOption('t')) {
             target = commandLine.getOptionValue('t');
-        }
-
-        // check if MMTF should be used
-        if (commandLine.hasOption('F')) {
-            mmtf = true;
-        }
-
-        // check if local PDB was provided an use MMTF if specified
-        if (commandLine.hasOption('p')) {
-            if (mmtf) {
-                localPdb = new StructureParser.LocalPDB(commandLine.getOptionValue('p'), SourceLocation.OFFLINE_MMTF);
-            } else {
-                localPdb = new StructureParser.LocalPDB(commandLine.getOptionValue('p'), SourceLocation.OFFLINE_PDB);
-            }
         }
 
         // check if statistical model was specified
@@ -380,6 +470,10 @@ public class Fit3DCommandLine {
         return distanceTolerance;
     }
 
+    public ItemsetMinerConfiguration<String> getItemsetMinerConfiguration() {
+        return itemsetMinerConfiguration;
+    }
+
     public StructureParser.LocalPDB getLocalPdb() {
         return localPdb;
     }
@@ -434,5 +528,21 @@ public class Fit3DCommandLine {
 
     public boolean isUniProtMapping() {
         return uniProtMapping;
+    }
+
+    private enum Fit3DMode {
+
+        TEMPLATE_BASED("template-based"),
+        TEMPLATE_FREE("template-free");
+
+        private final String commandLineFlag;
+
+        Fit3DMode(String commandLineFlag) {
+            this.commandLineFlag = commandLineFlag;
+        }
+
+        public String getCommandLineFlag() {
+            return commandLineFlag;
+        }
     }
 }

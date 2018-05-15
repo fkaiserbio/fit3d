@@ -25,18 +25,18 @@ import java.util.regex.Pattern;
 /**
  * @author fk
  */
-public class Fit3DCommandLineRunner {
+public class Fit3DTemplateBasedCommandLineRunner {
 
     public static final Pattern IDENTIFIER_PATTERN = Pattern.compile("([1-9a-zA-Z][0-9a-zA-Z]{3})(_[\\w]+)*");
 
-    private static final Logger logger = LoggerFactory.getLogger(Fit3DCommandLineRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Fit3DTemplateBasedCommandLineRunner.class);
     private static final StructureParserOptions STRUCTURE_PARSER_SETTINGS = StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS,
                                                                                                                 StructureParserOptions.Setting.OMIT_LIGAND_INFORMATION);
     private final Fit3DCommandLine commandLine;
     private Fit3D fit3d;
     private StructureParser.MultiParser multiParser;
 
-    public Fit3DCommandLineRunner(Fit3DCommandLine commandLine) throws Fit3DCommandLineException {
+    public Fit3DTemplateBasedCommandLineRunner(Fit3DCommandLine commandLine) throws Fit3DCommandLineException {
         this.commandLine = commandLine;
         run();
     }

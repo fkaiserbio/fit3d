@@ -96,7 +96,12 @@
         <dependency>
             <groupId>de.bioforscher.singa</groupId>
             <artifactId>singa-structure</artifactId>
-            <version>0.3.2</version>
+            <version>0.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>bio.fkaiser.mmm</groupId>
+            <artifactId>mmm-core</artifactId>
+            <version>0.1.2</version>
         </dependency>
         <dependency>
             <groupId>me.tongfei</groupId>
