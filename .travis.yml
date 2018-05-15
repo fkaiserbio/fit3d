@@ -10,6 +10,7 @@ before_install:
   - git clone -b development https://github.com/cleberecht/singa.git
   - cd singa/singa-all
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - cd ../../
   - git clone -b development https://github.com/fkaiserbio/mmm.git
   - cd mmm/mmm-all
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
