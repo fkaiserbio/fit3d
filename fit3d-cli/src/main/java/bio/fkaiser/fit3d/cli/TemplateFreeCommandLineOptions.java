@@ -65,6 +65,12 @@ public class TemplateFreeCommandLineOptions extends AbstractCommandLineOptions {
         mappingRule.setArgs(1);
         mappingRule.setArgName("CH|FG");
         options.addOption(mappingRule);
+
+        // interaction enrichment
+        Option interactionEnrichment = new Option("i", "annotate inter-residue interactions with PLIP\n" +
+                                                       " WARNING: requires internet access");
+        interactionEnrichment.setLongOpt("interactions");
+        options.addOption(interactionEnrichment);
     }
 
     /**

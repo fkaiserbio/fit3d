@@ -91,6 +91,13 @@
                     <include>configuration.json</include>
                 </includes>
             </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <targetPath>${project.build.directory}/classes</targetPath>
+                <includes>
+                    <include>plip_credentials.txt</include>
+                </includes>
+            </resource>
         </resources>
     </build>
 

@@ -2,9 +2,11 @@ package bio.fkaiser.fit3d.cli;
 
 import bio.fkaiser.mmm.model.configurations.ItemsetMinerConfiguration;
 import bio.fkaiser.mmm.model.configurations.metrics.ConsensusMetricConfiguration;
+import bio.fkaiser.mmm.model.enrichment.IntraChainInteractionEnricher;
 import bio.fkaiser.mmm.model.mapping.MappingRule;
 import bio.fkaiser.mmm.model.mapping.rules.ChemicalGroupsMappingRule;
 import bio.fkaiser.mmm.model.mapping.rules.FunctionalGroupsMappingRule;
+import bio.fkaiser.mmm.model.plip.PlipPostRequest;
 import de.bioforscher.singa.core.utility.Resources;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.representations.RepresentationSchemeType;
 import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.FofanovEstimation;
@@ -360,6 +362,19 @@ public class Fit3DCommandLine {
                 itemsetMinerConfiguration.setMappingRules(Stream.of(mappingRule).collect(Collectors.toList()));
                 logger.info("using mapping rule {}", mappingRule);
             }
+
+            // add interaction enrichment
+            if (commandLine.hasOption('i')) {
+                // trigger check for credentials
+                new PlipPostRequest(null, null, null);
+
+                if (commandLine.hasOption('F')) {
+                    throw new Fit3DCommandLineException("MMTF format cannot be used when enriching interactions.");
+                }
+                itemsetMinerConfiguration.setDataPointEnricher(new IntraChainInteractionEnricher());
+                logger.info("noncovalent interactions will be added as pseudoatoms");
+            }
+
 
         } catch (IOException e) {
             logger.error("failed to initialize from given parameters", e);

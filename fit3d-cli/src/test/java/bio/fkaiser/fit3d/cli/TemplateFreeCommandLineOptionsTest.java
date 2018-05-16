@@ -61,6 +61,17 @@ public class TemplateFreeCommandLineOptionsTest {
     }
 
     @Test
+    @Ignore("only works if plip_credentials.txt file is present in classpath")
+    public void failWithMmtfAndInteractions() {
+        String[] commandLineArguments = new String[]{"template-free",
+                                                     "-t", "1ten.A",
+                                                     "-o", folder.getRoot().toString(),
+                                                     "-i",
+                                                     "-F"};
+        Fit3DCommandLine.main(commandLineArguments);
+    }
+
+    @Test
     public void runWithSingleChainInput() {
         String[] commandLineArguments = new String[]{"template-free",
                                                      "-t", "1ten.A",
@@ -83,6 +94,19 @@ public class TemplateFreeCommandLineOptionsTest {
         assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
     }
 
+    @Test
+    public void runWithChainListInputAndInteractions() throws IOException {
+
+        copyResource(CHAIN_LIST_RESOURCE);
+
+        String[] commandLineArguments = new String[]{"template-free",
+                                                     "-l", folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
+                                                     "-o", folder.getRoot().toString(),
+                                                     "-r", "40",
+                                                     "-i"};
+        Fit3DCommandLine.main(commandLineArguments);
+        assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
+    }
 
     @Test
     @Ignore("only works with local PDB installation in PDB format")
