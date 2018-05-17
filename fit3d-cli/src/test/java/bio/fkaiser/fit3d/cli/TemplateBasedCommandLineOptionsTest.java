@@ -83,6 +83,7 @@ public class TemplateBasedCommandLineOptionsTest {
         String[] commandLineArguments = new String[]{"template-based",
                                                      "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
                                                      "-l", folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
+                                                     "-r", "4.0",
                                                      "-f", folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
     }

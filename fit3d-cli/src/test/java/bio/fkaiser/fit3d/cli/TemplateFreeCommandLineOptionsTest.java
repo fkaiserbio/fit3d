@@ -55,7 +55,7 @@ public class TemplateFreeCommandLineOptionsTest {
 
     @Test
     public void failWithoutOutputDirectory() {
-        String[] commandLineArguments = new String[]{"template-based",
+        String[] commandLineArguments = new String[]{"template-free",
                                                      "-t", "1ten.A"};
         Fit3DCommandLine.main(commandLineArguments);
     }

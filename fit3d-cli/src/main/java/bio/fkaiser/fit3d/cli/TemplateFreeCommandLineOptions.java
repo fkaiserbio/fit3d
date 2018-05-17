@@ -60,10 +60,10 @@ public class TemplateFreeCommandLineOptions extends AbstractCommandLineOptions {
 
         // mapping rule
         Option mappingRule = new Option("m", "use one of the mapping schemes to group residues: " +
-                                             "chemical groups, functional groups");
+                                             "chemical groups (C), functional groups (F)");
         mappingRule.setLongOpt("mapping");
         mappingRule.setArgs(1);
-        mappingRule.setArgName("CH|FG");
+        mappingRule.setArgName("C|F");
         options.addOption(mappingRule);
 
         // interaction enrichment

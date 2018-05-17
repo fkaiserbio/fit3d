@@ -350,10 +350,10 @@ public class Fit3DCommandLine {
             // set mapping rule
             if (commandLine.hasOption('m')) {
                 switch (commandLine.getOptionValue('m')) {
-                    case "CG":
+                    case "C":
                         mappingRule = new ChemicalGroupsMappingRule();
                         break;
-                    case "FG":
+                    case "F":
                         mappingRule = new FunctionalGroupsMappingRule();
                         break;
                     default:

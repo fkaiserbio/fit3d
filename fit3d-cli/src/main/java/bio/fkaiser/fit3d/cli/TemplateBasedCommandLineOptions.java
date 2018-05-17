@@ -28,13 +28,8 @@ public class TemplateBasedCommandLineOptions extends AbstractCommandLineOptions 
      */
     private void generateOptions() {
 
-        // align output
-        Option alignOutputStructures = new Option("g", "align output structures (default: true)");
-        alignOutputStructures.setLongOpt("align-output");
-        options.addOption(alignOutputStructures);
-
         // distance tolerance
-        Option distanceTolerance = new Option("d", "allowed tolerance of query motif spatial extent (default: 1.0 \u212B)\n" +
+        Option distanceTolerance = new Option("d", "allowed tolerance of template motif spatial extent (default: 1.0 \u212B)\n" +
                                                    "WARNING: performance decrease if raised, set lower value for larger motifs");
         distanceTolerance.setLongOpt("distance-tolerance");
         distanceTolerance.setArgs(1);
@@ -67,27 +62,27 @@ public class TemplateBasedCommandLineOptions extends AbstractCommandLineOptions 
         options.addOption(outputFile);
 
         // p-value calculation
-        Option pvalueCalculation = new Option("P", "calculate p-values for matches according to Fafoanov et al. 2008 (F) or Stark et al. 2003 (S) (default: false)\n" +
+        Option pvalueCalculation = new Option("P", "calculate p-values for matches according to Fafoanov et al. 2008 (F) or Stark et al. 2003 (S) (default: none)\n" +
                                                    "WARNING: F needs R in path with package sfsmisc installed");
-        pvalueCalculation.setLongOpt("pvalues");
+        pvalueCalculation.setLongOpt("p-values");
         pvalueCalculation.setArgs(1);
         pvalueCalculation.setArgName("F|S");
         options.addOption(pvalueCalculation);
 
         // Pfam annotation mapping
-        Option pfamMapping = new Option("M", "map Pfam annotation using SIFTS (default: true)\n" +
+        Option pfamMapping = new Option("M", "map Pfam annotation using SIFTS\n" +
                                              " WARNING: requires internet access");
         pfamMapping.setLongOpt("pfam-mapping");
         options.addOption(pfamMapping);
 
         // UniProt annotation mapping
-        Option uniProtMapping = new Option("U", "map UniProt annotation using SIFTS (default: true)\n" +
+        Option uniProtMapping = new Option("U", "map UniProt annotation using SIFTS\n" +
                                                 " WARNING: requires internet access");
         uniProtMapping.setLongOpt("uniprot-mapping");
         options.addOption(uniProtMapping);
 
         // EC annotation mapping
-        Option ecMapping = new Option("E", "map Enzyme Commission numbers using SIFTS (default: true)\n" +
+        Option ecMapping = new Option("E", "map Enzyme Commission numbers using SIFTS\n" +
                                            " WARNING: requires internet access");
         ecMapping.setLongOpt("ec-mapping");
         options.addOption(ecMapping);
@@ -97,11 +92,6 @@ public class TemplateBasedCommandLineOptions extends AbstractCommandLineOptions 
         rmsd.setLongOpt("rmsd");
         rmsd.setArgs(1);
         options.addOption(rmsd);
-
-        // title mapping
-        Option titleMapping = new Option("T", "map structure titles assigned by PDB");
-        titleMapping.setLongOpt("title-mapping");
-        options.addOption(titleMapping);
 
         // motif extraction
         Option motifExtraction = new Option("X",
