@@ -4,14 +4,14 @@ Fit3D is a software tool for the template-based and template-free detection of s
 # When should I use Fit3D?
 You can use Fit3D to detect small conserved structural motifs in protein structures (or other types of macromolecular structures, e.g. DNA/RNA). This can be useful to annotate the function 
 proteins, to identify similar binding sites for drug target prediction, or simply to study molecular mechanisms at atomic level. If you want to learn more about the importance of structural motifs 
-please refer to [Kaiser _et al._ 2016](https://doi.org/10.1093/bioinformatics/btv637) or [Kaiser _et al._ 2018](https://doi
-.org/10.1371/journal.pcbi.1006101).
+please refer to [Kaiser _et al._ 2016](https://doi.org/10.1093/bioinformatics/btv637) or [Kaiser _et al._ 2018](https://doi.org/10.1371/journal.pcbi.1006101).
 In contrast to most competitors, Fit3D makes use of full atomic resolution data found in the PDB. Key features of Fit3D are:
+
 - a user-defined selection of atoms to represent structural motifs computationally, and
 - the definition of so-called position-specific exchanges to cover isofunctional substitutions of residues,
 - the availability as command line implementation, [web server](https://biosciences.hs-mittweida.de/fit3d/home), and as flexible [API](https://github.com/cleberecht/singa/wiki/Structure-Alignments-(Chemistry)).
 
-###With Fit3D you can
+### With Fit3D you can
 
 1. use a defined template structural motif to search for similar occurrences in arbitrary-sized datasets of structures
 2. provide an arbitrary set of protein structures (or a single protein chain) to detect conserved structural motifs in a template-free manner
@@ -31,7 +31,7 @@ data or spatial data in general. For details on how this works please refer to [
 
 # Getting started
 In order to run the command line version of Fit3D nothing but an installation of [Java Runtime Environment](https://java.com/de/download/) 1.8 or later is required. Optionally, [R](https://www.r-project.org/)
-version 3.4.x or later is necessary to calculate _p_-values of reported matches when using the statistical model of [Fofanov _et al._](https://ieeexplore.ieee.org/abstract/document/4686202/).
+version 3.4.x or later is necessary to calculate _p_-values of reported matches when using the statistical model of [Fofanov _et al._](https://ieeexplore.ieee.org/abstract/document/4686202/)
 
 ## Command line version of Fit3D
 Download the latest release of Fit3D from [GitHub](https://github.com/fkaiserbio/fit3d/releases). The software is shipped as a runnable `jar` file. To run it on your machine type:
@@ -71,7 +71,7 @@ and writes the output to the directory `results/`.
 When run in template-free mode, Fit3D will output the found structural motifs, clustered by structural similarity, in PDB format to the specified output directory. Additionally, the coverage of 
 geometrically conserved structural motifs is written to a reference structure, encoded in B-factors. This structure can be conveniently visualized in [PyMOL](https://pymol.org/2/) by loading the provided `pml` script file. 
 
-###Advanced Options
+### Advanced Options
 
 The Fit3D command line software offers a variety of advanced options to customize the structural motif detection. The following table provides an overview of these options.
 
