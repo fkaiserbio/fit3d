@@ -39,8 +39,8 @@ public final class Fit3DWebConstants {
     }
 
     public final static class Database {
-        public static final String DB_HOST = "fit3d-web-mongodb";
-        //        public static final String DB_HOST = "localhost";
+                public static final String DB_HOST = "fit3d-web-mongodb";
+//        public static final String DB_HOST = "localhost";
         public static final int DB_PORT = 27017;
         public static final String DB_NAME = "fit3d";
         public static final String DB_COLLECTION_NAME = "jobs";

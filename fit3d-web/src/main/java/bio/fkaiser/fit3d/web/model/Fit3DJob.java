@@ -183,6 +183,7 @@ public class Fit3DJob implements Runnable, Serializable {
         }
         fit3d = parameterStep.run();
 
+        logger.info("writing summary file");
         fit3d.writeSummaryFile(jobPath.resolve("summary.csv"));
 
         matches = fit3d.getMatches();

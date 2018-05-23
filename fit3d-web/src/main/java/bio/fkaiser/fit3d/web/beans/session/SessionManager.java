@@ -35,7 +35,7 @@ public class SessionManager implements Serializable {
     @PostConstruct
     public void init() {
         sessionIdentifier = UUID.randomUUID();
-        logger.info("initializing new session with id {}", sessionIdentifier);
+        logger.debug("initializing new session with id {}", sessionIdentifier);
         sessionPath = BASE_PATH.resolve(sessionIdentifier.toString());
     }
 

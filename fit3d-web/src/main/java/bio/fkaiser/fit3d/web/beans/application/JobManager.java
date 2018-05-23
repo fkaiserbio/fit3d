@@ -113,7 +113,7 @@ public class JobManager implements Serializable {
         TimerTask jobCleaningTask = new TimerTask() {
             @Override
             public void run() {
-                logger.info("looking for expired jobs");
+                logger.debug("looking for expired jobs");
                 List<Fit3DJob> oldJobs = managedJobs.values().stream()
                                                     .flatMap(Collection::stream)
                                                     .filter(job -> job.getJobAgeInHours() > Fit3DWebConstants.JobManager.JOB_AGE_IN_HOURS)
