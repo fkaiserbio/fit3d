@@ -148,6 +148,14 @@ public class Fit3DJob implements Runnable, Serializable {
                                                                                      .everything()
                                                                                      .setOptions(StructureParserOptions.withSettings(StructureParserOptions.Setting.OMIT_HYDROGENS))
                                                                                      .parse().getAllLeafSubstructures());
+
+        List<ExchangeDefinition> exchangeDefinitions = parameters.getExchangeDefinitions();
+        if (exchangeDefinitions != null) {
+            for (ExchangeDefinition exchangeDefinition : exchangeDefinitions) {
+                exchangeDefinition.getExchangeAminoAcids().forEach(aminoAcidFamily -> motif.addExchangeableFamily(exchangeDefinition.getLeafIdentifier(), aminoAcidFamily));
+            }
+        }
+
         if (parameters.isChainTargetList()) {
             multiParser = StructureParser.local()
                                          .localPDB(Fit3DWebConstants.LOCAL_PDB)
