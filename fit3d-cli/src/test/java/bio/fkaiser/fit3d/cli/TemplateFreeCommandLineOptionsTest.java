@@ -16,6 +16,7 @@ import java.nio.file.Paths;
  */
 public class TemplateFreeCommandLineOptionsTest {
 
+    public static final String CONFIGURATION_RESOURCE = "configuration.json";
     public static final String CHAIN_LIST_RESOURCE = "craven2016_WSXWS_motif.txt";
     public static final String STRUCTURE_DIRECTORY = "PF00127";
 
@@ -174,4 +175,16 @@ public class TemplateFreeCommandLineOptionsTest {
 //        assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
     }
 
+    @Test
+    public void runWithConfigurationFile() {
+
+        copyResourceDirectory(CONFIGURATION_RESOURCE);
+
+        String[] commandLineArguments = new String[]{"template-free",
+                                                     "-c", folder.getRoot().toString() + "/configuration.json",
+                                                     "-o", folder.getRoot().toString()};
+        Fit3DCommandLine.main(commandLineArguments);
+//        assertTrue(new File(folder.getRoot().toString() + "/summary.csv").exists());
+
+    }
 }
