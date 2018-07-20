@@ -15,9 +15,9 @@
     <orderEntry type="library" name="R User Library" level="project" />
     <orderEntry type="library" name="R Skeletons" level="application" />
     <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.4" level="project" />
-    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-structure:0.3.3" level="project" />
-    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-mathematics:0.3.3" level="project" />
-    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-features:0.3.3" level="project" />
+    <orderEntry type="library" name="Maven: bio.singa:singa-structure:0.4.0" level="project" />
+    <orderEntry type="library" name="Maven: bio.singa:singa-mathematics:0.4.0" level="project" />
+    <orderEntry type="library" name="Maven: bio.singa:singa-features:0.4.0" level="project" />
     <orderEntry type="library" name="Maven: tec.uom:uom-se:1.0.8" level="project" />
     <orderEntry type="library" name="Maven: javax.measure:unit-api:1.0" level="project" />
     <orderEntry type="library" name="Maven: tec.uom.lib:uom-lib-common:1.0.2" level="project" />
@@ -29,8 +29,8 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-api:2.6.2" level="project" />
     <orderEntry type="library" name="Maven: org.rcsb:mmtf-api:1.0.7" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.21" level="project" />
-    <orderEntry type="library" name="Maven: bio.fkaiser.mmm:mmm-core:0.1.2" level="project" />
-    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-core:0.3.3" level="project" />
+    <orderEntry type="library" name="Maven: bio.fkaiser.mmm:mmm-core:0.2.0" level="project" />
+    <orderEntry type="library" name="Maven: bio.singa:singa-core:0.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.8.7" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.8.7" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.8.7" level="project" />

@@ -1,18 +1,15 @@
 package bio.fkaiser.fit3d.cli;
 
-import de.bioforscher.singa.core.utility.Resources;
+import bio.singa.core.utility.Resources;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author fk
@@ -87,6 +84,22 @@ public class TemplateBasedCommandLineOptionsTest {
                                                      "-f", folder.getRoot().toString() + "/summary.csv"};
         Fit3DCommandLine.main(commandLineArguments);
     }
+
+    @Test
+    public void runWithMotifAndChainListAndFiltering() throws IOException {
+
+        copyResource(MOTIF_RESOURCE);
+        copyResource(CHAIN_LIST_RESOURCE);
+
+        String[] commandLineArguments = new String[]{"template-based",
+                                                     "-m", folder.getRoot().toString() + "/" + MOTIF_RESOURCE,
+                                                     "-l", folder.getRoot().toString() + "/" + CHAIN_LIST_RESOURCE,
+                                                     "-r", "4.0",
+                                                     "-y", "3.0",
+                                                     "-f", folder.getRoot().toString() + "/summary.csv"};
+        Fit3DCommandLine.main(commandLineArguments);
+    }
+
 
     @Test
     public void runWithTargetFile() throws IOException {

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <fit3d-cli.version>0.2.0</fit3d-cli.version>
+        <fit3d-cli.version>0.3.0</fit3d-cli.version>
     </properties>
 
     <groupId>bio.fkaiser.fit3d</groupId>
@@ -108,14 +108,14 @@
             <version>1.4</version>
         </dependency>
         <dependency>
-            <groupId>de.bioforscher.singa</groupId>
+            <groupId>bio.singa</groupId>
             <artifactId>singa-structure</artifactId>
-            <version>0.3.3</version>
+            <version>0.4.0</version>
         </dependency>
         <dependency>
             <groupId>bio.fkaiser.mmm</groupId>
             <artifactId>mmm-core</artifactId>
-            <version>0.1.2</version>
+            <version>0.2.0</version>
         </dependency>
         <dependency>
             <groupId>me.tongfei</groupId>

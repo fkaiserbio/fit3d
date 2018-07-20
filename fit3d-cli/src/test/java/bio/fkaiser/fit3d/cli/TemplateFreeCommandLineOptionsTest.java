@@ -1,6 +1,6 @@
 package bio.fkaiser.fit3d.cli;
 
-import de.bioforscher.singa.core.utility.Resources;
+import bio.singa.core.utility.Resources;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;

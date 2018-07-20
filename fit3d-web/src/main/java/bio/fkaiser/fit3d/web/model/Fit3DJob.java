@@ -4,14 +4,14 @@ import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import bio.fkaiser.fit3d.web.model.constant.StatisticalModelType;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3D;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DBuilder;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.FofanovEstimation;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.StarkEstimation;
-import de.bioforscher.singa.structure.model.oak.StructuralMotif;
-import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
-import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserOptions;
+import bio.singa.structure.algorithms.superimposition.fit3d.Fit3D;
+import bio.singa.structure.algorithms.superimposition.fit3d.Fit3DBuilder;
+import bio.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
+import bio.singa.structure.algorithms.superimposition.fit3d.statistics.FofanovEstimation;
+import bio.singa.structure.algorithms.superimposition.fit3d.statistics.StarkEstimation;
+import bio.singa.structure.model.oak.StructuralMotif;
+import bio.singa.structure.parser.pdb.structures.StructureParser;
+import bio.singa.structure.parser.pdb.structures.StructureParserOptions;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,6 +177,8 @@ public class Fit3DJob implements Runnable, Serializable {
                                                                .skipBackboneTargets()
                                                                .limitedParallelism(Fit3DWebConstants.CORES / Fit3DWebConstants.THREAD_POOL_SIZE)
                                                                .atomFilter(parameters.getAtomFilterType().getFilter())
+                                                               // TODO eventually provide advances setting
+                                                               .filterEnvironments(Fit3DWebConstants.DefaultJobParameters.DEFAULT_FILTER_THRESHOLD)
                                                                .rmsdCutoff(parameters.getRmsdLimit())
                                                                .mapECNumbers()
                                                                .mapPfamIdentifiers()

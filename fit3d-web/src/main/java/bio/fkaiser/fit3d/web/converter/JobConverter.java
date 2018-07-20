@@ -4,7 +4,7 @@ import bio.fkaiser.fit3d.web.model.Fit3DJob;
 import bio.fkaiser.fit3d.web.model.Fit3DJobParameters;
 import bio.fkaiser.fit3d.web.model.constant.StatisticalModelType;
 import bio.fkaiser.fit3d.web.model.ExchangeDefinition;
-import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter.AtomFilterType;
+import bio.singa.structure.model.oak.StructuralEntityFilter.AtomFilterType;
 import org.bson.Document;
 
 import java.nio.file.Paths;

@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="fit3d-web:war exploded">
-    <output-path>$PROJECT_DIR$/fit3d-web/target/fit3d-web-0.1.3</output-path>
+    <output-path>$PROJECT_DIR$/fit3d-web/target/fit3d-web-0.2.0</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
@@ -17,9 +17,9 @@
           <element id="library" level="project" name="Maven: log4j:log4j:1.2.17" />
           <element id="library" level="project" name="Maven: org.primefaces:primefaces:6.1" />
           <element id="library" level="project" name="Maven: org.primefaces.themes:bootstrap:1.0.10" />
-          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-structure:0.3.3" />
-          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-mathematics:0.3.3" />
-          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-features:0.3.3" />
+          <element id="library" level="project" name="Maven: bio.singa:singa-structure:0.4.0" />
+          <element id="library" level="project" name="Maven: bio.singa:singa-mathematics:0.4.0" />
+          <element id="library" level="project" name="Maven: bio.singa:singa-features:0.4.0" />
           <element id="library" level="project" name="Maven: tec.uom:uom-se:1.0.8" />
           <element id="library" level="project" name="Maven: javax.measure:unit-api:1.0" />
           <element id="library" level="project" name="Maven: tec.uom.lib:uom-lib-common:1.0.2" />
@@ -33,14 +33,14 @@
           <element id="library" level="project" name="Maven: commons-lang:commons-lang:2.4" />
           <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-api:2.6.2" />
           <element id="library" level="project" name="Maven: org.rcsb:mmtf-api:1.0.7" />
-          <element id="library" level="project" name="Maven: de.bioforscher.singa:singa-core:0.3.3" />
+          <element id="library" level="project" name="Maven: bio.singa:singa-core:0.4.0" />
           <element id="library" level="project" name="Maven: javax.mail:mail:1.4.7" />
           <element id="library" level="project" name="Maven: javax.activation:activation:1.1" />
           <element id="library" level="project" name="Maven: org.omnifaces:omnifaces:1.10" />
         </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/fit3d-web/target/fit3d-web-0.1.3/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/fit3d-web/target/fit3d-web-0.2.0/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="fit3d-web/web/Web" />
     </root>

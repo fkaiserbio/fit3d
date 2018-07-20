@@ -1,8 +1,8 @@
 package bio.fkaiser.fit3d.web.model;
 
-import de.bioforscher.singa.structure.model.families.AminoAcidFamily;
-import de.bioforscher.singa.structure.model.identifiers.LeafIdentifier;
-import de.bioforscher.singa.structure.model.interfaces.AminoAcid;
+import bio.singa.structure.model.families.AminoAcidFamily;
+import bio.singa.structure.model.identifiers.LeafIdentifier;
+import bio.singa.structure.model.interfaces.AminoAcid;
 
 import java.io.Serializable;
 import java.util.ArrayList;

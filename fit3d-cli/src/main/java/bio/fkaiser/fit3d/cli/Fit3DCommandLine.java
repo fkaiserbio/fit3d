@@ -7,24 +7,24 @@ import bio.fkaiser.mmm.model.mapping.MappingRule;
 import bio.fkaiser.mmm.model.mapping.rules.ChemicalGroupsMappingRule;
 import bio.fkaiser.mmm.model.mapping.rules.FunctionalGroupsMappingRule;
 import bio.fkaiser.mmm.model.plip.PlipPostRequest;
-import de.bioforscher.singa.core.utility.Resources;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.representations.RepresentationSchemeType;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.FofanovEstimation;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.StarkEstimation;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.StatisticalModel;
-import de.bioforscher.singa.structure.model.families.AminoAcidFamily;
-import de.bioforscher.singa.structure.model.identifiers.LeafIdentifier;
-import de.bioforscher.singa.structure.model.interfaces.Atom;
-import de.bioforscher.singa.structure.model.interfaces.LeafSubstructure;
-import de.bioforscher.singa.structure.model.interfaces.Structure;
-import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter;
-import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter.AtomFilter;
-import de.bioforscher.singa.structure.model.oak.StructuralMotif;
-import de.bioforscher.singa.structure.parser.pdb.rest.cluster.PDBSequenceCluster;
-import de.bioforscher.singa.structure.parser.pdb.rest.cluster.PDBSequenceCluster.PDBSequenceClusterIdentity;
-import de.bioforscher.singa.structure.parser.pdb.structures.SourceLocation;
-import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
-import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserException;
+import bio.singa.core.utility.Resources;
+import bio.singa.structure.algorithms.superimposition.fit3d.representations.RepresentationSchemeType;
+import bio.singa.structure.algorithms.superimposition.fit3d.statistics.FofanovEstimation;
+import bio.singa.structure.algorithms.superimposition.fit3d.statistics.StarkEstimation;
+import bio.singa.structure.algorithms.superimposition.fit3d.statistics.StatisticalModel;
+import bio.singa.structure.model.families.AminoAcidFamily;
+import bio.singa.structure.model.identifiers.LeafIdentifier;
+import bio.singa.structure.model.interfaces.Atom;
+import bio.singa.structure.model.interfaces.LeafSubstructure;
+import bio.singa.structure.model.interfaces.Structure;
+import bio.singa.structure.model.oak.StructuralEntityFilter;
+import bio.singa.structure.model.oak.StructuralEntityFilter.AtomFilter;
+import bio.singa.structure.model.oak.StructuralMotif;
+import bio.singa.structure.parser.pdb.rest.cluster.PDBSequenceCluster;
+import bio.singa.structure.parser.pdb.rest.cluster.PDBSequenceCluster.PDBSequenceClusterIdentity;
+import bio.singa.structure.parser.pdb.structures.SourceLocation;
+import bio.singa.structure.parser.pdb.structures.StructureParser;
+import bio.singa.structure.parser.pdb.structures.StructureParserException;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +78,8 @@ public class Fit3DCommandLine {
     private int numberOfThreads = DEFAULT_NUMBER_OF_THREADS;
     private Path outputDirectoryPath;
     private ItemsetMinerConfiguration<String> itemsetMinerConfiguration;
+    private boolean distanceFiltering;
+    private Double filterThreshold;
 
     public Fit3DCommandLine(Fit3DMode mode, CommandLine commandLine) throws ParseException {
         this.mode = mode;
@@ -471,6 +473,17 @@ public class Fit3DCommandLine {
         if (commandLine.hasOption('P')) {
             createStatisticalModel();
         }
+
+        // check if distance filtering is enabled
+        if (commandLine.hasOption('y')) {
+            try {
+                distanceFiltering = true;
+                filterThreshold = Double.valueOf(commandLine.getOptionValue('y'));
+            } catch (NumberFormatException e) {
+                logger.error("failed to parse distance filtering threshold", e);
+                throw new Fit3DCommandLineException("Initialization of parameters failed.");
+            }
+        }
     }
 
     private void createStatisticalModel() throws ParseException {
@@ -607,6 +620,10 @@ public class Fit3DCommandLine {
         return distanceTolerance;
     }
 
+    public Double getFilterThreshold() {
+        return filterThreshold;
+    }
+
     public ItemsetMinerConfiguration<String> getItemsetMinerConfiguration() {
         return itemsetMinerConfiguration;
     }
@@ -649,6 +666,10 @@ public class Fit3DCommandLine {
 
     public Path getTargetListPath() {
         return targetListPath;
+    }
+
+    public boolean isDistanceFiltering() {
+        return distanceFiltering;
     }
 
     public boolean isEcMapping() {

@@ -1,6 +1,6 @@
 package bio.fkaiser.fit3d.web.converter;
 
-import de.bioforscher.singa.structure.model.families.AminoAcidFamily;
+import bio.singa.structure.model.families.AminoAcidFamily;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
