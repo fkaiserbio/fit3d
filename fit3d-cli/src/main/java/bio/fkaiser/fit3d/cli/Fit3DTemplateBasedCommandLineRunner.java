@@ -1,11 +1,11 @@
 package bio.fkaiser.fit3d.cli;
 
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3D;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DBuilder;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
-import de.bioforscher.singa.structure.model.interfaces.LeafSubstructureContainer;
-import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
-import de.bioforscher.singa.structure.parser.pdb.structures.StructureParserOptions;
+import bio.singa.structure.algorithms.superimposition.fit3d.Fit3D;
+import bio.singa.structure.algorithms.superimposition.fit3d.Fit3DBuilder;
+import bio.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
+import bio.singa.structure.model.interfaces.LeafSubstructureContainer;
+import bio.singa.structure.parser.pdb.structures.StructureParser;
+import bio.singa.structure.parser.pdb.structures.StructureParserOptions;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarStyle;
 import org.slf4j.Logger;
@@ -149,6 +149,11 @@ public class Fit3DTemplateBasedCommandLineRunner {
         }
         if (commandLine.isUniProtMapping()) {
             parameterStep.mapUniProtIdentifiers();
+        }
+
+        // set environment filtering
+        if(commandLine.isDistanceFiltering()){
+            parameterStep.filterEnvironments(commandLine.getFilterThreshold());
         }
 
         Timer timer = null;

@@ -2,7 +2,7 @@ package bio.fkaiser.fit3d.web.beans.application;
 
 import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import bio.fkaiser.fit3d.web.model.Fit3DJob;
-import de.bioforscher.singa.core.utility.Resources;
+import bio.singa.core.utility.Resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,11 +1,11 @@
 package bio.fkaiser.fit3d.web.model;
 
 import bio.fkaiser.fit3d.web.model.constant.MotifComplexity;
-import de.bioforscher.singa.structure.model.families.StructuralFamily;
-import de.bioforscher.singa.structure.model.identifiers.LeafIdentifier;
-import de.bioforscher.singa.structure.model.interfaces.LeafSubstructure;
-import de.bioforscher.singa.structure.model.oak.StructuralMotif;
-import de.bioforscher.singa.structure.model.oak.Structures;
+import bio.singa.structure.model.families.StructuralFamily;
+import bio.singa.structure.model.identifiers.LeafIdentifier;
+import bio.singa.structure.model.interfaces.LeafSubstructure;
+import bio.singa.structure.model.oak.StructuralMotif;
+import bio.singa.structure.model.oak.Structures;
 
 import java.util.stream.Collectors;
 

@@ -1,9 +1,9 @@
 package bio.fkaiser.fit3d.web.model;
 
-import de.bioforscher.singa.features.identifiers.ECNumber;
-import de.bioforscher.singa.features.identifiers.PfamIdentifier;
-import de.bioforscher.singa.features.identifiers.UniProtIdentifier;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
+import bio.singa.features.identifiers.ECNumber;
+import bio.singa.features.identifiers.PfamIdentifier;
+import bio.singa.features.identifiers.UniProtIdentifier;
+import bio.singa.structure.algorithms.superimposition.fit3d.Fit3DMatch;
 
 import java.util.Map;
 import java.util.Optional;

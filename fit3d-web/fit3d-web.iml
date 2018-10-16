@@ -43,9 +43,9 @@
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
     <orderEntry type="library" name="Maven: org.primefaces:primefaces:6.1" level="project" />
     <orderEntry type="library" name="Maven: org.primefaces.themes:bootstrap:1.0.10" level="project" />
-    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-structure:0.3.3" level="project" />
-    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-mathematics:0.3.3" level="project" />
-    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-features:0.3.3" level="project" />
+    <orderEntry type="library" name="Maven: bio.singa:singa-structure:0.4.0" level="project" />
+    <orderEntry type="library" name="Maven: bio.singa:singa-mathematics:0.4.0" level="project" />
+    <orderEntry type="library" name="Maven: bio.singa:singa-features:0.4.0" level="project" />
     <orderEntry type="library" name="Maven: tec.uom:uom-se:1.0.8" level="project" />
     <orderEntry type="library" name="Maven: javax.measure:unit-api:1.0" level="project" />
     <orderEntry type="library" name="Maven: tec.uom.lib:uom-lib-common:1.0.2" level="project" />
@@ -59,7 +59,7 @@
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.4" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-api:2.6.2" level="project" />
     <orderEntry type="library" name="Maven: org.rcsb:mmtf-api:1.0.7" level="project" />
-    <orderEntry type="library" name="Maven: de.bioforscher.singa:singa-core:0.3.3" level="project" />
+    <orderEntry type="library" name="Maven: bio.singa:singa-core:0.4.0" level="project" />
     <orderEntry type="library" name="Maven: javax.mail:mail:1.4.7" level="project" />
     <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.omnifaces:omnifaces:1.10" level="project" />

@@ -9,7 +9,7 @@ Fit3D is a software for template-based and template-free detection of substructu
 ## Background
 The biological function of proteins and nucleic acids, such as riboswitches or ribozymes, relies on the correct arrangement of small substructural units to catalyze substrates, bind ligands, or to 
 preserve an ordered state. These molecular building blocks have evolved to retain similar interaction patterns and geometrical features to ensure functionality. While some of these patterns are 
-reflected in recurring sequence motifs, evolutionarily remote proteins may only share a small set of similar structural motifs, which are not obvious on sequence level. The Fit3D algorithm is a 
+reflected in recurring sequence motifs, evolutionarily remote proteins may only share a small set of similar structural motifs, which are not obvious at sequence level. The Fit3D algorithm is a 
 highly accurate search engine to detect substructure similarities based on a given template. Additionally, it uses the [mmm](https://github.com/fkaiserbio/mmm) framework
 to discover structural motifs without the need for a template.
 

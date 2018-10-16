@@ -1,7 +1,7 @@
 package bio.fkaiser.fit3d.web.model;
 
 import bio.fkaiser.fit3d.web.model.constant.StatisticalModelType;
-import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter.AtomFilterType;
+import bio.singa.structure.model.oak.StructuralEntityFilter.AtomFilterType;
 
 import java.io.Serializable;
 import java.nio.file.Path;

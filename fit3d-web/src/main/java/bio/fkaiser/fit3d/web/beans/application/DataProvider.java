@@ -3,8 +3,8 @@ package bio.fkaiser.fit3d.web.beans.application;
 import bio.fkaiser.fit3d.web.Fit3DWebConstants;
 import bio.fkaiser.fit3d.web.model.constant.PredefinedList;
 import bio.fkaiser.fit3d.web.model.constant.StatisticalModelType;
-import de.bioforscher.singa.structure.model.families.AminoAcidFamily;
-import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter.AtomFilterType;
+import bio.singa.structure.model.families.AminoAcidFamily;
+import bio.singa.structure.model.oak.StructuralEntityFilter.AtomFilterType;
 
 import java.util.stream.Stream;
 

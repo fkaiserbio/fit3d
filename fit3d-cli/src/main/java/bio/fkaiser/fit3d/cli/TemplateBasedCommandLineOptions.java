@@ -93,6 +93,11 @@ public class TemplateBasedCommandLineOptions extends AbstractCommandLineOptions 
         rmsd.setArgs(1);
         options.addOption(rmsd);
 
+        Option distanceFiltering = new Option("y","filter local environments based on distance thresholds (default: disabled)");
+        distanceFiltering.setLongOpt("distance-filtering");
+        distanceFiltering.setArgs(1);
+        options.addOption(distanceFiltering);
+
         // motif extraction
         Option motifExtraction = new Option("X",
                                             "extract motif from structure input (-m) following the syntax [chain]-[residue type][residue number]_... (e.g. A-E651_A-D649_A-T177)\n" +

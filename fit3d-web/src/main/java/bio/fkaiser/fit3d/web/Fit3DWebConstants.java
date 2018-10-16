@@ -1,10 +1,10 @@
 package bio.fkaiser.fit3d.web;
 
 import bio.fkaiser.fit3d.web.model.constant.StatisticalModelType;
-import de.bioforscher.singa.core.utility.Resources;
-import de.bioforscher.singa.structure.model.oak.StructuralEntityFilter.AtomFilterType;
-import de.bioforscher.singa.structure.parser.pdb.structures.SourceLocation;
-import de.bioforscher.singa.structure.parser.pdb.structures.StructureParser;
+import bio.singa.core.utility.Resources;
+import bio.singa.structure.model.oak.StructuralEntityFilter.AtomFilterType;
+import bio.singa.structure.parser.pdb.structures.SourceLocation;
+import bio.singa.structure.parser.pdb.structures.StructureParser;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,6 +35,7 @@ public final class Fit3DWebConstants {
         public static final Set<AtomFilterType> ENABLED_ATOM_FILTERS = Stream.of(AtomFilterType.ALPHA_CARBON, AtomFilterType.ARBITRARY, AtomFilterType.BACKBONE, AtomFilterType.SIDE_CHAIN)
                                                                              .collect(Collectors.toSet());
         public static final double DEFAULT_RMSD_LIMIT = 2.0;
+        public static final double DEFAULT_FILTER_THRESHOLD = 8.0;
         public static final StatisticalModelType DEFAULT_STATISTICAL_MODEL_TYPE = StatisticalModelType.FOFANOV;
     }
 

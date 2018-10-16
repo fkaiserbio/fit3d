@@ -1,6 +1,6 @@
 package bio.fkaiser.fit3d.cli;
 
-import de.bioforscher.singa.structure.parser.pdb.rest.cluster.PDBSequenceCluster;
+import bio.singa.structure.parser.pdb.rest.cluster.PDBSequenceCluster;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 

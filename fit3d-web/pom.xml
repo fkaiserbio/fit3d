@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.bioforscher.fit3d</groupId>
+    <groupId>bio.fkaiser.fit3d</groupId>
     <artifactId>fit3d-web</artifactId>
-    <version>0.1.3</version>
+    <version>0.2.0</version>
     <packaging>war</packaging>
 
     <properties>
@@ -68,14 +68,14 @@
             <version>1.0.10</version>
         </dependency>
         <dependency>
-            <groupId>de.bioforscher.singa</groupId>
+            <groupId>bio.singa</groupId>
             <artifactId>singa-structure</artifactId>
-            <version>0.3.3</version>
+            <version>0.4.0</version>
         </dependency>
         <dependency>
-            <groupId>de.bioforscher.singa</groupId>
+            <groupId>bio.singa</groupId>
             <artifactId>singa-core</artifactId>
-            <version>0.3.3</version>
+            <version>0.4.0</version>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>

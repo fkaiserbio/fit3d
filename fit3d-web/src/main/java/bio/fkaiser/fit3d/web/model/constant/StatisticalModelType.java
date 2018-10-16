@@ -1,8 +1,8 @@
 package bio.fkaiser.fit3d.web.model.constant;
 
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.FofanovEstimation;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.StarkEstimation;
-import de.bioforscher.singa.structure.algorithms.superimposition.fit3d.statistics.StatisticalModel;
+import bio.singa.structure.algorithms.superimposition.fit3d.statistics.FofanovEstimation;
+import bio.singa.structure.algorithms.superimposition.fit3d.statistics.StarkEstimation;
+import bio.singa.structure.algorithms.superimposition.fit3d.statistics.StatisticalModel;
 
 /**
  * @author fk
