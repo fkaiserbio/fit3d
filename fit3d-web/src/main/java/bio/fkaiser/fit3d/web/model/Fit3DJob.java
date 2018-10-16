@@ -257,7 +257,9 @@ public class Fit3DJob implements Runnable, Serializable {
         File jobPathFile = jobPath.toFile();
         String[] jobPathFileList = jobPathFile.list();
         if (jobPathFileList != null && jobPathFileList.length == 0) {
-            jobPathFile.delete();
+            if (jobPathFile.exists()) {
+                jobPathFile.delete();
+            }
         }
 
         logger.info("files of job {} with ID {} deleted", this, jobIdentifier);
@@ -267,8 +269,10 @@ public class Fit3DJob implements Runnable, Serializable {
         File sessionPathFile = sessionPath.toFile();
         String[] sessionPathFileList = sessionPathFile.list();
         if (sessionPathFileList != null && sessionPathFileList.length == 0) {
-            sessionPathFile.delete();
-            logger.info("session directory {} of job {} empty and deleted", sessionPath, this);
+            if (sessionPathFile.exists()) {
+                sessionPathFile.delete();
+                logger.info("session directory {} of job {} empty and deleted", sessionPath, this);
+            }
         }
     }
 
